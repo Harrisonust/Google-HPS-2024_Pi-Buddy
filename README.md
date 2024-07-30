@@ -1,5 +1,7 @@
+# Desktop Assistant Pet (DAP)
+
 ## Installation
-`bash
-sudo apt update
-sudo apt install python3-pip
-`
+```sh
+./install.sh
+```
+
