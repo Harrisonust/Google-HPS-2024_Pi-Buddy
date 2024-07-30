@@ -1,2 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment directories
+env/
+venv/
+ENV/
+.venv/
+.VENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Unit test / coverage reports
+.tox/
+.nox/
+.coverage
+coverage.xml
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyInstaller
+*.spec
+
+# Mypy
+.mypy_cache/
+
+# Pyre
+.pyre/
+
+# Cython debug symbols
+cython_debug/
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# Local .env files
+.env
+.env.*
+
+#
+*.swo
 *.swp
-*.pyc

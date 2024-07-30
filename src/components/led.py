@@ -41,26 +41,22 @@ class LED:
         self.__pwm.ChangeDutyCycle(self.__duty_cycle)
 
     def blocking_blink(self, interval):
-        flag = self.on()
-        if flag == False:
+        if(self.on() == False):
             return False
         time.sleep(interval/2)
         
-        flag = self.off()
-        if flag == False:
+        if(self.off() == False):
             return False
         time.sleep(interval/2)
         return True
-
+    
     def nonblocking_blink(self, interval):  
         if time.time() - self.__last_blink >= interval/2:
             if self.__state == GPIO.LOW:
-                flag = self.on()
-                if flag == False: 
+                if self.on() == False: 
                     return False
             if self.__state == GPIO.HIGH:
-                flag = self.off()
-                if flag == False:
+                if self.off() == False:
                     return False
             self.__last_blink = time.time()
         return True
