@@ -1,21 +1,7 @@
 import multiprocessing
 
 
-class  ValueManager:
-    def __init__(self, value):
-        # Initialize a shared value with a lock for safe access
-        self.value = value
-        self.lock = multiprocessing.Lock()
-
-    def reveal(self):
-        # Return the current value in a safe manner
-        with self.lock:
-            return self.value
-    
-    def overwrite(self, value):
-        # Overwrite the current value in a safe manner
-        with self.lock:
-            self.value = value
+from value_manager import ValueManager
 
 
 class Handler:
