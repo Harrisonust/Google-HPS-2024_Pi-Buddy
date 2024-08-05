@@ -1,6 +1,7 @@
 import time
 import math
 from enum import Enum
+from PIL import Image, ImageDraw, ImageFont
 import spidev
 import RPi.GPIO as GPIO
 from st7735s_reg import *
@@ -33,6 +34,7 @@ class Screen:
 
         self._brush_color      = RGB565Color.WHITE
         self._background_color = RGB565Color.BLACK
+        self._chunksize        = 1024
 
         GPIO.setup(self._pin_dc, GPIO.OUT)
         GPIO.setup(self._pin_rst, GPIO.OUT)
@@ -247,8 +249,49 @@ class Screen:
             
             self._write_data(buf[j + radius])
 
-    def draw_image(self, path) -> None:
-        pass
+    def draw_text(self, x, y, text, size, color=None) -> None:
+        if color is None:
+            color = self._brush_color
+
+        font = ImageFont.truetype("./arial.ttf", size)
+        image = Image.new("RGB", (self._col_dim, self._row_dim), (0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.text((x, y), text, font=font, fill=0xFFFFFF)
+
+        image = image.convert("RGB")
+        pixels = list(image.getdata())
+        buf = []
+        for pixel in pixels:
+            r, g, b = pixel
+            rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+            buf.append(rgb565 >> 8)
+            buf.append(rgb565 & 0xFF)
+
+        self._set_area(x, y, x+len(text)*size-1, y+size-1)
+        for i in range(0, len(buf), self._chunksize):
+            self._write_data(buf[i:i+self._chunksize])
+
+    def draw_image(self, x, y, width, height, path) -> None:
+        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+            raise ValueError("Pixel out of bound")
+        if (x + width > self._col_dim) or (y + height > self._row_dim):
+            raise ValueError("Image exceeds display bounds")
+
+        img = Image.open(path)
+        img = img.resize((width, height), Image.Resampling.LANCZOS)
+        img = img.convert("RGB")
+
+        pixels = list(img.getdata())
+        buf = []
+        for pixel in pixels:
+            r, g, b = pixel
+            rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+            buf.append(rgb565 >> 8)
+            buf.append(rgb565 & 0xFF)
+        
+        self._set_area(x, y, x+width-1, y+height-1)
+        for i in range(0, len(buf), self._chunksize):
+            self._write_data(buf[i:i+self._chunksize])
 
     def fill_screen(self, color) -> None:
         if color is None:
@@ -271,13 +314,16 @@ if __name__ == '__main__':
 
         screen.draw_vertical_line(15, 15, 10)
         screen.draw_horizontal_line(30, 10, 20)
-        screen.draw_circle(screen.get_col_dim()//2, screen.get_row_dim()//2, 30, RGB565Color.YELLOW)
+        screen.draw_circle(100, 20, 10, RGB565Color.YELLOW)
+        screen.draw_image(35, 35, 60, 60, "./google.jpg")
+        screen.draw_text(40, 100, "Hello", 14, RGB565Color.WHITE)
 
         colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 
                      RGB565Color.GREEN, RGB565Color.ORANGE, RGB565Color.YELLOW, RGB565Color.PINK, 
                      RGB565Color.CYAN, RGB565Color.VIOLET]
         for index, color in enumerate(colorlist):
-            screen.draw_rectangle(10+index*10, 110, 10, 8, color)
+            screen.draw_rectangle(10+index*10, 124, 10, 8, color)
 
+    
         time.sleep(1)
         screen.clear()
