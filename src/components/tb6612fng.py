@@ -17,7 +17,7 @@ class SingleChannelMotor:
         self._duty_cycle = 0
 
         GPIO.setup(self._pin_pwm, GPIO.OUT)
-        self._pwm = GPIO.PWM(self._pin_pwm, frequency=1000)
+        self._pwm = GPIO.PWM(self._pin_pwm, 1000)
         self._pwm.start(self._duty_cycle)
         
         GPIO.setup(self._pin_in1, GPIO.OUT)
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         else:
             motor_driver.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
             motor_driver.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-        print(f'rotatiobn: {motor_driver.left_motor.get_rotation()} duty {duty}')
+        print(f'rotation: {motor_driver.left_motor.get_rotation()} duty {duty}')
         motor_driver.left_motor.set_duty(duty)
         motor_driver.right_motor.set_duty(duty)
         time.sleep(2)
