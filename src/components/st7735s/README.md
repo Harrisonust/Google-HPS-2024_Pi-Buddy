@@ -1,0 +1,11 @@
+# Connection
+|ST7735S|RPi|
+|---|---|
+|VCC|3.3V|
+|GND|GND|
+|DIN|GPIO 10 (SPI MOSI)|
+|CLK|GPIO 11 (SPI SCLK)|
+|CS|GND|
+|DC|GPIO 24|
+|RST|GPIO 25|
+|BL|3.3V||ST7735S|RPi|
