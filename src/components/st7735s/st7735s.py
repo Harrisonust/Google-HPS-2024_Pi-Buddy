@@ -71,6 +71,9 @@ class Screen:
         self.set_inversion(0)
         
         self.set_display_mode(1)    # Normal display mode
+
+        self._write_command(MADCTL)
+        self._write_data([0x60])
         
         self.set_display_on_off(1)
         time.sleep(0.1)
@@ -102,8 +105,8 @@ class Screen:
         self._write_data([from_addr >> 8, from_addr & 0xFF, to_addr >> 8, to_addr & 0xFF])
 
     def _set_area(self, x0, y0, x1, y1):
-        self._set_address(0, x0+2, x1+2) # col
-        self._set_address(1, y0+1, y1+1) # row
+        self._set_address(0, x0+1, x1+1) # col
+        self._set_address(1, y0+2, y1+2) # row
         self._write_command(RAMWR)
 
     def get_col_dim(self) -> int:
@@ -299,7 +302,7 @@ class Screen:
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
-    screen = Screen(col_dim=128, row_dim=160)
+    screen = Screen(col_dim=160, row_dim=128)
     screen.clear()
 
     while 1:
@@ -318,19 +321,19 @@ if __name__ == '__main__':
         screen.draw_circle(90, 20, 20, RGB565Color.BLUE)
         screen.draw_sector(40, 30, 25, -45, 45, RGB565Color.ORANGE)
         
-        screen.draw_image(44, 64, 40, 40, "./google.jpg")
-        screen.draw_text(20, 120, "Google HPS 2024", 12, RGB565Color.WHITE)
+        screen.draw_image(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, 40, 40, "./google.jpg")
+        screen.draw_text(screen.get_col_dim()//2-50, screen.get_row_dim()//2+30, "Google HPS 2024", 12, RGB565Color.WHITE)
 
         colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 
                      RGB565Color.GREEN, RGB565Color.ORANGE, RGB565Color.YELLOW, RGB565Color.PINK, 
                      RGB565Color.CYAN, RGB565Color.VIOLET]
         for index, color in enumerate(colorlist):
-            screen.draw_rectangle(10+index*10, 151, 10, 8, color)
-        screen.draw_horizontal_line(10, 151, 100, RGB565Color.WHITE)
-        screen.draw_horizontal_line(10, 159, 100, RGB565Color.WHITE)
-        screen.draw_vertical_line(10, 151, 9, RGB565Color.WHITE)
-        screen.draw_vertical_line(110, 151, 9, RGB565Color.WHITE)
+            screen.draw_rectangle(30+index*10, screen.get_row_dim()-8-1, 10, 8, color)
+        screen.draw_horizontal_line(30, screen.get_row_dim()-8-2, 100, RGB565Color.WHITE)
+        screen.draw_horizontal_line(30, screen.get_row_dim()-1, 100, RGB565Color.WHITE)
+        screen.draw_vertical_line(30, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
+        screen.draw_vertical_line(130, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
 
-        screen.draw_text(80, 0, "FPS: {:.2f}".format(screen.get_fps()), 10, RGB565Color.CYAN)
+        screen.draw_text(0, 0, "FPS: {:.2f}".format(screen.get_fps()), 10, RGB565Color.CYAN)
         screen.update()
         screen.clear()
