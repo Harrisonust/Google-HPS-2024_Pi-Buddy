@@ -16,7 +16,10 @@ class Encoder:
             self.__position += 1
         else:
             self.__position -= 1
-            
+    
+    # return current position
+    # 轉一個刻度數字會變化 1
+    # 要加上 capacitor 不然會有 bouncing effect, 會過於敏感
     def get_position(self):
         return self.__position
 

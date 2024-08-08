@@ -34,7 +34,7 @@ class BatteryHandler(Handler):
         self.battery = TestBattery() if self.debug else Battery()   # The battery component
         
         # States to describe the current status of the battery and battery handler
-        self.battery_busy = ValueManager(0)
+        self.battery_busy = ValueManager(int(False))
         self.battery_output_state = ValueManager(BatteryOutputState.IDLE, enum=BatteryOutputState)
         self.battery_power_state = ValueManager(BatteryPowerState.NORMAL_POWER, enum=BatteryPowerState)
 
@@ -114,7 +114,7 @@ class BatteryHandler(Handler):
         
         else:
             # Set battery to busy
-            self.battery_busy.overwrite(True)
+            self.battery_busy.overwrite(int(True))
             
             # Get current battery states
             current_battery_output_state = self.battery_output_state.reveal()
@@ -142,4 +142,4 @@ class BatteryHandler(Handler):
     
             
             # Set battery to not busy
-            self.battery_busy.overwrite(False)
+            self.battery_busy.overwrite(int(False))
