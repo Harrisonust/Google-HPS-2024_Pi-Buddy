@@ -266,7 +266,7 @@ class Screen:
 
         img = img.convert("RGB")
         pixels = list(img.getdata())
-        # print(img.height, img.width)
+        
         for j in range(img.height):
             for i in range(img.width):
                 r, g, b = pixels[j*img.width+i]

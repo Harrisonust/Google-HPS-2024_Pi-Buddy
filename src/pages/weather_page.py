@@ -1,5 +1,4 @@
-from pages.page import Page
 
-class WeatherPage(Page):
+class WeatherPage():
     def __init__(self):
         pass

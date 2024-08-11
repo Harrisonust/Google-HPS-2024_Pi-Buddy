@@ -1,10 +1,9 @@
 import time
 from enum import Enum
 
-
 from components.encoder import Encoder
 from handlers.handler import Handler
-# from value_manager import ValueManager
+from value_manager import ValueManager
 
 
 class EncoderConfig(Enum):
@@ -19,8 +18,9 @@ class EncodersHandler(Handler):
         self.run_input_process = True
         self.task_queue = task_queue
         
-        self.glide_encoder = Encoder()
-        self.select_encoder = Encoder()
+        
+        self.glide_encoder = Encoder(0, 5)
+        self.select_encoder = Encoder(0, 5)
         
         self.glide_encoder_prev_pos = self.glide_encoder.get_position()
         self.select_encoder_prev_pos = self.select_encoder.get_position()
@@ -38,7 +38,7 @@ class EncodersHandler(Handler):
                 # self.task_queue.append({
                 #     'requester_name': 'encoders',
                 #     'handler_name': 'menu',
-                #     'task': 'ENTER',
+                #     'task': 'ENTER_SELECT',
                 #     'task_priority': 1
                 # })
                 pass
@@ -48,7 +48,7 @@ class EncodersHandler(Handler):
                 # self.task_queue.append({
                 #     'requester_name': 'encoders',
                 #     'handler_name': 'menu',
-                #     'task': 'RESUME',
+                #     'task': 'OUT_RESUME',
                 #     'task_priority': 1
                 # })
                 pass

@@ -42,7 +42,9 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            'battery': BatteryHandler(self.task_queue, debug=self.debug)
+            # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
+            'encoders': TestEncodersHandler(self.task_queue, debug=self.debug),
+            'menu_screen': MenuScreenHandler(self.task_queue, debug=self.debug)
         }
     
         # Start listening processes for each handler
@@ -86,4 +88,5 @@ if __name__ == '__main__':
     test_function = battery_charge_discharge_test
     
     # Initialize the Control class, which starts all processes
-    Control(debug=debug, test_function=test_function)
+    # Control(debug=debug, test_function=test_function)
+    Control()
