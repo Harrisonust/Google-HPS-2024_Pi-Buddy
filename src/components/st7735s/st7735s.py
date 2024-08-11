@@ -285,7 +285,7 @@ class Screen:
         self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
     # data: numpy array with shape = (y, x, depth) 
-    def draw_image_from_data(self, x, y, width, height, data) -> None:
+    def draw_image_from_data(self, x, y, width, height, data: np.ndarray) -> None:
         if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
             raise ValueError("Pixel out of bound")
         if (x + width > self._col_dim) or (y + height > self._row_dim):
