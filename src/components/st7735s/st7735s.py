@@ -6,6 +6,7 @@ import spidev
 import RPi.GPIO as GPIO
 from st7735s_reg import *
 import numpy as np
+import os
 
 class RGB565Color:
     # https://rgbcolorpicker.com/565
@@ -247,8 +248,11 @@ class Screen:
 
         if color is None:
             color = self._brush_color
+        
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        font_path = os.path.join(module_dir, 'arial.ttf')
+        font = ImageFont.truetype(font_path, size)
 
-        font = ImageFont.truetype("./arial.ttf", size)
         img  = Image.new("RGB", (len(text)*(size-4), size+4), (0, 0, 0))
         draw = ImageDraw.Draw(img)
         draw.text((0, 0), text, font=font, fill=0xFFFFFF)
@@ -262,13 +266,31 @@ class Screen:
                 if rgb565 != 0x0000:
                     self.draw_pixel(x+i, y+j, rgb565)
 
-    def draw_image(self, x, y, width, height, path) -> None:
+    def draw_image_from_path(self, x, y, width, height, path) -> None:
         if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
             raise ValueError("Pixel out of bound")
         if (x + width > self._col_dim) or (y + height > self._row_dim):
             raise ValueError("Image exceeds display bounds")
 
         img = Image.open(path)
+        img = img.resize((width, height), Image.Resampling.LANCZOS)
+        img = img.convert("RGB")
+
+        pixels = list(img.getdata())
+        for j in range(height):
+            for i in range(width):
+                r, g, b = pixels[j*width+i]
+                rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+                self.draw_pixel(x+i, y+j, rgb565)
+
+    # data: numpy array with shape = (y, x, depth) 
+    def draw_image_from_data(self, x, y, width, height, data) -> None:
+        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+            raise ValueError("Pixel out of bound")
+        if (x + width > self._col_dim) or (y + height > self._row_dim):
+            raise ValueError("Image exceeds display bounds")
+        
+        img = Image.fromarray(data)
         img = img.resize((width, height), Image.Resampling.LANCZOS)
         img = img.convert("RGB")
 
@@ -318,7 +340,7 @@ if __name__ == '__main__':
         screen.draw_circle(90, 20, 20, RGB565Color.BLUE)
         screen.draw_sector(40, 30, 25, -45, 45, RGB565Color.ORANGE)
         
-        screen.draw_image(44, 64, 40, 40, "./google.jpg")
+        screen.draw_image_from_path(44, 64, 40, 40, "./google.jpg")
         screen.draw_text(20, 120, "Google HPS 2024", 12, RGB565Color.WHITE)
 
         colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 
