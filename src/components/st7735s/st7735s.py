@@ -4,8 +4,12 @@ from enum import Enum
 from PIL import Image, ImageDraw, ImageFont
 import spidev
 import RPi.GPIO as GPIO
-from st7735s_reg import *
 import numpy as np
+
+
+from components.st7735s.st7735s_reg import *
+# from st7735s_reg import *
+
 
 class RGB565Color:
     # https://rgbcolorpicker.com/565
@@ -175,36 +179,40 @@ class Screen:
         if color is None:
             color = self._brush_color
 
+        x, y = int(x), int(y)
         self._buf[y, x] = [color >> 8, color & 0xFF]
 
     def draw_vertical_line(self, x, y, len_, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
-        if len_ < 1:
-            raise ValueError("len must be greater than 1")
-
-        if color is None:
-            color = self._brush_color
-        for i in range(len_):
-           self.draw_pixel(x, y+i, color)
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
+        # if len_ < 1:
+        #     raise ValueError("len must be greater than 1")
+        if x >= 0 and x <= self._col_dim:
+            if color is None:
+                color = self._brush_color
+            for i in range(len_):
+                # if y >= 0 and y <= self._row_dim:
+                self.draw_pixel(x, y+i, color)
 
     def draw_horizontal_line(self, x, y, len_, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
-        if len_ < 1:
-            raise ValueError("len must be greater than 1")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
+        # if len_ < 1:
+        #     raise ValueError("len must be greater than 1")
+        
+        if y >= 0 and y <= self._row_dim:
+            if color is None:
+                color = self._brush_color
 
-        if color is None:
-            color = self._brush_color
-
-        for i in range(len_):
-            self.draw_pixel(x+i, y, color)
+            for i in range(len_):
+                # if x >= 0 and x <= self._col_dim:
+                self.draw_pixel(x+i, y, color)
 
     def draw_rectangle(self, x, y, xlen, ylen, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
-        if xlen < 1 or ylen < 1:
-            raise ValueError("lens must be greater than 1")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
+        # if xlen < 1 or ylen < 1:
+        #     raise ValueError("lens must be greater than 1")
 
         if color is None:
             color = self._brush_color
@@ -213,8 +221,8 @@ class Screen:
             self.draw_horizontal_line(x, y+i, xlen, color)
 
     def draw_circle(self, x, y, radius, color=None)->None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
         if color is None:
             color = self._brush_color
         
@@ -224,8 +232,8 @@ class Screen:
                     self.draw_pixel(x+i, y+j, color)
 
     def draw_sector(self, x, y, radius, start_angle, end_angle, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
         if color is None:
             color = self._brush_color
         
@@ -234,7 +242,7 @@ class Screen:
 
         for j in range(-radius, radius):
             for i in range(-radius, radius):
-                if i**2 + j**2 < radius**2:
+                if i**2 + j**2 < radius**2:                    
                     angle = math.degrees(math.atan2(-j, i))
                     angle = angle + 360 if angle < 0 else angle  # Normalize angle to [0, 360)
                     if start_angle <= end_angle:
@@ -243,33 +251,34 @@ class Screen:
                     else:  # Crossing the 0-degree line
                         if angle >= start_angle or angle <= end_angle:
                             self.draw_pixel(x+i, y+j, color) 
-
+    
     def draw_text(self, x, y, text, size, color=None) -> None:
-        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-            raise ValueError("Pixel out of bound")
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
 
         if color is None:
             color = self._brush_color
 
-        font = ImageFont.truetype("./arial.ttf", size)
+        font = ImageFont.truetype("./components/st7735s/arial.ttf", size)
         img  = Image.new("RGB", (len(text)*(size-4), size+4), (0, 0, 0))
         draw = ImageDraw.Draw(img)
         draw.text((0, 0), text, font=font, fill=0xFFFFFF)
 
         img = img.convert("RGB")
         pixels = list(img.getdata())
+        # print(img.height, img.width)
         for j in range(img.height):
             for i in range(img.width):
                 r, g, b = pixels[j*img.width+i]
                 rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
                 if rgb565 != 0x0000:
-                    self.draw_pixel(x+i, y+j, rgb565)
+                    self.draw_pixel(x+i, y+j, color)
 
-    def draw_image(self, x, y, width, height, path) -> None:
-        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-            raise ValueError("Pixel out of bound")
-        if (x + width > self._col_dim) or (y + height > self._row_dim):
-            raise ValueError("Image exceeds display bounds")
+    def draw_image(self, x, y, width, height, path, replace_with=None) -> None:
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
+        # if (x + width > self._col_dim) or (y + height > self._row_dim):
+        #     raise ValueError("Image exceeds display bounds")
 
         img = Image.open(path)
         img = img.resize((width, height), Image.Resampling.LANCZOS)
@@ -279,8 +288,12 @@ class Screen:
         for j in range(height):
             for i in range(width):
                 r, g, b = pixels[j*width+i]
-                rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-                self.draw_pixel(x+i, y+j, rgb565)
+                # print(r,g,b)
+                if replace_with and (r, g, b) in replace_with:
+                    self.draw_pixel(x+i, y+j, replace_with[(r,g,b)])
+                else:
+                    rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+                    self.draw_pixel(x+i, y+j, rgb565)
 
     def fill_screen(self, color) -> None:
         if color is None:
@@ -306,34 +319,41 @@ if __name__ == '__main__':
     screen.clear()
 
     while 1:
-        screen.draw_pixel(0, 0, RGB565Color.WHITE)
-        screen.draw_pixel(1, 0, RGB565Color.WHITE)
-        screen.draw_pixel(0, 1, RGB565Color.WHITE)
-        screen.draw_pixel(1, 1, RGB565Color.WHITE)
-        screen.draw_pixel(0, screen.get_row_dim()-1)
-        screen.draw_pixel(screen.get_col_dim()-1, 0)
-        screen.draw_pixel(screen.get_col_dim()-1, screen.get_row_dim()-1)
         
-        screen.draw_vertical_line(15, 15, 10)
-        screen.draw_horizontal_line(30, 10, 20)
-        screen.draw_rectangle(10, 35, 20, 20, RGB565Color.PINK)
+        screen.draw_text(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, "00:00:00")
+        # screen.draw_text(50, 50, "1 min", 15, RGB565Color.WHITE)
+        # screen.draw_text(50, 60, "2 min", 15, RGB565Color.WHITE)
+        # screen.draw_text(50, 70, "3 min", 15, RGB565Color.WHITE)
+        # screen.draw_text(50, 80, "4 min", 15, RGB565Color.WHITE)
+        # screen.draw_text(50, 90, "5 min", 15, RGB565Color.WHITE)
+        # screen.draw_pixel(0, 0, RGB565Color.WHITE)
+        # screen.draw_pixel(1, 0, RGB565Color.WHITE)
+        # screen.draw_pixel(0, 1, RGB565Color.WHITE)
+        # screen.draw_pixel(1, 1, RGB565Color.WHITE)
+        # screen.draw_pixel(0, screen.get_row_dim()-1)
+        # screen.draw_pixel(screen.get_col_dim()-1, 0)
+        # screen.draw_pixel(screen.get_col_dim()-1, screen.get_row_dim()-1)
         
-        screen.draw_circle(90, 20, 20, RGB565Color.BLUE)
-        screen.draw_sector(40, 30, 25, -45, 45, RGB565Color.ORANGE)
+        # screen.draw_vertical_line(15, 15, 10)
+        # screen.draw_horizontal_line(30, 10, 20)
+        # screen.draw_rectangle(10, 35, 20, 20, RGB565Color.PINK)
         
-        screen.draw_image(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, 40, 40, "./google.jpg")
-        screen.draw_text(screen.get_col_dim()//2-50, screen.get_row_dim()//2+30, "Google HPS 2024", 12, RGB565Color.WHITE)
+        # screen.draw_circle(90, 20, 20, RGB565Color.BLUE)
+        # screen.draw_sector(40, 30, 25, -45, 45, RGB565Color.ORANGE)
+        
+        # screen.draw_image(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, 40, 40, "./google.jpg")
+        # screen.draw_text(screen.get_col_dim()//2-50, screen.get_row_dim()//2+30, "Google HPS 2024", 12, RGB565Color.WHITE)
 
-        colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 
-                     RGB565Color.GREEN, RGB565Color.ORANGE, RGB565Color.YELLOW, RGB565Color.PINK, 
-                     RGB565Color.CYAN, RGB565Color.VIOLET]
-        for index, color in enumerate(colorlist):
-            screen.draw_rectangle(30+index*10, screen.get_row_dim()-8-1, 10, 8, color)
-        screen.draw_horizontal_line(30, screen.get_row_dim()-8-2, 100, RGB565Color.WHITE)
-        screen.draw_horizontal_line(30, screen.get_row_dim()-1, 100, RGB565Color.WHITE)
-        screen.draw_vertical_line(30, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
-        screen.draw_vertical_line(130, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
+        # colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 
+        #              RGB565Color.GREEN, RGB565Color.ORANGE, RGB565Color.YELLOW, RGB565Color.PINK, 
+        #              RGB565Color.CYAN, RGB565Color.VIOLET]
+        # for index, color in enumerate(colorlist):
+        #     screen.draw_rectangle(30+index*10, screen.get_row_dim()-8-1, 10, 8, color)
+        # screen.draw_horizontal_line(30, screen.get_row_dim()-8-2, 100, RGB565Color.WHITE)
+        # screen.draw_horizontal_line(30, screen.get_row_dim()-1, 100, RGB565Color.WHITE)
+        # screen.draw_vertical_line(30, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
+        # screen.draw_vertical_line(130, screen.get_row_dim()-8-2, 10, RGB565Color.WHITE)
 
-        screen.draw_text(0, 0, "FPS: {:.2f}".format(screen.get_fps()), 10, RGB565Color.CYAN)
+        # screen.draw_text(0, 0, "FPS: {:.2f}".format(screen.get_fps()), 10, RGB565Color.CYAN)
         screen.update()
         screen.clear()
