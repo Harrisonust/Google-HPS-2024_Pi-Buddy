@@ -15,7 +15,6 @@ class MenuScreenHandler(Handler):
         self.run_input_process = False
         self.task_queue = task_queue
         
-        GPIO.setmode(GPIO.BCM)
         self.screen = Screen(col_dim=160, row_dim=128)
         self.screen.clear()
         self.page = SetTimerPage(self.screen)
