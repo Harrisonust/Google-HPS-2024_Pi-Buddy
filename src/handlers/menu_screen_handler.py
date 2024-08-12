@@ -17,7 +17,8 @@ class MenuScreenHandler(Handler):
         
         self.screen = Screen(col_dim=160, row_dim=128)
         self.screen.clear()
-        self.page = SetTimerPage(self.screen)
+        #self.page = SetTimerPage(self.screen)
+        self.page = WeatherPage(self.screen)
 
         self.menu_screen_handler_busy = ValueManager(int(False))
         self.current_page_id = ValueManager(0)
