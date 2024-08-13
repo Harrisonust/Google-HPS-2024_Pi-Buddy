@@ -100,7 +100,7 @@ class MenuPage(Page):
         self._initiate_option_boxes()
         
     
-    def reset_states(self):
+    def reset_states(self, args):
         self.cursor_direction.overwrite(MenuPageCursorDirection.NONE)
         self.select_triggered.overwrite(int(False))
         self.select_transition_state.overwrite(MenuPageSelectTransitionStage.NONE)
@@ -134,8 +134,8 @@ class MenuPage(Page):
                     if self.display_completed.reveal():
                         next_page_title = self.option_box_information[self.hovered_id][0]
                         if next_page_title == 'Timer':
-                            return 'SetTimerPage'
-                        return None
+                            return 'SetTimerPage', None
+                        return None, None
                 
             elif task_info['task'] == 'OUT_RESUME':
                 pass
