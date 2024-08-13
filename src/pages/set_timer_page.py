@@ -213,6 +213,8 @@ class SetTimerPage():
             elif task_info['task'] == 'ENTER_SELECT':
                 if state == SetTimerPageState.HOVER_TIME_DIGIT:
                     self.state.overwrite(SetTimerPageState.SELECT_TIME_DIGIT)
+                elif state == SetTimerPageState.SELECT_TIME_DIGIT:
+                    self.state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
                 elif state == SetTimerPageState.HOVER_BTN:
                     # Perform button task
                     if self.hoverable_tags[hover_id] == 'proceed':
@@ -230,7 +232,6 @@ class SetTimerPage():
                         self.state.overwrite(SetTimerPageState.END_DISPLAY)
                         while True:
                             if self.display_completed.reveal():
-                                print('returning "MenuPage"')
                                 return 'MenuPage'
                 
             elif task_info['task'] == 'OUT_RESUME':
@@ -288,7 +289,6 @@ class SetTimerPage():
             change_time_digit_val = self.change_time_digit_val.reveal()
             
             if state == SetTimerPageState.END_DISPLAY:
-                print('END DISPLAY SEEN')
                 break
             
             elif state != prev_state:
@@ -332,5 +332,4 @@ class SetTimerPage():
             time.sleep(0.01)
             self.screen.clear()
         
-        self.display_completed.overwrite(True)
-        print('disply_completed:', self.display_completed.reveal())
+        self.display_completed.overwrite(int(True))

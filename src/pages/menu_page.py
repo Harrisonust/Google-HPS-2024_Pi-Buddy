@@ -108,7 +108,6 @@ class MenuPage():
     
     def start_display(self):
         # Start display process for menu page
-        print('in start display of menu page')
         self.display_completed.overwrite(int(False))
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
@@ -181,7 +180,6 @@ class MenuPage():
                 
         
     def _display(self):
-        print('displaying')
         while True:
             
             cursor_direction = self.cursor_direction.reveal()
