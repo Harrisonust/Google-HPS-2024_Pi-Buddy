@@ -4,6 +4,7 @@ import RPi.GPIO as GPIO
 
 
 from pages.pages_utils import theme_colors, PageConfig, OptionBox, IconPaths
+from pages.page import Page
 from components.st7735s.st7735s import Screen
 from value_manager import ValueManager
 
@@ -74,7 +75,7 @@ class MenuPageOptionBox(OptionBox):
         }
 
 
-class MenuPage():
+class MenuPage(Page):
     def __init__(self, screen):        
         self.screen = screen
         

@@ -3,6 +3,7 @@ import multiprocessing
 
 
 from pages.pages_utils import theme_colors, PageConfig, Text, IconTextBox, OptionBox, IconPaths
+from pages.page import Page
 from value_manager import ValueManager
        
  
@@ -143,7 +144,7 @@ class SetTimerPageState():
     END_DISPLAY = 3
 
 
-class SetTimerPage():
+class SetTimerPage(Page):
     def __init__(self, screen):
         self.screen = screen
         
