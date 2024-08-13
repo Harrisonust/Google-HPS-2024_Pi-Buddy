@@ -88,6 +88,7 @@ class MenuPage(Page):
         # Setting the options in the menu
         self.option_box_information = [
             ['Weather', IconPaths.Weather],
+            ['Time', IconPaths.Time],
             ['Battery', IconPaths.Battery],
             ['Timer',   IconPaths.Timer],
             ['???',     IconPaths.Surprise]
@@ -132,9 +133,12 @@ class MenuPage(Page):
                 # Return message to go to next page after display is done
                 while True:
                     if self.display_completed.reveal():
-                        next_page_title = self.option_box_information[self.hovered_id][0]
+                        next_page_title = self.option_box_information[self.hovered_id.reveal()][0]
                         if next_page_title == 'Timer':
                             return 'SetTimerPage', None
+                        if next_page_title == 'Weather':
+                            return 'WeatherPage', None
+                    
                         return None, None
                 
             elif task_info['task'] == 'OUT_RESUME':
@@ -146,7 +150,8 @@ class MenuPage(Page):
         
         # Hover over the option box in the middle as default
         num_boxes = len(self.option_box_information)
-        self.hovered_id = num_boxes // 2
+        self.hovered_id = ValueManager(num_boxes // 2)
+        print('initial hovered_id', self.hovered_id)
         
         # Calculate x value of the first box
         screen_width = self.screen.get_col_dim()
@@ -156,7 +161,7 @@ class MenuPage(Page):
         # Calculate y vlaue of the first box
         screen_height = self.screen.get_row_dim()
         option_box_height = MenuPageOptionBoxConfig.DEFAULT_BOX_HEIGHT + (2 * MenuPageOptionBoxConfig.Y_MARGIN)
-        current_box_y = (screen_height // 2) - ((self.hovered_id * 2 + 1) / 2.0 * option_box_height) + MenuPageOptionBoxConfig.Y_MARGIN
+        current_box_y = (screen_height // 2) - ((self.hovered_id.reveal() * 2 + 1) / 2.0 * option_box_height) + MenuPageOptionBoxConfig.Y_MARGIN
         
         # Initiate option boxes with information from self.option_box_information
         self.option_boxes = []
@@ -177,7 +182,7 @@ class MenuPage(Page):
         self.content_height = option_box_height * len(self.option_box_information)
         
         # Hover 
-        self.option_boxes[self.hovered_id].hover()
+        self.option_boxes[self.hovered_id.reveal()].hover()
                 
         
     def _display(self):
@@ -185,6 +190,7 @@ class MenuPage(Page):
             
             cursor_direction = self.cursor_direction.reveal()
             select_triggered = self.select_triggered.reveal()
+            hovered_id = self.hovered_id.reveal()
             
             # Check if the cursor had been moved
             if cursor_direction:
@@ -199,9 +205,11 @@ class MenuPage(Page):
                 for option_box in self.option_boxes:
                     option_box.scroll(direction * self.option_box_height, self.content_height)
                 
-                self.hovered_id = (self.hovered_id - direction) % len(self.option_box_information)
-                self.option_boxes[self.hovered_id].hover()
+                hovered_id = (hovered_id - direction) % len(self.option_box_information)
+                self.option_boxes[hovered_id].hover()
+                self.hovered_id.overwrite(hovered_id)
                 self.cursor_direction.overwrite(MenuPageCursorDirection.NONE)
+                print('after cursor moved:',self.hovered_id)
             
             # Check if select had been triggered
             elif select_triggered:
@@ -209,15 +217,14 @@ class MenuPage(Page):
                 
                 if select_transition_state == MenuPageSelectTransitionStage.REMOVE_OTHERS:
                     for option_box_id, option_box in enumerate(self.option_boxes):
-                        if option_box_id != self.hovered_id:
+                        if option_box_id != hovered_id:
                             option_box.display = False
                 
                 elif select_transition_state == MenuPageSelectTransitionStage.REVERSE_SELECTED_COLOR:
-                    self.option_boxes[self.hovered_id].reverse_color()
+                    self.option_boxes[hovered_id].reverse_color()
                 
                 elif select_transition_state == MenuPageSelectTransitionStage.COLOR_BACKGROUND:
-                    # self.option_boxes[self.hovered_id].hide_border()
-                    self.option_boxes[self.hovered_id].show_border = False
+                    self.option_boxes[hovered_id].show_border = False
                     self.background_color = MenuPageOptionBoxConfig.HOVERED_COLOR
                 
                 elif select_transition_state == MenuPageSelectTransitionStage.END_DISPLAY:

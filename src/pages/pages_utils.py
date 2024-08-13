@@ -49,6 +49,7 @@ class IconPaths:
     Weather = './icons/weather.png'
     Battery = './icons/battery.png'
     Timer = './icons/timer.png'
+    Time = './icons/time.png'
     Surprise = './icons/surprise.png'
     Menu = './icons/menu.png'
     Reset = './icons/reset.png'

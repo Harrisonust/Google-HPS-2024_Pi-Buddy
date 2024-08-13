@@ -220,7 +220,6 @@ class SetTimerPage(Page):
                         while True:
                             if self.display_completed.reveal():
                                 time_value_pipe = self.time_value_pipe.reveal()
-                                print(time_value_pipe)
                                 return 'TimerPage', self._decode_time_value_pipe(time_value_pipe)
                         
                     elif self.hoverable_tags[hover_id] == 'reset':
