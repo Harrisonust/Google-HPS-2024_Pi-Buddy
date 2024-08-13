@@ -45,6 +45,16 @@ class ThemeColors:
 theme_colors = ThemeColors()
 
 
+class IconPaths:
+    Weather = './icons/weather.png'
+    Battery = './icons/battery.png'
+    Timer = './icons/timer.png'
+    Surprise = './icons/surprise.png'
+    Menu = './icons/menu.png'
+    Reset = './icons/reset.png'
+    Proceed = './icons/proceed.png'
+
+
 class PageConfig():
     # Colors
     ICON_TRUE_COLOR = (255, 255, 255)
@@ -54,15 +64,22 @@ class PageConfig():
     TITLE_COLOR = theme_colors.Contrast
     BACKGROUND_COLOR = theme_colors.Primary
     
-    ICON_TEXT_BOX_WIDTH = 110
-    ICON_TEXT_BOX_HEIGHT = 35
-    ICON_TEXT_BOX_BORDER = 2
-    ICON_TEXT_BOX_ICON_Y_RATIO = 0.8
-    ICON_TEXT_BOX_ICON_X_MARGIN = 5
-    ICON_TEXT_BOX_TEXT_SIZE = 14
+    PAGE_TITLE_BOX_WIDTH = 110
+    PAGE_TITLE_BOX_HEIGHT = 35
+    PAGE_TITLE_BOX_BORDER = 2
+    PAGE_TITLE_BOX_ICON_Y_RATIO = 0.8
+    PAGE_TITLE_BOX_ICON_X_MARGIN = 5
+    PAGE_TITLE_BOX_TEXT_SIZE = 14
     
+    BTN_WIDTH = 45
+    BTN_HEIGHT = 18
+    BTN_BORDER = 1
+    BTN_ICON_Y_RATIO = 0.8
+    BTN_ICON_X_MARGIN = 2
+    BTN_TEXT_SIZE = 10
+         
     
-class IconTextBox:
+class IconTextBox():
     def __init__(self, screen, x_marking, y_marking, box_width, box_height, text, text_size, color, background_color, 
                  icon_path, icon_margin_x, icon_y_ratio, border=0, x_margin=0, y_margin=0,
                  x_mark_edge='Left', y_mark_edge='Top', icon_alignment='Left', icon_color_replacements=None):
@@ -152,6 +169,88 @@ class IconTextBox:
             self.screen.draw_image(self.icon_x, self.icon_y, self.icon_size, self.icon_size, self.icon_path, self.icon_color_replacements)
             self.screen.draw_text(self.text_x, self.text_y, self.text, self.text_size, self.color)
         
+    
+
+class OptionBox(IconTextBox):
+    def __init__(self, screen, default_x, default_y, text, icon_path, box_hover_scale, border_hover_scale, default_color, 
+                 hovered_color, background_color, default_box_width, default_box_height, default_border, default_icon_x_margin,
+                 default_text_size, icon_y_ratio, y_margin=0):
+        
+        self.screen = screen
+        self.default_x = default_x
+        self.default_y = default_y
+        self.text = text
+        self.icon_path = icon_path
+        self.box_hover_scale = box_hover_scale
+        self.border_hover_scale = border_hover_scale
+        self.default_color = default_color
+        self.hovered_color = hovered_color
+        self.background_color = background_color
+        self.default_box_width = default_box_width
+        self.default_box_height = default_box_height
+        self.default_border = default_border
+        self.default_icon_x_margin = default_icon_x_margin
+        self.default_text_size = default_text_size
+        self.y_margin = y_margin
+        self.icon_y_ratio = icon_y_ratio
+        
+        
+        self.default_icon_color_replacements={
+            PageConfig.ICON_TRUE_COLOR: self.default_color,
+            PageConfig.ICON_FALSE_COLOR: self.background_color
+        }
+        self.hovered_icon_color_replacements={
+            PageConfig.ICON_TRUE_COLOR: self.hovered_color,
+            PageConfig.ICON_FALSE_COLOR: self.background_color
+        }
+
+        super().__init__(
+            screen=self.screen, 
+            x_marking=self.default_x, 
+            y_marking=self.default_y, 
+            box_width=self.default_box_width, 
+            box_height=self.default_box_height,
+            text=self.text,
+            text_size=self.default_text_size,
+            color=self.default_color,
+            background_color=self.background_color,
+            icon_path=self.icon_path,
+            icon_margin_x=self.default_icon_x_margin,
+            icon_y_ratio=self.icon_y_ratio,
+            border=self.default_border,
+            y_margin=self.y_margin,
+            icon_color_replacements=self.default_icon_color_replacements
+        )
+    
+    
+    def reset(self):
+        # Set parameters to default value
+        self.box_width = self.default_box_width
+        self.box_height = self.default_box_height
+        self.border = self.default_border
+        self.color = self.default_color
+        self.icon_x_margin = self.default_icon_x_margin
+        self.text_size = self.default_text_size
+        self.x_marking = self.default_x
+        self.y_marking = self.default_y
+        self.icon_color_replacements = self.default_icon_color_replacements
+        self._reset_dim()
+        
+    
+    def hover(self):
+        # Set parameters to hover mode
+        self.box_width = int(self.default_box_width * self.box_hover_scale)
+        self.box_height = int(self.default_box_height * self.box_hover_scale)
+        self.border = int(self.default_border * self.border_hover_scale)
+        self.color = self.hovered_color
+        self.icon_size = int((self.box_height - (2 * self.border)) * self.icon_y_ratio)
+        self.icon_x_margin = int(self.default_icon_x_margin * self.box_hover_scale)
+        self.text_size = int(self.default_text_size * self.box_hover_scale)
+        self.x_marking = int(self.default_x - (self.box_width * (self.box_hover_scale - 1) / 2))
+        self.y_marking = int(self.default_y - (self.box_height * (self.box_hover_scale - 1) / 2))
+        self.icon_color_replacements = self.hovered_icon_color_replacements
+        self._reset_dim()
+    
     
 class Text:
     def __init__(self, screen, text, text_size, color, 

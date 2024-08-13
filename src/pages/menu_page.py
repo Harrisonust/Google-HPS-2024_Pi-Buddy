@@ -3,7 +3,7 @@ import time
 import RPi.GPIO as GPIO
 
 
-from pages.pages_utils import theme_colors, PageConfig, IconTextBox
+from pages.pages_utils import theme_colors, PageConfig, OptionBox, IconPaths
 from components.st7735s.st7735s import Screen
 from value_manager import ValueManager
 
@@ -21,79 +21,43 @@ class MenuPageSelectTransitionStage():
     END_DISPLAY = 4
 
 
-class OptionBoxConfig():
-    ICON_TRUE_COLOR = PageConfig.ICON_TRUE_COLOR                    #
-    ICON_FALSE_COLOR = PageConfig.ICON_FALSE_COLOR                  #
+class MenuPageOptionBoxConfig():
     BOX_HOVER_SCALE = 1.2                                           # The ratio the box is scaled at in hover mode 
     BORDER_HOVER_SCALE = 2                                          # The ratio the box border is scaled at in hover mode
     DEFAULT_COLOR = PageConfig.DEFAULT_COLOR                        # Default color for border box, icon, and text
     HOVERED_COLOR = PageConfig.HOVERED_COLOR                        # Hovered color for border box, icon, and text
     BACKGROUND_COLOR = PageConfig.BACKGROUND_COLOR                  # Background color of the screen
-    DEFAULT_BOX_WIDTH = PageConfig.ICON_TEXT_BOX_WIDTH              # Box width in default mode, border width included
-    DEFAULT_BOX_HEIGHT = PageConfig.ICON_TEXT_BOX_HEIGHT            # Box height in default mode, border width included
-    DEFAULT_BORDER = PageConfig.ICON_TEXT_BOX_BORDER                # Default border width 
-    Y_MARGIN = PageConfig.ICON_TEXT_BOX_ICON_X_MARGIN               # Box margin in vertical direction
-    ICON_Y_RATIO = PageConfig.ICON_TEXT_BOX_ICON_Y_RATIO            # The amount of horizontal space the icon takes, border width exclusive
-    DEFAULT_ICON_X_MARGIN = PageConfig.ICON_TEXT_BOX_ICON_X_MARGIN  # The x margin between border-icon and icon-text 
-    DEFAULT_TEXT_SIZE = PageConfig.ICON_TEXT_BOX_TEXT_SIZE          # Default text size
+    DEFAULT_BOX_WIDTH = PageConfig.PAGE_TITLE_BOX_WIDTH             # Box width in default mode, border width included
+    DEFAULT_BOX_HEIGHT = PageConfig.PAGE_TITLE_BOX_HEIGHT           # Box height in default mode, border width included
+    DEFAULT_BORDER = PageConfig.PAGE_TITLE_BOX_BORDER               # Default border width 
+    Y_MARGIN = 5                                                    # Box margin in vertical direction
+    ICON_Y_RATIO = PageConfig.PAGE_TITLE_BOX_ICON_Y_RATIO           # The amount of horizontal space the icon takes, border width exclusive
+    DEFAULT_ICON_X_MARGIN = PageConfig.PAGE_TITLE_BOX_ICON_X_MARGIN # The x margin between border-icon and icon-text 
+    DEFAULT_TEXT_SIZE = PageConfig.PAGE_TITLE_BOX_TEXT_SIZE         # Default text size
 
 
-class OptionBox(IconTextBox):
-    def __init__(self, screen, default_x, default_y, text, icon_path):
-        
-        self.box_hover_scale = OptionBoxConfig.BOX_HOVER_SCALE
-        self.border_hover_scale = OptionBoxConfig.BORDER_HOVER_SCALE
-        self.default_color = OptionBoxConfig.DEFAULT_COLOR
-        self.hovered_color = OptionBoxConfig.HOVERED_COLOR
-        self.default_icon_color_replacements={
-            OptionBoxConfig.ICON_TRUE_COLOR: self.default_color,
-            OptionBoxConfig.ICON_FALSE_COLOR: OptionBoxConfig.BACKGROUND_COLOR
-        }
-        self.hovered_icon_color_replacements={
-            OptionBoxConfig.ICON_TRUE_COLOR: self.hovered_color,
-            OptionBoxConfig.ICON_FALSE_COLOR: OptionBoxConfig.BACKGROUND_COLOR
-        }
-        
-        self.default_x = default_x
-        self.default_y = default_y
-        self.default_box_width = OptionBoxConfig.DEFAULT_BOX_WIDTH
-        self.default_box_height = OptionBoxConfig.DEFAULT_BOX_HEIGHT
-        self.default_border = OptionBoxConfig.DEFAULT_BORDER
-        self.default_icon_x_margin = OptionBoxConfig.DEFAULT_ICON_X_MARGIN
-        self.default_text_size = OptionBoxConfig.DEFAULT_TEXT_SIZE
-        
+class MenuPageOptionBox(OptionBox):
+    def __init__(self, screen, default_x, default_y, text, icon_path):       
         super().__init__(
             screen=screen, 
-            x_marking=self.default_x, 
-            y_marking=self.default_y, 
-            box_width=self.default_box_width, 
-            box_height=self.default_box_height,
+            default_x=default_x,
+            default_y=default_y,
             text=text,
-            text_size=self.default_text_size,
-            color=self.default_color,
-            background_color=OptionBoxConfig.BACKGROUND_COLOR,
             icon_path=icon_path,
-            icon_margin_x=self.default_icon_x_margin,
-            icon_y_ratio=OptionBoxConfig.ICON_Y_RATIO,
-            border=OptionBoxConfig.DEFAULT_BORDER,
-            y_margin=OptionBoxConfig.Y_MARGIN,
-            icon_color_replacements=self.default_icon_color_replacements
+            box_hover_scale=MenuPageOptionBoxConfig.BOX_HOVER_SCALE,
+            border_hover_scale=MenuPageOptionBoxConfig.BORDER_HOVER_SCALE,
+            default_color=MenuPageOptionBoxConfig.DEFAULT_COLOR,
+            hovered_color=MenuPageOptionBoxConfig.HOVERED_COLOR,
+            background_color=MenuPageOptionBoxConfig.BACKGROUND_COLOR,
+            default_box_width=MenuPageOptionBoxConfig.DEFAULT_BOX_WIDTH,
+            default_box_height=MenuPageOptionBoxConfig.DEFAULT_BOX_HEIGHT,
+            default_border=MenuPageOptionBoxConfig.DEFAULT_BORDER,
+            default_icon_x_margin=MenuPageOptionBoxConfig.DEFAULT_ICON_X_MARGIN,
+            default_text_size=MenuPageOptionBoxConfig.DEFAULT_TEXT_SIZE,
+            icon_y_ratio=MenuPageOptionBoxConfig.ICON_Y_RATIO,
+            y_margin=MenuPageOptionBoxConfig.Y_MARGIN,
         )
     
-    
-    def reset(self):
-        # Set parameters to default value
-        self.box_width = self.default_box_width
-        self.box_height = self.default_box_height
-        self.border = self.default_border
-        self.color = self.default_color
-        self.icon_x_margin = self.default_icon_x_margin
-        self.text_size = self.default_text_size
-        self.x_marking = self.default_x
-        self.y_marking = self.default_y
-        self.icon_color_replacements = self.default_icon_color_replacements
-        self._reset_dim()
-
 
     def scroll(self, y_incr, div):
         # Move y value, where y_incr is the amount to move and div keeps the value in range
@@ -101,27 +65,12 @@ class OptionBox(IconTextBox):
         self.default_y %= div
         self.reset()
         
-    
-    def hover(self):
-        # Set parameters to hover mode
-        self.box_width = int(self.default_box_width * self.box_hover_scale)
-        self.box_height = int(self.default_box_height * self.box_hover_scale)
-        self.border = int(self.default_border * self.border_hover_scale)
-        self.color = self.hovered_color
-        self.icon_size = int((self.box_height - (2 * self.border)) * self.icon_y_ratio)
-        self.icon_x_margin = int(self.default_icon_x_margin * self.box_hover_scale)
-        self.text_size = int(self.default_text_size * self.box_hover_scale)
-        self.x_marking = int(self.default_x - (self.box_width * (self.box_hover_scale - 1) / 2))
-        self.y_marking = int(self.default_y - (self.box_height * (self.box_hover_scale - 1) / 2))
-        self.icon_color_replacements = self.hovered_icon_color_replacements
-        self._reset_dim()
-        
 
     def reverse_color(self):
         self.color, self.background_color = self.background_color, self.color
         self.icon_color_replacements = {
-            OptionBoxConfig.ICON_TRUE_COLOR: self.color,
-            OptionBoxConfig.ICON_FALSE_COLOR: self.background_color
+            PageConfig.ICON_TRUE_COLOR: self.color,
+            PageConfig.ICON_FALSE_COLOR: self.background_color
         }
 
 
@@ -137,10 +86,10 @@ class MenuPage():
         
         # Setting the options in the menu
         self.option_box_information = [
-            ['Weather', './icons/menu_weather.png'],
-            ['Battery', './icons/menu_battery.png'],
-            ['Timer',    './icons/menu_timer.png'],
-            ['???',     './icons/menu_surprise.png']
+            ['Weather', IconPaths.Weather],
+            ['Battery', IconPaths.Battery],
+            ['Timer',   IconPaths.Timer],
+            ['???',     IconPaths.Surprise]
         ]
         self.background_color = theme_colors.Primary
         self.option_boxes = None 
@@ -149,8 +98,18 @@ class MenuPage():
         self.content_height = None
         self._initiate_option_boxes()
         
+    
+    def reset_states(self):
+        self.cursor_direction.overwrite(MenuPageCursorDirection.NONE)
+        self.select_triggered.overwrite(int(False))
+        self.select_transition_state.overwrite(MenuPageSelectTransitionStage.NONE)
+        self.display_completed.overwrite(int(False))
         
+    
+    def start_display(self):
         # Start display process for menu page
+        print('in start display of menu page')
+        self.display_completed.overwrite(int(False))
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
     
@@ -173,7 +132,10 @@ class MenuPage():
                 # Return message to go to next page after display is done
                 while True:
                     if self.display_completed.reveal():
-                        return self.option_box_information[self.hovered_id][0]
+                        next_page_title = self.option_box_information[self.hovered_id][0]
+                        if next_page_title == 'Timer':
+                            return 'SetTimerPage'
+                        return None
                 
             elif task_info['task'] == 'OUT_RESUME':
                 pass
@@ -188,20 +150,20 @@ class MenuPage():
         
         # Calculate x value of the first box
         screen_width = self.screen.get_col_dim()
-        box_width = OptionBoxConfig.DEFAULT_BOX_WIDTH
+        box_width = MenuPageOptionBoxConfig.DEFAULT_BOX_WIDTH
         current_box_x = (screen_width // 2) - (box_width // 2)
         
         # Calculate y vlaue of the first box
         screen_height = self.screen.get_row_dim()
-        option_box_height = OptionBoxConfig.DEFAULT_BOX_HEIGHT + (2 * OptionBoxConfig.Y_MARGIN)
-        current_box_y = (screen_height // 2) - ((self.hovered_id * 2 + 1) / 2.0 * option_box_height) + OptionBoxConfig.Y_MARGIN
+        option_box_height = MenuPageOptionBoxConfig.DEFAULT_BOX_HEIGHT + (2 * MenuPageOptionBoxConfig.Y_MARGIN)
+        current_box_y = (screen_height // 2) - ((self.hovered_id * 2 + 1) / 2.0 * option_box_height) + MenuPageOptionBoxConfig.Y_MARGIN
         
         # Initiate option boxes with information from self.option_box_information
         self.option_boxes = []
         for box_info in self.option_box_information:
             option_box_name, option_box_icon_path = box_info
             self.option_boxes.append(
-                OptionBox(
+                MenuPageOptionBox(
                     self.screen, 
                     current_box_x, 
                     current_box_y, 
@@ -219,6 +181,7 @@ class MenuPage():
                 
         
     def _display(self):
+        print('displaying')
         while True:
             
             cursor_direction = self.cursor_direction.reveal()
@@ -256,7 +219,7 @@ class MenuPage():
                 elif select_transition_state == MenuPageSelectTransitionStage.COLOR_BACKGROUND:
                     # self.option_boxes[self.hovered_id].hide_border()
                     self.option_boxes[self.hovered_id].show_border = False
-                    self.background_color = OptionBoxConfig.HOVERED_COLOR
+                    self.background_color = MenuPageOptionBoxConfig.HOVERED_COLOR
                 
                 elif select_transition_state == MenuPageSelectTransitionStage.END_DISPLAY:
                     break
@@ -272,3 +235,5 @@ class MenuPage():
             self.screen.clear()
         
         self.display_completed.overwrite(int(True))
+    
+

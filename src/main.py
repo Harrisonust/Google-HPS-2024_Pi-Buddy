@@ -75,8 +75,7 @@ class Control:
         while True:
             if self.task_queue.get_len() != 0:
                 # Pop task from task_queue
-                task_info = self.task_queue.pop()     
-                
+                task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
                 process = multiprocessing.Process(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.start()             

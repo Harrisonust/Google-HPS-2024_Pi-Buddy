@@ -2,7 +2,7 @@ import time
 import multiprocessing
 
 
-from pages.pages_utils import theme_colors, PageConfig, Text, IconTextBox
+from pages.pages_utils import theme_colors, PageConfig, Text, IconTextBox, OptionBox, IconPaths
 from value_manager import ValueManager
        
  
@@ -12,10 +12,10 @@ class SetTimerPageConfig():
     TITLE_COLOR = PageConfig.TITLE_COLOR
     DEFAULT_COLOR = PageConfig.DEFAULT_COLOR
     BACKGROUND_COLOR = PageConfig.BACKGROUND_COLOR
-    
-    TIME_DIGIT_Y_RATIO = 0.5
+    TITLE_TEXT_SIZE = 14
     
     # Time digit coordinates
+    TIME_DIGIT_Y = 60
     TIME_DIGIT_TEXT_SIZE = 25
     TIME_DIGIT_HR_H_X = 25
     TIME_DIGIT_HR_L_X = 40
@@ -24,28 +24,19 @@ class SetTimerPageConfig():
     TIME_DIGIT_SEC_H_X = 105
     TIME_DIGIT_SEC_L_X = 120
     
-    # Time digit text
-    TIME_DIGIT_TEXT_COL0_X = 55
-    TIME_DIGIT_TEXT_COL1_X = 95
+    # Button coordinates
+    BTN_Y = 90
+    PROCEED_BTN_X = 112
+    RESET_BTN_X = 60
+    MENU_BTN_X = 8
     
-    # Title box
-    TITLE_X = 80
-    TITLE_Y = 20
-    TITLE_BOX_WIDTH = PageConfig.ICON_TEXT_BOX_WIDTH             
-    TITLE_BOX_HEIGHT = PageConfig.ICON_TEXT_BOX_HEIGHT            
-    TITLE_TEXT_SIZE = PageConfig.ICON_TEXT_BOX_TEXT_SIZE 
-    TITLE_ICON_Y_RATIO = PageConfig.ICON_TEXT_BOX_ICON_Y_RATIO            
-    TITLE_ICON_X_MARGIN = PageConfig.ICON_TEXT_BOX_ICON_X_MARGIN   
-    TITLE_ICON_COLOR_REPLACEMENTS = {
-        ICON_TRUE_COLOR: TITLE_COLOR,
-        ICON_FALSE_COLOR: BACKGROUND_COLOR
-    }
+    # Text coordinates
+    TIME_DIGIT_TEXT_COL_0_X = 55
+    TIME_DIGIT_TEXT_COL_1_X = 95
+    TITLE_TEXT_X = 35
+    TITLE_TEXT_Y = 15
     
-    # Message to users
-    MSG_X = 30
-    MSG_Y = 90
-    MSG_TEXT_SIZE = 15
-    MSG_COLOR = theme_colors.Warning
+    TITLE_TEXT_SIZE = 14
     
     
 
@@ -80,27 +71,76 @@ class TimeDigit(Text):
         '''        
     
     def hover(self):
+        # Set to hovered color
         self.color = self.hovered_color
     
     def unhover(self):
+        # Set to default color
         self.color = self.default_color
-        
+
     def select(self):
+        # Set to on-change color
         self.color = self.on_change_color
         
     def unselect(self):
+        # Set to hovered color
         self.color = self.hovered_color
     
     def change_value(self, change):
+        # Change value by 'change'
         self.num = (self.num + change) % self.num_max_exclusive
         self.text = str(self.num)
+    
+    def reset_value(self):
+        # Reset value to 0
+        self.num = 0
+        self.text = str(self.text)
+        
 
+
+class SetTimerPageBtnConfig:
+    BOX_HOVER_SCALE = 1                                             # The ratio the box is scaled at in hover mode 
+    BORDER_HOVER_SCALE = 1                                          # The ratio the box border is scaled at in hover mode
+    DEFAULT_COLOR = PageConfig.DEFAULT_COLOR                        # Default color for border box, icon, and text
+    HOVERED_COLOR = PageConfig.HOVERED_COLOR                        # Hovered color for border box, icon, and text
+    BACKGROUND_COLOR = PageConfig.BACKGROUND_COLOR                  # Background color of the screen
+    DEFAULT_BOX_WIDTH = PageConfig.BTN_WIDTH                        # Box width in default mode, border width included
+    DEFAULT_BOX_HEIGHT = PageConfig.BTN_HEIGHT                      # Box height in default mode, border width included
+    DEFAULT_BORDER = PageConfig.BTN_BORDER                          # Default border width 
+    ICON_Y_RATIO = PageConfig.BTN_ICON_Y_RATIO                      # The amount of horizontal space the icon takes, border width exclusive
+    DEFAULT_ICON_X_MARGIN = PageConfig.BTN_ICON_X_MARGIN            # The x margin between border-icon and icon-text 
+    DEFAULT_TEXT_SIZE = PageConfig.BTN_TEXT_SIZE                    # Default text size
+
+
+class SetTimerPageBtn(OptionBox):
+    def __init__(self, screen, default_x, default_y, text, icon_path):
+        super().__init__(
+            screen=screen, 
+            default_x=default_x,
+            default_y=default_y,
+            text=text,
+            icon_path=icon_path,
+            box_hover_scale=SetTimerPageBtnConfig.BOX_HOVER_SCALE,
+            border_hover_scale=SetTimerPageBtnConfig.BORDER_HOVER_SCALE,
+            default_color=SetTimerPageBtnConfig.DEFAULT_COLOR,
+            hovered_color=SetTimerPageBtnConfig.HOVERED_COLOR,
+            background_color=SetTimerPageBtnConfig.BACKGROUND_COLOR,
+            default_box_width=SetTimerPageBtnConfig.DEFAULT_BOX_WIDTH,
+            default_box_height=SetTimerPageBtnConfig.DEFAULT_BOX_HEIGHT,
+            default_border=SetTimerPageBtnConfig.DEFAULT_BORDER,
+            default_icon_x_margin=SetTimerPageBtnConfig.DEFAULT_ICON_X_MARGIN,
+            default_text_size=SetTimerPageBtnConfig.DEFAULT_TEXT_SIZE,
+            icon_y_ratio=SetTimerPageBtnConfig.ICON_Y_RATIO
+        )
+        
+    def unhover(self):
+        self.reset()
 
 class SetTimerPageState():
-    HOVER = 0
-    SELECT = 1
-    TO_DISCARD = 2
-    TO_PROCEED = 3
+    HOVER_TIME_DIGIT = 0
+    SELECT_TIME_DIGIT = 1
+    HOVER_BTN = 2
+    END_DISPLAY = 3
 
 
 class SetTimerPage():
@@ -109,27 +149,39 @@ class SetTimerPage():
         
         self.background_color = SetTimerPageConfig.BACKGROUND_COLOR
 
-        self.time_digit_count = 6
-        self.time_digit_components = None
-        self.title_box = None
+        self.hoverable_components = None
+        self.hoverable_tags = None
         self.text_components = None
-        self.proceed_message = None
-        self.discard_message = None
         self._initiate_components()
         
         
         self.set_timer_page_busy = ValueManager(int(False))
-        self.state = ValueManager(SetTimerPageState.HOVER)
-        self.prev_state = ValueManager(SetTimerPageState.HOVER)
+        self.state = ValueManager(SetTimerPageState.HOVER_TIME_DIGIT)
+        self.prev_state = ValueManager(SetTimerPageState.HOVER_TIME_DIGIT)
         self.hover_id = ValueManager(0)
         self.prev_hover_id = ValueManager(0)
         self.change_time_digit_val = ValueManager(0)
+        self.display_completed = ValueManager(int(False))
         
-        self.time_digit_components[self.hover_id.reveal()].hover()
+        self.hoverable_components[self.hover_id.reveal()].hover()
         
+        
+    def reset_states(self):
+        self.set_timer_page_busy.overwrite(int(False))
+        self.state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
+        self.prev_state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
+        self.hover_id.overwrite(0)
+        self.prev_hover_id.overwrite(0)
+        self.change_time_digit_val.overwrite(0)
+        self.display_completed.overwrite(int(False))
+    
+    
+    def start_display(self):
         # Start display process for set timer page
+        self.display_completed.overwrite(int(False))
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
+        
         
     def handle_task(self, task_info):
         if not self.set_timer_page_busy.reveal():
@@ -139,86 +191,91 @@ class SetTimerPage():
             hover_id = self.hover_id.reveal()
 
             if task_info['task'] == 'MOVE_CURSOR_LEFT_DOWN':
-                if state == SetTimerPageState.HOVER:
+                if (state == SetTimerPageState.HOVER_TIME_DIGIT or 
+                    state == SetTimerPageState.HOVER_BTN):
                     # Move hover to next digit
-                    hover_id = (hover_id - 1) % self.time_digit_count
+                    hover_id = (hover_id - 1) % len(self.hoverable_components)
                     self.hover_id.overwrite(hover_id)
-                elif state == SetTimerPageState.SELECT:
+                elif state == SetTimerPageState.SELECT_TIME_DIGIT:
                     # Decrease digit value by 1
                     self.change_time_digit_val.overwrite(-1)
                 
             elif task_info['task'] == 'MOVE_CURSOR_RIGHT_UP':
-                if state == SetTimerPageState.HOVER:
+                if (state == SetTimerPageState.HOVER_TIME_DIGIT or 
+                    state == SetTimerPageState.HOVER_BTN):
                     # Move hover to previous digits
-                    hover_id = (hover_id + 1) % self.time_digit_count
+                    hover_id = (hover_id + 1) % len(self.hoverable_components)
                     self.hover_id.overwrite(hover_id)
-                elif state == SetTimerPageState.SELECT:
+                elif state == SetTimerPageState.SELECT_TIME_DIGIT:
                     # Increase digit value by 1      
-                    self.change_time_digit_val.overwrite(1)      
+                    self.change_time_digit_val.overwrite(1)  
             
             elif task_info['task'] == 'ENTER_SELECT':
-                if state == SetTimerPageState.HOVER:
-                    self.state.overwrite(SetTimerPageState.SELECT)
-                elif state == SetTimerPageState.TO_DISCARD:
-                    self.state.overwrite(SetTimerPageState.HOVER)
-                elif state == SetTimerPageState.TO_PROCEED:
-                    return 'TimerStart'
+                if state == SetTimerPageState.HOVER_TIME_DIGIT:
+                    self.state.overwrite(SetTimerPageState.SELECT_TIME_DIGIT)
+                elif state == SetTimerPageState.HOVER_BTN:
+                    # Perform button task
+                    if self.hoverable_tags[hover_id] == 'proceed':
+                        self.state.overwrite(SetTimerPageState.END_DISPLAY)
+                        while True:
+                            if self.display_completed.reveal():
+                                return 'TimerPage'
+                        
+                    elif self.hoverable_tags[hover_id] == 'reset':
+                        for i in range(len(self.hoverable_tags)):
+                            if self.hoverable_tags[i] == 'time_digit':
+                                self.hoverable_components[i].reset_value()
+                        
+                    elif self.hoverable_tags[hover_id] == 'menu':
+                        self.state.overwrite(SetTimerPageState.END_DISPLAY)
+                        while True:
+                            if self.display_completed.reveal():
+                                print('returning "MenuPage"')
+                                return 'MenuPage'
                 
             elif task_info['task'] == 'OUT_RESUME':
-                if state == SetTimerPageState.HOVER:
-                    self.state.overwrite(SetTimerPageState.TO_DISCARD)
-                elif state == SetTimerPageState.SELECT:
-                    self.state.overwrite(SetTimerPageState.HOVER)
-                elif state == SetTimerPageState.TO_DISCARD:
-                    return 'Menu'
+                if state == SetTimerPageState.SELECT_TIME_DIGIT:
+                    self.state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
             
             self.set_timer_page_busy.overwrite(int(False))
     
     
     def _initiate_components(self):
-        time_digit_y = self.screen.get_row_dim() * SetTimerPageConfig.TIME_DIGIT_Y_RATIO
 
-        self.time_digit_components = [
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_HR_H_X, time_digit_y, 10),     # Hour-higher-digit
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_HR_L_X, time_digit_y, 10),     # Hour-lower-digit
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_MIN_H_X, time_digit_y, 6),     # Minute-higher-digit
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_MIN_L_X, time_digit_y, 10),    # Minute-lower-digit
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_SEC_H_X, time_digit_y, 6),     # Second-higher-digit
-            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_SEC_L_X, time_digit_y, 10),    # Second-lower-digit
+        self.hoverable_components = [
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_HR_H_X, SetTimerPageConfig.TIME_DIGIT_Y, 10),                      
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_HR_L_X, SetTimerPageConfig.TIME_DIGIT_Y, 10),                      
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_MIN_H_X, SetTimerPageConfig.TIME_DIGIT_Y, 6),                      
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_MIN_L_X, SetTimerPageConfig.TIME_DIGIT_Y, 10),                     
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_SEC_H_X, SetTimerPageConfig.TIME_DIGIT_Y, 6),                      
+            TimeDigit(self.screen, SetTimerPageConfig.TIME_DIGIT_SEC_L_X, SetTimerPageConfig.TIME_DIGIT_Y, 10),                     
+            SetTimerPageBtn(self.screen, SetTimerPageConfig.MENU_BTN_X, SetTimerPageConfig.BTN_Y, 'Menu', IconPaths.Menu),         
+            SetTimerPageBtn(self.screen, SetTimerPageConfig.RESET_BTN_X, SetTimerPageConfig.BTN_Y, 'Reset', IconPaths.Reset),  
+            SetTimerPageBtn(self.screen, SetTimerPageConfig.PROCEED_BTN_X, SetTimerPageConfig.BTN_Y, 'Start', IconPaths.Proceed),          
+        ]
+        
+        self.hoverable_tags = [
+            'time_digit',
+            'time_digit',
+            'time_digit',
+            'time_digit',
+            'time_digit',
+            'time_digit',
+            'menu',
+            'reset',
+            'proceed',
         ]
         
         self.text_components = [
             Text(self.screen, ':', SetTimerPageConfig.TIME_DIGIT_TEXT_SIZE, SetTimerPageConfig.DEFAULT_COLOR, 
-                 SetTimerPageConfig.TIME_DIGIT_TEXT_COL0_X, time_digit_y, y_mark_edge='Center'),
+                 SetTimerPageConfig.TIME_DIGIT_TEXT_COL_0_X, SetTimerPageConfig.TIME_DIGIT_Y, y_mark_edge='Center'),
             Text(self.screen, ':', SetTimerPageConfig.TIME_DIGIT_TEXT_SIZE, SetTimerPageConfig.DEFAULT_COLOR, 
-                 SetTimerPageConfig.TIME_DIGIT_TEXT_COL1_X, time_digit_y, y_mark_edge='Center'),
+                 SetTimerPageConfig.TIME_DIGIT_TEXT_COL_1_X, SetTimerPageConfig.TIME_DIGIT_Y, y_mark_edge='Center'),
+            Text(self.screen, 'Set Your Timer:', SetTimerPageConfig.TITLE_TEXT_SIZE, SetTimerPageConfig.DEFAULT_COLOR,
+                 SetTimerPageConfig.TITLE_TEXT_X, SetTimerPageConfig.TITLE_TEXT_Y)
         ]
-        
-        self.title_box = IconTextBox(
-            screen=self.screen,
-            x_marking=SetTimerPageConfig.TITLE_X,
-            y_marking=SetTimerPageConfig.TITLE_Y,
-            box_width=SetTimerPageConfig.TITLE_BOX_WIDTH,
-            box_height=SetTimerPageConfig.TITLE_BOX_HEIGHT,
-            text='Timer',
-            text_size=SetTimerPageConfig.TITLE_TEXT_SIZE,
-            color=SetTimerPageConfig.TITLE_COLOR,
-            background_color=SetTimerPageConfig.BACKGROUND_COLOR,
-            icon_path='./icons/menu_timer.png',
-            icon_margin_x=SetTimerPageConfig.TITLE_ICON_X_MARGIN,
-            icon_y_ratio=SetTimerPageConfig.TITLE_ICON_Y_RATIO,
-            x_mark_edge='Center',
-            y_mark_edge='Center',
-            icon_alignment='Left',
-            icon_color_replacements=SetTimerPageConfig.TITLE_ICON_COLOR_REPLACEMENTS
-        )
-        
-        self.proceed_message = Text(self.screen, 'Start timing?', SetTimerPageConfig.MSG_TEXT_SIZE, SetTimerPageConfig.MSG_COLOR,
-                                    SetTimerPageConfig.MSG_X, SetTimerPageConfig.MSG_Y)  
-        self.discard_message = Text(self.screen, 'Discard timer?', SetTimerPageConfig.MSG_TEXT_SIZE, SetTimerPageConfig.MSG_COLOR,
-                                    SetTimerPageConfig.MSG_X, SetTimerPageConfig.MSG_Y)  
-    
 
+  
     def _display(self):
         while True:
             self.screen.fill_screen(self.background_color)
@@ -230,52 +287,50 @@ class SetTimerPage():
             prev_hover_id = self.prev_hover_id.reveal()
             change_time_digit_val = self.change_time_digit_val.reveal()
             
-            if state != prev_state:
+            if state == SetTimerPageState.END_DISPLAY:
+                print('END DISPLAY SEEN')
+                break
+            
+            elif state != prev_state:
                 
-                if prev_state == SetTimerPageState.SELECT and state == SetTimerPageState.HOVER:
-                    # Selected => Hovered
-                    self.time_digit_components[hover_id].unselect()
+                if prev_state == SetTimerPageState.SELECT_TIME_DIGIT and state == SetTimerPageState.HOVER_TIME_DIGIT:
+                    # Time digit selected => Time digit hovered
+                    self.hoverable_components[hover_id].unselect()
                 
-                elif prev_state == SetTimerPageState.HOVER and state == SetTimerPageState.SELECT:
-                    # Hovered => Selected
-                    self.time_digit_components[hover_id].select()
-                
-                elif prev_state == SetTimerPageState.HOVER:
-                    # Hovered => To Proceed
-                    # Hovered => To Discard
-                    self.time_digit_components[hover_id].unhover()
-                    
-                elif state == SetTimerPageState.TO_HOVER:
-                    # To Proceed => Hovered
-                    # To Discard => Hovered 
-                    self.time_digit_components[hover_id].hover()
+                elif prev_state == SetTimerPageState.HOVER_TIME_DIGIT and state == SetTimerPageState.SELECT_TIME_DIGIT:
+                    # Time digit hovered => Time digit selected
+                    self.hoverable_components[hover_id].select()
 
                 self.prev_state.overwrite(state)
                 
             elif hover_id != prev_hover_id:
                 # The digit hovered has changed
-                self.time_digit_components[prev_hover_id].unhover()
-                self.time_digit_components[hover_id].hover()
+                self.hoverable_components[prev_hover_id].unhover()
+                self.hoverable_components[hover_id].hover()
                 self.prev_hover_id.overwrite(hover_id)
+                
+                # Update state according to the selected hoverable
+                self.prev_state.overwrite(self.state.reveal())
+                if self.hoverable_tags[hover_id] == 'time_digit':
+                    self.state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
+                else:
+                    self.state.overwrite(SetTimerPageState.HOVER_BTN)
                 
             elif change_time_digit_val != 0:
                 # The value of the digit should change
-                self.time_digit_components[hover_id].change_value(change_time_digit_val)
+                self.hoverable_components[hover_id].change_value(change_time_digit_val)
                 self.change_time_digit_val.overwrite(0)
             
             
             # Draw components
-            for time_digit in self.time_digit_components:
-                time_digit.draw()
+            for hoverable in self.hoverable_components:
+                hoverable.draw()
             for text in self.text_components:
-                text.draw()
+                text.draw()    
             
-            if state == SetTimerPageState.TO_PROCEED:
-                self.proceed_message.draw()
-            elif state == SetTimerPageState.TO_DISCARD:
-                self.discard_message.draw()
-            
-            self.title_box.draw()
             self.screen.update()
             time.sleep(0.01)
             self.screen.clear()
+        
+        self.display_completed.overwrite(True)
+        print('disply_completed:', self.display_completed.reveal())

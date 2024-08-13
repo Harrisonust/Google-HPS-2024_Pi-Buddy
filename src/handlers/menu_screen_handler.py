@@ -8,6 +8,12 @@ from value_manager import ValueManager
 from pages import *
 
 
+# PageId indexes
+class PageId:
+    MenuPage = 0
+    SetTimerPage = 1 
+
+
 class MenuScreenHandler(Handler):
     def __init__(self, task_queue, debug=False):
         self.debug = debug
@@ -18,11 +24,20 @@ class MenuScreenHandler(Handler):
         GPIO.setmode(GPIO.BCM)
         self.screen = Screen(col_dim=160, row_dim=128)
         self.screen.clear()
-        self.page = SetTimerPage(self.screen)
-
+        
+        self.pages = [
+            MenuPage(self.screen),
+            SetTimerPage(self.screen)
+        ]
+        
         self.menu_screen_handler_busy = ValueManager(int(False))
-        self.current_page_id = ValueManager(0)
+        
+        # self.current_page_id = ValueManager(PageId.SetTimerPage)
+        self.current_page_id = ValueManager(PageId.MenuPage)
+        
         self.current_page_priority = ValueManager(0)
+        
+        self.pages[self.current_page_id.reveal()].start_display()
         
     
     def listen(self):
@@ -35,15 +50,18 @@ class MenuScreenHandler(Handler):
         
         else:
             self.menu_screen_handler_busy.overwrite(int(True))
-            new_page = self.page.handle_task(task_info)
-            
-            if new_page:
-                
-                if new_page == 'Menu':
-                    self.page = MenuPage(self.screen)
-                elif new_page == 'Timer':
-                    self.page = SetTimerPage(self.screen)
+            new_page = self.pages[self.current_page_id.reveal()].handle_task(task_info)
 
+            if new_page:            
+                if new_page == 'MenuPage':
+                    self.current_page_id.overwrite(PageId.MenuPage)
+                    
+                elif new_page == 'SetTimerPage':
+                    self.current_page_id.overwrite(PageId.SetTimerPage)
+                
+                current_page_id = self.current_page_id.reveal()
+                self.pages[current_page_id].reset_states()
+                self.pages[current_page_id].start_display()
                         
             self.menu_screen_handler_busy.overwrite(int(False))
         
