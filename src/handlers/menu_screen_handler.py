@@ -13,6 +13,7 @@ class PageId:
     MenuPage = 0
     SetTimerPage = 1 
     TimerPage = 2
+    TimePage = 3
 
 class MenuScreenHandler(Handler):
     def __init__(self, task_queue, debug=False):
@@ -28,14 +29,16 @@ class MenuScreenHandler(Handler):
         self.pages = [
             MenuPage(self.screen),
             SetTimerPage(self.screen),
-            TimerPage(self.screen)
+            TimerPage(self.screen),
+            TimePage(self.screen)
         ]
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
-        self.current_page_id = ValueManager(PageId.MenuPage)
+        # self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
+        self.current_page_id = ValueManager(PageId.TimePage)
         
         self.current_page_priority = ValueManager(0)
         
@@ -64,6 +67,10 @@ class MenuScreenHandler(Handler):
                     
                 elif new_page == 'TimerPage':
                     self.current_page_id.overwrite(PageId.TimerPage)
+                
+                elif new_page == 'TimePage':
+                    print('B time page')
+                    self.current_page_id.overwrite(PageId.TimePage)
                 
                 current_page_id = self.current_page_id.reveal()
                 self.pages[current_page_id].reset_states(msg_to_new_page)

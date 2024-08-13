@@ -134,10 +134,13 @@ class MenuPage(Page):
                 while True:
                     if self.display_completed.reveal():
                         next_page_title = self.option_box_information[self.hovered_id.reveal()][0]
-                        if next_page_title == 'Timer':
-                            return 'SetTimerPage', None
                         if next_page_title == 'Weather':
                             return 'WeatherPage', None
+                        if next_page_title == 'Timer':
+                            return 'SetTimerPage', None
+                        if next_page_title == 'Time':
+                            print('A time page')
+                            return 'TimePage', None
                     
                         return None, None
                 
