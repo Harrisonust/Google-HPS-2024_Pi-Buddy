@@ -59,7 +59,7 @@ class WeatherPage():
             text='Weather',
             text_size=PageConfig.ICON_TEXT_BOX_TEXT_SIZE,
             color=PageConfig.TITLE_COLOR,
-            icon_path='./icons/menu_timer.png',
+            icon_path='./icons/weather.png',
             background_color=PageConfig.BACKGROUND_COLOR,
             icon_margin_x=PageConfig.ICON_TEXT_BOX_ICON_X_MARGIN,
             icon_y_ratio=PageConfig.ICON_TEXT_BOX_ICON_Y_RATIO,
