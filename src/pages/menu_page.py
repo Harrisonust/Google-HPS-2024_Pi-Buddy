@@ -106,6 +106,7 @@ class MenuPage(Page):
         self.select_triggered.overwrite(int(False))
         self.select_transition_state.overwrite(MenuPageSelectTransitionStage.NONE)
         self.display_completed.overwrite(int(False))
+        self._initiate_option_boxes()
         
     
     def start_display(self):
@@ -153,8 +154,11 @@ class MenuPage(Page):
         
         # Hover over the option box in the middle as default
         num_boxes = len(self.option_box_information)
-        self.hovered_id = ValueManager(num_boxes // 2)
-        print('initial hovered_id', self.hovered_id)
+        if not self.hovered_id:
+            self.hovered_id = ValueManager(num_boxes // 2)
+        else:
+            self.hovered_id.overwrite(num_boxes // 2)
+        # print('initial hovered_id', self.hovered_id)
         
         # Calculate x value of the first box
         screen_width = self.screen.get_col_dim()
@@ -212,8 +216,7 @@ class MenuPage(Page):
                 self.option_boxes[hovered_id].hover()
                 self.hovered_id.overwrite(hovered_id)
                 self.cursor_direction.overwrite(MenuPageCursorDirection.NONE)
-                print('after cursor moved:',self.hovered_id)
-            
+                
             # Check if select had been triggered
             elif select_triggered:
                 select_transition_state = self.select_transition_state.reveal()

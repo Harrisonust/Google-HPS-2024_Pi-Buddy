@@ -64,6 +64,7 @@ class TimePage(Page):
         
         
     def reset_states(self, args):
+        print(args)
         self.state.overwrite(TimePageStates.IDLE)
         self.busy.overwrite(int(False))
         self.display_completed.overwrite(int(False))

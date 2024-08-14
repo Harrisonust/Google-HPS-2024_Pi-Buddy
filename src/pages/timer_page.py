@@ -236,7 +236,6 @@ class TimerPage(Page):
     def _display(self):
         
         prev_tick_time = time.time()
-        # timeup_flag = False
         
         while True:
             self.screen.fill_screen(TimerPageConfig.BACKGROUND_COLOR)

@@ -36,9 +36,9 @@ class MenuScreenHandler(Handler):
         self.menu_screen_handler_busy = ValueManager(int(False))
         
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
-        # self.current_page_id = ValueManager(PageId.MenuPage)
+        self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
-        self.current_page_id = ValueManager(PageId.TimePage)
+        # self.current_page_id = ValueManager(PageId.TimePage)
         
         self.current_page_priority = ValueManager(0)
         
@@ -69,7 +69,6 @@ class MenuScreenHandler(Handler):
                     self.current_page_id.overwrite(PageId.TimerPage)
                 
                 elif new_page == 'TimePage':
-                    print('B time page')
                     self.current_page_id.overwrite(PageId.TimePage)
                 
                 current_page_id = self.current_page_id.reveal()

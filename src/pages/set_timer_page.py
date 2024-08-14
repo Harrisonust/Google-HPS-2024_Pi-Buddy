@@ -95,7 +95,7 @@ class TimeDigit(Text):
     def reset_value(self):
         # Reset value to 0
         self.num = 0
-        self.text = str(self.text)
+        self.text = str(self.num)
         
 
 class SetTimerPageBtnConfig:
@@ -160,6 +160,7 @@ class SetTimerPage(Page):
         self.change_time_digit_val = ValueManager(0)
         self.display_completed = ValueManager(int(False))
         self.time_value_pipe = ValueManager(0)
+        self.reset_values = ValueManager(int(False))
         
         self.hoverable_components[self.hover_id.reveal()].hover()
         
@@ -172,11 +173,11 @@ class SetTimerPage(Page):
         self.prev_hover_id.overwrite(0)
         self.change_time_digit_val.overwrite(0)
         self.display_completed.overwrite(int(False))
+        self.reset_values.overwrite(int(False))
     
     
     def start_display(self):
         # Start display process for set timer page
-        self.display_completed.overwrite(int(False))
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
         
@@ -223,9 +224,7 @@ class SetTimerPage(Page):
                                 return 'TimerPage', self._decode_time_value_pipe(time_value_pipe)
                         
                     elif self.hoverable_tags[hover_id] == 'reset':
-                        for i in range(len(self.hoverable_tags)):
-                            if self.hoverable_tags[i] == 'time_digit':
-                                self.hoverable_components[i].reset_value()
+                        self.reset_values.overwrite(int(True))
                         
                     elif self.hoverable_tags[hover_id] == 'menu':
                         self.state.overwrite(SetTimerPageState.END_DISPLAY)
@@ -286,6 +285,7 @@ class SetTimerPage(Page):
             hover_id = self.hover_id.reveal()
             prev_hover_id = self.prev_hover_id.reveal()
             change_time_digit_val = self.change_time_digit_val.reveal()
+            reset_values = self.reset_values.reveal()
             
             if state == SetTimerPageState.END_DISPLAY:
                 break
@@ -299,6 +299,7 @@ class SetTimerPage(Page):
                 elif prev_state == SetTimerPageState.HOVER_TIME_DIGIT and state == SetTimerPageState.SELECT_TIME_DIGIT:
                     # Time digit hovered => Time digit selected
                     self.hoverable_components[hover_id].select()
+                    
 
                 self.prev_state.overwrite(state)
                 
@@ -320,6 +321,12 @@ class SetTimerPage(Page):
                 self.hoverable_components[hover_id].change_value(change_time_digit_val)
                 self.change_time_digit_val.overwrite(0)
             
+            if reset_values:
+                for i in range(len(self.hoverable_tags)):
+                    if self.hoverable_tags[i] == 'time_digit':
+                        self.hoverable_components[i].reset_value()
+                self.reset_values.overwrite(int(False))
+            
             
             # Draw components
             for hoverable in self.hoverable_components:
@@ -336,7 +343,8 @@ class SetTimerPage(Page):
         
     
     def _decode_time_value_pipe(self, time_value_pipe):
-        time_val_keys = ['sec_l', 'sec_h', 'min_l', 'min_h', 'hr_l', 'hr_h']
+        # time_val_keys = ['sec_l', 'sec_h', 'min_l', 'min_h', 'hr_l', 'hr_h']
+        time_val_keys = ['hr_h', 'hr_l', 'min_h', 'min_l', 'sec_h', 'sec_l']
         time_val = dict()
         
         for i in range(len(time_val_keys)):
