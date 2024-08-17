@@ -111,7 +111,6 @@ class MenuPage(Page):
     
     def start_display(self):
         # Start display process for menu page
-        self.display_completed.overwrite(int(False))
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
     

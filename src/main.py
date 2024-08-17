@@ -3,7 +3,7 @@ import multiprocessing
 
 from handlers import *
 from test_functions import *
-
+import RPi.GPIO as GPIO
 
 class TaskQueue:
     def __init__(self):
@@ -87,6 +87,7 @@ if __name__ == '__main__':
     debug = True
     test_function = battery_charge_discharge_test
     
+    GPIO.setmode(GPIO.BCM)
     # Initialize the Control class, which starts all processes
     # Control(debug=debug, test_function=test_function)
     Control()

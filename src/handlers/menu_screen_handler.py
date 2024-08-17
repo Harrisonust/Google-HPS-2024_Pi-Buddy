@@ -14,6 +14,8 @@ class PageId:
     SetTimerPage = 1 
     TimerPage = 2
     TimePage = 3
+    WeatherPage = 4
+    
 
 class MenuScreenHandler(Handler):
     def __init__(self, task_queue, debug=False):
@@ -22,7 +24,6 @@ class MenuScreenHandler(Handler):
         self.run_input_process = False
         self.task_queue = task_queue
         
-        GPIO.setmode(GPIO.BCM)
         self.screen = Screen(col_dim=160, row_dim=128)
         self.screen.clear()
         
@@ -30,15 +31,18 @@ class MenuScreenHandler(Handler):
             MenuPage(self.screen),
             SetTimerPage(self.screen),
             TimerPage(self.screen),
-            TimePage(self.screen)
+            TimePage(self.screen),
+            WeatherPage(self.screen)
         ]
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         
-        # self.current_page_id = ValueManager(PageId.SetTimerPage)
         self.current_page_id = ValueManager(PageId.MenuPage)
+        
+        # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
         # self.current_page_id = ValueManager(PageId.TimePage)
+        self.current_page_id = ValueManager(PageId.WeatherPage)
         
         self.current_page_priority = ValueManager(0)
         
@@ -70,6 +74,9 @@ class MenuScreenHandler(Handler):
                 
                 elif new_page == 'TimePage':
                     self.current_page_id.overwrite(PageId.TimePage)
+                    
+                elif new_page == 'WeatherPage':
+                    self.current_page_id.overwrite(PageId.WeatherPage)
                 
                 current_page_id = self.current_page_id.reveal()
                 self.pages[current_page_id].reset_states(msg_to_new_page)

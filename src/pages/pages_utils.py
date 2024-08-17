@@ -10,8 +10,8 @@ class ThemeColors:
             'Success':      0x5df8,     # teal
             'Danger':       0xf16f,     # pink
             'Warning':      0x64bd,     # blue
-            'Info':         0x9dcb,     # rose
-            'Contrast':     0xfc8e,     # olive-green
+            'Info':         0x9dcb,     # olive-green
+            'Contrast':     0xfc8e,     # rose
         },
         'UprightCrimson': {
             'Primary':      0xffff,     # white
@@ -46,15 +46,34 @@ theme_colors = ThemeColors()
 
 
 class IconPaths:
+    # Menu icons
     Weather = './icons/weather.png'
     Battery = './icons/battery.png'
     Timer = './icons/timer.png'
     Time = './icons/time.png'
     Surprise = './icons/surprise.png'
+    
+    # Timer icons
     Menu = './icons/menu.png'
     Reset = './icons/reset.png'
     Proceed = './icons/proceed.png'
+    
+    # Weather icons
+    Sun = './icons/sun.png'
+    Moon = './icons/moon.png'
+    CloudSun = './icons/cloud_sun.png'
+    CloudMoon = './icons/cloud_moon.png'
+    Cloud = './icons/cloud.png'
 
+    Rain = './icons/rain.png'
+    Lightning = './icons/lightning.png'
+    Fog = './icons/fog.png'
+    Snow = './icons/snow.png'
+    Ice = './icons/ice.png'
+    RainLightning = './icons/rain_lightning.png'
+    RainSnow = './icons/rain_snow.png'
+    IceLightning = './icons/ice_lightning.png'
+    SnowLightning = './icons/snow_lightning.png'
 
 class PageConfig():
     # Colors
@@ -78,8 +97,9 @@ class PageConfig():
     BTN_ICON_Y_RATIO = 0.8
     BTN_ICON_X_MARGIN = 2
     BTN_TEXT_SIZE = 10
-         
-    
+
+
+
 class IconTextBox():
     def __init__(self, screen, x_marking, y_marking, box_width, box_height, text, text_size, color, background_color, 
                  icon_path, icon_margin_x, icon_y_ratio, border=0, x_margin=0, y_margin=0,
