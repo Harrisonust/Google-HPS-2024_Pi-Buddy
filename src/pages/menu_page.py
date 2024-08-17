@@ -140,7 +140,6 @@ class MenuPage(Page):
                         if next_page_title == 'Timer':
                             return 'SetTimerPage', None
                         if next_page_title == 'Time':
-                            print('A time page')
                             return 'TimePage', None
                     
                         return None, None
@@ -158,7 +157,6 @@ class MenuPage(Page):
             self.hovered_id = ValueManager(num_boxes // 2)
         else:
             self.hovered_id.overwrite(num_boxes // 2)
-        # print('initial hovered_id', self.hovered_id)
         
         # Calculate x value of the first box
         screen_width = self.screen.get_col_dim()

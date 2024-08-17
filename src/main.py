@@ -79,6 +79,7 @@ class Control:
                 # Start a new process to handle the output for the task
                 process = multiprocessing.Process(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.start()             
+
                 
    
 if __name__ == '__main__':
