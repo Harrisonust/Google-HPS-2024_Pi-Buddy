@@ -2,7 +2,8 @@ import time
 from datetime import datetime
 import RPi.GPIO as GPIO
 import smbus
-from pisugar3_reg import *
+from components.pisugar3.pisugar3_reg import *
+# from pisugar3_reg import *
 
 class BatteryManager: 
 	def __init__(self):

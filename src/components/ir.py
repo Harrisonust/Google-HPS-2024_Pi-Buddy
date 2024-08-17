@@ -9,9 +9,11 @@ class IR:
         GPIO.setup(self.__pin, GPIO.IN, pull_up_down=GPIO.PUD_OFF)
         GPIO.add_event_detect(self.__pin, GPIO.BOTH, callback=self.__ir_callback, bouncetime=200)
 
+    # triggers if distance is less than a pre-defined threshold
     def is_triggered(self) -> bool: 
         return self.__current_state == GPIO.LOW
 
+    # returns 0 or 1; does pretty much the same thing as is_triggered
     def get_state(self) -> int:
         return self.__current_state
 

@@ -4,10 +4,11 @@ from enum import Enum
 from PIL import Image, ImageDraw, ImageFont
 import spidev
 import RPi.GPIO as GPIO
-from st7735s_reg import *
+from components.st7735s.st7735s_reg import *
+# from st7735s_reg import *
 import numpy as np
 import os
-import cv2
+# import cv2
 
 class RGB565Color:
     # https://rgbcolorpicker.com/565
@@ -180,10 +181,10 @@ class Screen:
         self._buf[y, x] = [color >> 8, color & 0xFF]
 
     def draw_vertical_line(self, x, y, len_, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or y+len_ > self._row_dim:
-            raise ValueError("pixel out of bound")
-        if len_ < 1:
-            raise ValueError("len must be greater than 1")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or y+len_ > self._row_dim:
+        #     raise ValueError("pixel out of bound")
+        # if len_ < 1:
+        #     raise ValueError("len must be greater than 1")
 
         if color is None:
             color = self._brush_color
@@ -192,10 +193,10 @@ class Screen:
         self._buf[y:y+len_, x, 1] = color & 0xFF
 
     def draw_horizontal_line(self, x, y, len_, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or x+len_ > self._col_dim:
-            raise ValueError("pixel out of bound")
-        if len_ < 1:
-            raise ValueError("len must be greater than 1")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or x+len_ > self._col_dim:
+        #     raise ValueError("pixel out of bound")
+        # if len_ < 1:
+        #     raise ValueError("len must be greater than 1")
 
         if color is None:
             color = self._brush_color
@@ -204,10 +205,10 @@ class Screen:
         self._buf[y, x:x+len_, 1] = color & 0xFF
 
     def draw_rectangle(self, x, y, xlen, ylen, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or x+xlen > self._col_dim or y+ylen > self._row_dim:
-            raise ValueError("pixel out of bound")
-        if xlen < 1 or ylen < 1:
-            raise ValueError("lens must be greater than 1")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim or x+xlen > self._col_dim or y+ylen > self._row_dim:
+        #     raise ValueError("pixel out of bound")
+        # if xlen < 1 or ylen < 1:
+        #     raise ValueError("lens must be greater than 1")
 
         if color is None:
             color = self._brush_color
@@ -216,8 +217,8 @@ class Screen:
         self._buf[y:y+ylen, x:x+xlen, 1] = color & 0xFF
 
     def draw_circle(self, x, y, radius, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
         if color is None:
             color = self._brush_color
         
@@ -227,8 +228,8 @@ class Screen:
                     self.draw_pixel(x+i, y+j, color)
 
     def draw_sector(self, x, y, radius, start_angle, end_angle, color=None) -> None:
-        if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
-            raise ValueError("pixel out of bound")
+        # if x < 0 or x > self._col_dim or y < 0 or y > self._row_dim:
+        #     raise ValueError("pixel out of bound")
         if color is None:
             color = self._brush_color
         
@@ -248,8 +249,8 @@ class Screen:
                             self.draw_pixel(x+i, y+j, color) 
 
     def draw_text(self, x, y, text, size, color=None) -> None:
-        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-            raise ValueError("Pixel out of bound")
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
 
         if color is None:
             color = self._brush_color
@@ -270,37 +271,59 @@ class Screen:
                 rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
                 if rgb565 != 0x0000:
                     self.draw_pixel(x+i, y+j, rgb565)
+                    
+    def draw_image(self, x, y, width, height, path, replace_with=None) -> None:
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
+        # if (x + width > self._col_dim) or (y + height > self._row_dim):
+        #     raise ValueError("Image exceeds display bounds")
 
-    def draw_image_from_path(self, x, y, width, height, path) -> None:
-        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-            raise ValueError("Pixel out of bound")
-        if (x + width > self._col_dim) or (y + height > self._row_dim):
-            raise ValueError("Image exceeds display bounds")
+        img = Image.open(path)
+        img = img.resize((width, height), Image.Resampling.LANCZOS)
+        img = img.convert("RGB")
 
-        img = cv2.imread(path)
-        img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+        pixels = list(img.getdata())
+        for j in range(height):
+            for i in range(width):
+                r, g, b = pixels[j*width+i]
+                # print(r,g,b)
+                if replace_with and (r, g, b) in replace_with:
+                    self.draw_pixel(x+i, y+j, replace_with[(r,g,b)])
+                else:
+                    rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+                    self.draw_pixel(x+i, y+j, rgb565)
+                    
+
+    # def draw_image_from_path(self, x, y, width, height, path) -> None:
+    #     # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+    #     #     raise ValueError("Pixel out of bound")
+    #     # if (x + width > self._col_dim) or (y + height > self._row_dim):
+    #     #     raise ValueError("Image exceeds display bounds")
+
+    #     img = cv2.imread(path)
+    #     img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         
-        r = img[:, :, 2].astype(np.uint16) 
-        g = img[:, :, 1].astype(np.uint16) 
-        b = img[:, :, 0].astype(np.uint16) 
-        color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-        self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
-        self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
+    #     r = img[:, :, 2].astype(np.uint16) 
+    #     g = img[:, :, 1].astype(np.uint16) 
+    #     b = img[:, :, 0].astype(np.uint16) 
+    #     color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+    #     self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
+    #     self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
-    # data: numpy array with shape = (y, x, depth) 
-    def draw_image_from_data(self, x, y, width, height, data: np.ndarray) -> None:
-        if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-            raise ValueError("Pixel out of bound")
-        if (x + width > self._col_dim) or (y + height > self._row_dim):
-            raise ValueError("Image exceeds display bounds")
+    # # data: numpy array with shape = (y, x, depth) 
+    # def draw_image_from_data(self, x, y, width, height, data: np.ndarray) -> None:
+    #     # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+    #     #     raise ValueError("Pixel out of bound")
+    #     # if (x + width > self._col_dim) or (y + height > self._row_dim):
+    #     #     raise ValueError("Image exceeds display bounds")
         
-        data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
-        r = data[:, :, 2].astype(np.uint16)
-        g = data[:, :, 1].astype(np.uint16)
-        b = data[:, :, 0].astype(np.uint16)
-        color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-        self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
-        self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
+    #     data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
+    #     r = data[:, :, 2].astype(np.uint16)
+    #     g = data[:, :, 1].astype(np.uint16)
+    #     b = data[:, :, 0].astype(np.uint16)
+    #     color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+    #     self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
+    #     self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
     def fill_screen(self, color) -> None:
         if color is None:
@@ -325,7 +348,7 @@ if __name__ == '__main__':
     screen = Screen(col_dim=160, row_dim=128)
     screen.clear()
 
-    img = cv2.imread("./google.jpg")
+    # img = cv2.imread("./google.jpg")
     while 1:
         
         screen.draw_pixel(0, 0, RGB565Color.WHITE)
@@ -343,7 +366,7 @@ if __name__ == '__main__':
         screen.draw_circle(90, 20, 20, RGB565Color.BLUE)
         screen.draw_sector(40, 30, 25, -45, 45, RGB565Color.ORANGE)
         
-        screen.draw_image_from_path(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, 40, 40, "./google.jpg")
+        # screen.draw_image_from_path(screen.get_col_dim()//2-20, screen.get_row_dim()//2-10, 40, 40, "./google.jpg")
         screen.draw_text(screen.get_col_dim()//2-50, screen.get_row_dim()//2+30, "Google HPS 2024", 12, RGB565Color.WHITE)
 
         colorlist = [RGB565Color.BLACK, RGB565Color.WHITE, RGB565Color.BLUE, RGB565Color.RED, 

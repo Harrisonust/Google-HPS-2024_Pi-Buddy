@@ -3,7 +3,7 @@ import multiprocessing
 
 from handlers import *
 from test_functions import *
-
+import RPi.GPIO as GPIO
 
 class TaskQueue:
     def __init__(self):
@@ -42,7 +42,9 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            'battery': BatteryHandler(self.task_queue, debug=self.debug)
+            # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
+            'encoders': TestEncodersHandler(self.task_queue, debug=self.debug),
+            'menu_screen': MenuScreenHandler(self.task_queue, debug=self.debug)
         }
     
         # Start listening processes for each handler
@@ -73,11 +75,11 @@ class Control:
         while True:
             if self.task_queue.get_len() != 0:
                 # Pop task from task_queue
-                task_info = self.task_queue.pop()     
-                
+                task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
                 process = multiprocessing.Process(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.start()             
+
                 
    
 if __name__ == '__main__':
@@ -85,5 +87,7 @@ if __name__ == '__main__':
     debug = True
     test_function = battery_charge_discharge_test
     
+    GPIO.setmode(GPIO.BCM)
     # Initialize the Control class, which starts all processes
-    Control(debug=debug, test_function=test_function)
+    # Control(debug=debug, test_function=test_function)
+    Control()
