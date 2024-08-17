@@ -269,8 +269,8 @@ class Screen:
             for i in range(img.width):
                 r, g, b = pixels[j*img.width+i]
                 rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-                if rgb565 != 0x0000:
-                    self.draw_pixel(x+i, y+j, rgb565)
+                if rgb565 > 20000:
+                    self.draw_pixel(x+i, y+j, color)
                     
     def draw_image(self, x, y, width, height, path, replace_with=None) -> None:
         # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
