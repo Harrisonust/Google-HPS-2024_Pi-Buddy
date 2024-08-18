@@ -15,13 +15,12 @@ if __name__ == '__main__':
                     output_device_index=DEVICE_INDEX,)
 
     start = time.time()
-    dataframe = None
     data = []
 
+    print('recording')
     while 1:
         if time.time() - start < 5.0:
-            print('recording')
-            dataframe = stream.read(DATA_CHUNK_SIZE)
+            dataframe = stream.read(DATA_CHUNK_SIZE, exception_on_overflow=False)
             data.append(dataframe)
         else:
             print('playing')
