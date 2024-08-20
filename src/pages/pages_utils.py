@@ -47,11 +47,12 @@ theme_colors = ThemeColors()
 
 class IconPaths:
     # Menu icons
-    Weather = './icons/weather.png'
+    Weather = './icons/cloud_sun.png'
     Battery = './icons/battery.png'
     Timer = './icons/timer.png'
     Time = './icons/time.png'
     Surprise = './icons/surprise.png'
+    Todo = './icons/checked_bordered.png'
     
     # Timer icons
     Menu = './icons/menu.png'
@@ -64,7 +65,6 @@ class IconPaths:
     CloudSun = './icons/cloud_sun.png'
     CloudMoon = './icons/cloud_moon.png'
     Cloud = './icons/cloud.png'
-
     Rain = './icons/rain.png'
     Lightning = './icons/lightning.png'
     Fog = './icons/fog.png'
@@ -75,8 +75,16 @@ class IconPaths:
     IceLightning = './icons/ice_lightning.png'
     SnowLightning = './icons/snow_lightning.png'
 
+    # Todo icons
+    Unchecked = './icons/unchecked.png'
+    Checked_Bordered = './icons/checked_bordered.png'
+    Checked_Filled = './icons/checked_filled.png'
+
 class PageConfig():
     # Colors
+    SCREEN_HEIGHT = 128
+    SCREEN_WIDTH = 160
+    
     ICON_TRUE_COLOR = (255, 255, 255)
     ICON_FALSE_COLOR = (0, 0, 0)
     DEFAULT_COLOR = theme_colors.Font

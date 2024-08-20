@@ -1,5 +1,6 @@
 import time
 import threading
+import sqlite3
 
 from value_manager import ValueManager
 from handlers.handler import Handler
@@ -10,6 +11,9 @@ class TestEncodersHandler(Handler):
     def __init__(self, task_queue, debug=False):
         self.run_input_process = False
         self.task_queue = task_queue
+        
+        self.conn = sqlite3.connect('database/todo.db')
+        self.cursor = self.conn.cursor()
 
         listen_key_input_thread = threading.Thread(target=self._listen_key_input)
         listen_key_input_thread.start()
@@ -46,6 +50,28 @@ class TestEncodersHandler(Handler):
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
                     'task': 'OUT_RESUME',
+                    'task_priority': 1
+                })
+            
+            # FOR DEBUGGIN ONLY!!
+            # adds a new task to the sql table
+            elif user_input == '+':
+                try:
+                    self.cursor.execute(
+                        f'''
+                        INSERT INTO todo (task_name, due_date, priority, is_active)
+                        VALUES ('Dummy task for testing', '2024-08-21', 1, 1)
+                        '''
+                    )
+                    self.conn.commit()
+                    
+                except Exception as e:
+                    print(f'An error ocurred: {e}')
+                
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'RELOAD_SQL_TABLE',
                     'task_priority': 1
                 })
     

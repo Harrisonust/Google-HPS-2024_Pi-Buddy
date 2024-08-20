@@ -91,6 +91,7 @@ class MenuPage(Page):
             ['Time', IconPaths.Time],
             ['Battery', IconPaths.Battery],
             ['Timer',   IconPaths.Timer],
+            ['Todo List', IconPaths.Todo],
             ['???',     IconPaths.Surprise]
         ]
         self.background_color = theme_colors.Primary
@@ -140,6 +141,8 @@ class MenuPage(Page):
                             return 'SetTimerPage', None
                         if next_page_title == 'Time':
                             return 'TimePage', None
+                        if next_page_title == 'Todo List':
+                            return 'TodoPage', None
                     
                         return None, None
                 

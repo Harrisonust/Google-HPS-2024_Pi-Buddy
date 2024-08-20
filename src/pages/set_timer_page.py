@@ -45,7 +45,7 @@ class TimeDigitConfig():
     DEFAULT_NUM = 0
     TEXT_SIZE = SetTimerPageConfig.TIME_DIGIT_TEXT_SIZE
     DEFAULT_COLOR = PageConfig.DEFAULT_COLOR
-    HOVERED_COLOR = PageConfig.HOVERED_COLOR
+    HOVERED_COLOR = theme_colors.Highlight
     ON_CHANGE_COLOR = theme_colors.Danger
     
     

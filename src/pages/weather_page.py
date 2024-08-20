@@ -8,7 +8,7 @@ import sys
 
 from pages.pages_utils import theme_colors, PageConfig, Text, IconPaths
 from value_manager import ValueManager
-
+from pages.page import Page
 
 
 
@@ -120,7 +120,7 @@ class WeatherPageStates:
     EXITING = 1
 
 
-class WeatherPage():
+class WeatherPage(Page):
     def __init__(self, screen):
         self.screen = screen
         
@@ -151,10 +151,6 @@ class WeatherPage():
         display_process = multiprocessing.Process(target=self._display)
         display_process.start()
         
-        
-    def listen(self):
-        raise TypeError(f'Invalid call to ScreenHandler "listen" function')
-
 
     def handle_task(self, task_info):
         if not self.weather_page_busy.reveal():
