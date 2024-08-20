@@ -1,5 +1,6 @@
 import time
 from  smbus2 import SMBus, i2c_msg
+from vl53l1x_reg import *
 
 class VL53L1X:
     def __init__(self):
@@ -24,32 +25,35 @@ class VL53L1X:
             return read
 
     def init_sensor(self):
-        self.write_register(0x0000, 0x00, wlen=1)
+        self.write_register(SOFT_RESET, 0x00, wlen=1)
         time.sleep(0.1)
-        self.write_register(0x0000, 0x01, wlen=1) # reset
+        self.write_register(SOFT_RESET, 0x01, wlen=1) # reset
         time.sleep(1)
         
-        self.fast_osc_freq = int.from_bytes(self.read_register(0x0006, rlen=2))
-        self.osc_calibrate_val = int.from_bytes(self.read_register(0x00DE, rlen=2))
+        self.fast_osc_freq = int.from_bytes(self.read_register(MEASURED_FAST_OSC_FREQ, rlen=2))
+        self.osc_calibrate_val = int.from_bytes(self.read_register(OSC_CALIBRATE_VAL, rlen=2))
 
     def start_continuous(self, period_ms):
-        self.write_register(0x006C, self.osc_calibrate_val, 4)
-        self.write_register(0x0086, 0x01, wlen=1) # system interrupt clear
-        self.write_register(0x0087, 0x40, wlen=1) # continuous
+        self.write_register(INTER_MEASUREMENT_PERIOD, self.osc_calibrate_val, wlen=4) # set inter-measurement period in miiliseconds
+        self.write_register(INTERRUPT_CLEAR, 0x01, wlen=1) # system interrupt clear
+        self.write_register(MODE_START, 0x40, wlen=1) # continuous
 
     def get_model_id(self):
-        return self.read_register(0x010F, 1)
+        return self.read_register(IDENTIFICATION_MODEL_ID, rlen=1)
 
     def start_ranging(self):
-        self.write_register(0x0000, 0x01, wlen=1)  # Example command to start ranging
+        self.write_register(SOFT_RESET, 0x01, wlen=1)  
+
+    def stop_ranging(self):
+        self.write_register(SOFT_RESET, 0x00, wlen=1)  # Example command to stop ranging
 
     def check_data_ready(self):
-        status = self.read_register(0x0031, 1)  # Example register for status
+        status = self.read_register(TIO_HV_STATUS, rlen=1)  
         return (status & 0x01) == 0x00
 
     def get_distance(self):
         if self.check_data_ready():
-            rbuf = list(self.read_register(0x0089, 17))  # Example register for distance
+            rbuf = list(self.read_register(RANGE_STATUS, rlen=17))  
             # 0: range status
             # 1: report status (not used)
             # 2: stream count
@@ -71,9 +75,6 @@ class VL53L1X:
             return distance
         else:
             return None
-
-    def stop_ranging(self):
-        self.write_register(0x0000, 0x00)  # Example command to stop ranging
 
     def close(self):
         self.bus.close()
