@@ -11,6 +11,10 @@ ENV/
 .venv/
 .VENV/
 
+# Photographed images and filmed videos
+photographs/
+videos/
+
 # Distribution / packaging
 build/
 dist/

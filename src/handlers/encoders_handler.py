@@ -34,44 +34,39 @@ class EncodersHandler(Handler):
             select_encoder_cur_pos = self.select_encoder.get_position()
             
             if select_encoder_cur_pos - self.select_encoder_prev_pos > EncoderConfig.VALID_DISPLACEMENT.value:
-                # ENTER SELECTED
-                # self.task_queue.append({
-                #     'requester_name': 'encoders',
-                #     'handler_name': 'menu',
-                #     'task': 'ENTER_SELECT',
-                #     'task_priority': 1
-                # })
-                pass
+                # ENTER_SELECT
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'ENTER_SELECT',
+                    'task_priority': 1
+                })
             
             elif self.select_encoder_prev_pos - select_encoder_cur_pos > EncoderConfig.VALID_DISPLACEMENT.value:
-                # RESUME
-                # self.task_queue.append({
-                #     'requester_name': 'encoders',
-                #     'handler_name': 'menu',
-                #     'task': 'OUT_RESUME',
-                #     'task_priority': 1
-                # })
-                pass
+                # OUT_RESUME
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'OUT_RESUME',
+                    'task_priority': 1
+                })
             
             elif glide_encoder_cur_pos - self.glide_encoder_prev_pos > EncoderConfig.VALID_DISPLACEMENT.value:
-                # MOVE CURSOR RIGHT/UP
-                # self.task_queue.append({
-                #     'requester_name': 'encoders',
-                #     'handler_name': 'menu',
-                #     'task': 'MOVE_CURSOR_RIGHT_UP',
-                #     'task_priority': 1
-                # })
-                pass
+                # MOVE_CURSOR_RIGHT_UP
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'MOVE_CURSOR_RIGHT_UP',
+                    'task_priority': 1
+                })
             
             elif self.glide_encoder_prev_pos - glide_encoder_cur_pos > EncoderConfig.VALID_DISPLACEMENT.value:
-                # MOVE CURSOR LEFT/DOWN
-                # self.task_queue.append({
-                #     'requester_name': 'encoders',
-                #     'handler_name': 'menu',
-                #     'task': 'MOVE_CURSOR_LEFT_DOWN',
-                #     'task_priority': 1
-                # })
-                pass
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'MOVE_CURSOR_LEFT_DOWN',
+                    'task_priority': 1
+                })
             
             else:
                 # NO ACTION

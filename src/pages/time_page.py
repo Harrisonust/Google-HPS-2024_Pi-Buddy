@@ -64,7 +64,6 @@ class TimePage(Page):
         
         
     def reset_states(self, args):
-        print(args)
         self.state.overwrite(TimePageStates.IDLE)
         self.busy.overwrite(int(False))
         self.display_completed.overwrite(int(False))
@@ -96,7 +95,6 @@ class TimePage(Page):
         
         
     def _display(self):
-        print('in display')
         while True:
             
             state = self.state.reveal()

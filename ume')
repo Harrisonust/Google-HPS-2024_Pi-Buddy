@@ -1,0 +1,180 @@
+[33mcommit cb5e4ddbbef8ac5b0c0ba240c40f079252a2e8c3[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/add-menu-screen[m[33m, [m[1;31morigin/feature/add-menu-screen[m[33m)[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Mon Aug 12 02:14:49 2024 +0800
+
+    feat: done menu_page and set_timer_page; transitions between pages to go
+
+[33mcommit 59557714682c9742fc40a5b3131b37dc04d22c19[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Sun Aug 11 18:00:35 2024 +0800
+
+    triv: minor changes made to st7735s.py
+    
+    1. Disabled out-of-bound value errors
+       Modified code to only check if pixel is out-of-bound in draw_pixel function.
+       Change was made to enable drawing components that fits partly in screen.
+    2. Added parameter 'replace_with' in draw_image function
+       Dictionaries mapping color of target to color to replace with could be
+       passed to the draw_image function through the 'replace_with' parameter.
+       The target color should be specified through a tuple representing rgb,
+       and the replace-with-color should be specified in the rgb565 format.
+    3. Enabled usage of 'color' in draw_text
+       Changed the last line of the function for usage of the specified color.
+
+[33mcommit 39def4dfe05dd6f3dca2eb2aab7d5a57dc32b73a[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Sun Aug 11 17:59:45 2024 +0800
+
+    "feat: menu_page completed"
+
+[33mcommit 69fb54d0125b80d3cf947f9d7ab8a796e78a1063[m
+Merge: 01439c5 934385d
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Fri Aug 9 07:37:48 2024 +0800
+
+    Merge branch 'feature/st7735s' into feature/add-menu-screen
+
+[33mcommit 934385d61b7147f7d582e9311020dee3f353463d[m[33m ([m[1;31morigin/feature/st7735s[m[33m, [m[1;32mfeature/st7735s[m[33m)[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Thu Aug 8 21:55:50 2024 +0800
+
+    rotate screen orientation
+
+[33mcommit 01439c5a6d3c6d454f9ef793a3050c8cf904af82[m
+Merge: 7292f8f 9d725ac
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Thu Aug 8 21:17:05 2024 +0800
+
+    Merge branch 'feature/st7735s' into feature/add-menu-screen
+
+[33mcommit 7292f8f96c2fe2d38fe5c42edcac610c1a2d0d60[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Thu Aug 8 21:12:38 2024 +0800
+
+    wip: Screen and menu features still in process
+
+[33mcommit 9d725ac6727f8c645438bb247df4486646a84fe1[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Tue Aug 6 23:20:40 2024 +0800
+
+    send screen update once when update is called
+
+[33mcommit 7e23def1b28f78df9c50e3d1b835db3cc10b7bc0[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Mon Aug 5 19:20:53 2024 +0800
+
+    add draw image and text(text still not working), move st7735s files to an independent folder
+
+[33mcommit 80da4bacdbba6f65ea9ca1941092a31bc3693f12[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Mon Aug 5 15:28:24 2024 +0800
+
+    add color codes, add circles and sector
+
+[33mcommit db3597177d4c8e138d16214dd7e58270bb492626[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Mon Aug 5 04:26:05 2024 +0100
+
+    add basic functions for st7735s
+
+[33mcommit 74f843000c0fcba480710e19addafffbb6550bcb[m[33m ([m[1;31morigin/feature/add-screen-handler[m[33m, [m[1;31morigin/debug/fix-test-main-battery-handler[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Thu Aug 1 20:22:13 2024 +0800
+
+    debug, test: Improved and tested main.py and battery_handler.py
+    
+    - Enhanced TaskQueue and ValueManager classes by using multiprocessing
+      objects for better robustness.
+    - Updated BatteryHandler to use Enums for states and made ValueManager
+      more flexible to handle both integers and Enums.
+    - Changed task_queue from lists to dictionaries for improved readability
+      and reduced errors.
+    - Added new test functions and components for verification. Included a
+      debug settins in main.py.
+
+[33mcommit 1281185d23e424f6deef8bffbf4cde3f742818fc[m
+Author: Beer-and-Skittles <jessicahu1012@gmail.com>
+Date:   Wed Jul 31 23:52:21 2024 +0800
+
+    update main and handlers folder
+    
+    Added multiprocessing support in main.py to handle task management and
+    state monitoring in the control system. Provided templated of handlers in
+    src/handler.py, and provided untested example in src/battery_handler.py.
+    
+    - Introduced `TaskQueue` class for managing tasks using a synchronized
+      list with locking.
+      - Provides methods to append tasks, pop tasks, and get the length of
+        the task queue.
+    
+    - Created `Control` class to manage the overall control flow.
+      - Initiates task queue and handlers; passes the instantiated task_queue
+        pointer to all handlers during initialization.
+      - Starts separate processes for input listening and task handling.
+    
+    - Added `Value`
+      - Provides method to reveal and overwrite values in a safe manner.
+    
+    - Created `Handler` class as blueprint to all future handlers.
+    
+    - Added `BatteryHandler` class to provide example.
+      - Listens to battery levels and updates task queue to call on screen
+        to show 'HUNGRY'/'ENERGETIC' expressions when batter level drops to
+        low/has charged to full.
+      - Handles output tasks such as resuming or stopping charging based on
+        battery states. Task is pended back to queue when battery is busy and
+        will be ignored if the task is already in execution.
+
+[33mcommit 56b2278d89f27915938f7faf8eb3f1265b730967[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Wed Jul 31 16:23:13 2024 +0100
+
+    update pin definitions (add I2S DIN)
+
+[33mcommit 4c82db9913fe0dce41df28f3d440aa7274952fab[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Wed Jul 31 05:04:30 2024 +0100
+
+    add ir implementation
+
+[33mcommit 48dfadd935314cc051ca1df9670d37d781033bf0[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Wed Jul 31 04:06:15 2024 +0100
+
+    add encoder unit test
+
+[33mcommit 000bc4d090ad7ebf5a27e3c9031f5d761459d5a7[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Tue Jul 30 16:31:46 2024 +0100
+
+    update readme
+
+[33mcommit 4f821cf2f7799839e18bc3670bda95f9c30935bf[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Tue Jul 30 16:29:06 2024 +0100
+
+    add api prototypes for each components
+
+[33mcommit 8a59ed5c1a88d4e858ad0d48bddacde9af5fc227[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Tue Jul 30 16:28:44 2024 +0100
+
+    separate tasks to different files
+
+[33mcommit 48f74b8e5fd5d95826d5c035ee042f939836dbb9[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Mon Jul 29 13:02:11 2024 +0100
+
+    move file __init__.py into components/ and remove empty folder
+
+[33mcommit c127d24ef7fea1f896ce6fc54fd694b487c6ca07[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Mon Jul 29 12:57:09 2024 +0100
+
+    add button, encoder and led components
+
+[33mcommit 87e2cd5eeb1128ca98db9dc5fca145386f2e0e08[m
+Author: Harrisonust <harrisonlo2024@hps-program.com>
+Date:   Sun Jul 28 14:44:07 2024 +0100
+
+    init

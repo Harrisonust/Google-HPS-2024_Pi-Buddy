@@ -146,11 +146,9 @@ class BatteryPage(Page):
     
         
     def reset_states(self, args):
-        print('reset states')
         self.state.overwrite(BatteryPageStates.IDLE)
         self.busy.overwrite(int(False))
         self.display_completed.overwrite(int(False))
-        
         # battery_level and battery_charging should NOT be reset!!
     
     
@@ -186,8 +184,7 @@ class BatteryPage(Page):
                         return 'MenuPage', None
             
             self.busy.overwrite(int(False))
-        
-        print('handle task ended')
+
             
     
     def _display(self):
