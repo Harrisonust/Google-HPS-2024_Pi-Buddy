@@ -22,17 +22,40 @@
 -- INSERT INTO todo (task_name, due_date, is_active)
 -- VALUES ('Submit assignment for UC San Diego', '2024-08-20', 1);
 
-
-
 -- UPDATE todo
 -- SET is_active = 1;
 
-
 -- SELECT * FROM todo;
 
-DROP TABLE IF EXISTS saved_imgs;
 
-CREATE TABLE saved_imgs (
+
+
+-- DROP TABLE IF EXISTS saved_imgs;
+
+-- CREATE TABLE saved_imgs (
+--     id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     img_name TEXT NOT NULL,
+--     img_path TEXT NOT NULL,
+--     is_active INTEGER DEFAULT 1,
+--     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+--     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- INSERT INTO saved_imgs (img_name, img_path)
+-- VALUES ('img1.png', '../images/img1.png');
+
+-- INSERT INTO saved_imgs (img_name, img_path)
+-- VALUES ('img2.png', '../images/img2.png');
+
+-- INSERT INTO saved_imgs (img_name, img_path)
+-- VALUES ('img3.png', '../images/img3.png');
+
+-- SELECT * FROM saved_imgs;
+
+
+
+
+CREATE TABLE saved_videos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     img_name TEXT NOT NULL,
     img_path TEXT NOT NULL,
@@ -41,14 +64,13 @@ CREATE TABLE saved_imgs (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO saved_imgs (img_name, img_path)
+INSERT INTO saved_videos (img_name, img_path)
 VALUES ('img1.png', '../images/img1.png');
 
-INSERT INTO saved_imgs (img_name, img_path)
+INSERT INTO saved_videos (img_name, img_path)
 VALUES ('img2.png', '../images/img2.png');
 
 INSERT INTO saved_imgs (img_name, img_path)
 VALUES ('img3.png', '../images/img3.png');
-
 
 SELECT * FROM saved_imgs;

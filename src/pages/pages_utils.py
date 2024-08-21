@@ -81,6 +81,9 @@ class IconPaths:
     Unchecked = './icons/unchecked.png'
     Checked_Bordered = './icons/checked_bordered.png'
     Checked_Filled = './icons/checked_filled.png'
+    
+    # Battery icons
+    Unplugged = './icons/unplugged.png'
 
 class PageConfig():
     

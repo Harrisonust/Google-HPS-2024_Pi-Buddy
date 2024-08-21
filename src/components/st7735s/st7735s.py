@@ -8,7 +8,7 @@ from components.st7735s.st7735s_reg import *
 # from st7735s_reg import *
 import numpy as np
 import os
-# import cv2
+import cv2
 
 class RGB565Color:
     # https://rgbcolorpicker.com/565

@@ -17,6 +17,8 @@ class PageId:
     WeatherPage = 4
     TodoPage = 5
     PhotographPage = 6
+    FilmPage = 7
+    BatteryPage = 8
     
 
 class MenuScreenHandler(Handler):
@@ -36,18 +38,22 @@ class MenuScreenHandler(Handler):
             TimePage(self.screen),
             WeatherPage(self.screen),
             TodoPage(self.screen),
-            PhotographPage(self.screen)
+            PhotographPage(self.screen),
+            FilmPage(self.screen),
+            BatteryPage(self.screen)
         ]
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         
-        # self.current_page_id = ValueManager(PageId.MenuPage)
+        self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
         # self.current_page_id = ValueManager(PageId.TimePage)
         # self.current_page_id = ValueManager(PageId.WeatherPage)
         # self.current_page_id = ValueManager(PageId.TodoPage)        
-        self.current_page_id = ValueManager(PageId.PhotographPage)
+        # self.current_page_id = ValueManager(PageId.PhotographPage)
+        # self.current_page_id = ValueManager(PageId.BatteryPage)
+        
         
         self.current_page_priority = ValueManager(0)
         
@@ -65,7 +71,7 @@ class MenuScreenHandler(Handler):
         else:
             self.menu_screen_handler_busy.overwrite(int(True))
             new_page_info = self.pages[self.current_page_id.reveal()].handle_task(task_info)
-            print('new page info:', new_page_info)
+
             if new_page_info:
                 new_page, msg_to_new_page = new_page_info         
                 if new_page == 'MenuPage':
@@ -88,6 +94,12 @@ class MenuScreenHandler(Handler):
                 
                 elif new_page == 'PhotographPage':
                     self.current_page_id.overwrite(PageId.PhotographPage)
+                
+                elif new_page == 'FilmPage':
+                    self.current_page_id.overwrite(PageId.FilmPage)
+                    
+                elif new_page == 'BatteryPage':
+                    self.current_page_id.overwrite(PageId.BatteryPage)
                 
                 current_page_id = self.current_page_id.reveal()
                 self.pages[current_page_id].reset_states(msg_to_new_page)

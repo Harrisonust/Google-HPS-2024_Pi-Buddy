@@ -147,6 +147,10 @@ class MenuPage(Page):
                             return 'TodoPage', None
                         if next_page_title == 'Photograph':
                             return 'PhotographPage', None
+                        if next_page_title == 'Film':
+                            return 'FilmPage', None
+                        if next_page_title == 'Battery':
+                            return 'BatteryPage', None
                     
                         return None, None
                 
