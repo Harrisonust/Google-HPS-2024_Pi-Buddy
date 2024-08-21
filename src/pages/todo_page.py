@@ -9,7 +9,6 @@ from pages.page import Page
 
 
 class TodoPageConfig:
-    DB_PATH = 'database/todo.db'
     TABLE_NAME = 'todo'
     
     NO_TASK_MESSAGE_COLOR = theme_colors.Danger
@@ -141,7 +140,7 @@ class TodoPage(Page):
         self.screen = screen
         
         # Handlers for SQL database
-        self.conn = sqlite3.connect(TodoPageConfig.DB_PATH)
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
         self.cursor = self.conn.cursor()
         
         # States
@@ -163,9 +162,11 @@ class TodoPage(Page):
         
         # Get active tasks from SQL database
         self.cursor.execute(
-            f'''SELECT * 
+            f'''
+            SELECT * 
             FROM {TodoPageConfig.TABLE_NAME}
-            WHERE is_active == 1'''
+            WHERE is_active == 1
+            '''
         )
         tasks = self.cursor.fetchall()
         
@@ -302,9 +303,11 @@ class TodoPage(Page):
 
                     try:
                         self.cursor.execute(
-                            f'''UPDATE {TodoPageConfig.TABLE_NAME}
+                            f'''
+                            UPDATE {TodoPageConfig.TABLE_NAME}
                             SET is_active = 0
-                            WHERE id = {self.task_components[hovered_id].task_id}'''
+                            WHERE id = {self.task_components[hovered_id].task_id};
+                            '''
                         )
                         self.conn.commit()
                         

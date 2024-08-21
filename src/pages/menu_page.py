@@ -90,6 +90,8 @@ class MenuPage(Page):
             ['Weather', IconPaths.Weather],
             ['Time', IconPaths.Time],
             ['Battery', IconPaths.Battery],
+            ['Photograph', IconPaths.Photograph],
+            ['Film', IconPaths.Film],
             ['Timer',   IconPaths.Timer],
             ['Todo List', IconPaths.Todo],
             ['???',     IconPaths.Surprise]
@@ -143,6 +145,8 @@ class MenuPage(Page):
                             return 'TimePage', None
                         if next_page_title == 'Todo List':
                             return 'TodoPage', None
+                        if next_page_title == 'Photograph':
+                            return 'PhotographPage', None
                     
                         return None, None
                 

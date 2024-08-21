@@ -4,6 +4,7 @@ from .timer_page import TimerPage
 from .weather_page import WeatherPage
 from .time_page import TimePage
 from .todo_page import TodoPage
+from .photograph_page import PhotographPage
 
 __all__ = [
     'MenuPage',
@@ -11,5 +12,6 @@ __all__ = [
     'TimerPage',
     'WeatherPage',
     'TimePage',
-    'TodoPage'
+    'TodoPage',
+    'PhotographPage'
 ]

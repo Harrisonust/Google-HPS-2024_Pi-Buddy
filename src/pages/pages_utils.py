@@ -49,6 +49,8 @@ class IconPaths:
     # Menu icons
     Weather = './icons/cloud_sun.png'
     Battery = './icons/battery.png'
+    Photograph = './icons/photograph.png'
+    Film = './icons/film.png'
     Timer = './icons/timer.png'
     Time = './icons/time.png'
     Surprise = './icons/surprise.png'
@@ -81,7 +83,9 @@ class IconPaths:
     Checked_Filled = './icons/checked_filled.png'
 
 class PageConfig():
-    # Colors
+    
+    DB_PATH = 'database/database.db'
+    
     SCREEN_HEIGHT = 128
     SCREEN_WIDTH = 160
     
