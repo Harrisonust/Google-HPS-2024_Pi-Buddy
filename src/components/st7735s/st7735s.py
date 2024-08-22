@@ -295,36 +295,36 @@ class Screen:
                     self.draw_pixel(x+i, y+j, rgb565)
                     
 
-    # def draw_image_from_path(self, x, y, width, height, path) -> None:
-    #     # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-    #     #     raise ValueError("Pixel out of bound")
-    #     # if (x + width > self._col_dim) or (y + height > self._row_dim):
-    #     #     raise ValueError("Image exceeds display bounds")
+    def draw_image_from_path(self, x, y, width, height, path) -> None:
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
+        # if (x + width > self._col_dim) or (y + height > self._row_dim):
+        #     raise ValueError("Image exceeds display bounds")
 
-    #     img = cv2.imread(path)
-    #     img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+        img = cv2.imread(path)
+        img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         
-    #     r = img[:, :, 2].astype(np.uint16) 
-    #     g = img[:, :, 1].astype(np.uint16) 
-    #     b = img[:, :, 0].astype(np.uint16) 
-    #     color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-    #     self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
-    #     self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
+        r = img[:, :, 2].astype(np.uint16) 
+        g = img[:, :, 1].astype(np.uint16) 
+        b = img[:, :, 0].astype(np.uint16) 
+        color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+        self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
+        self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
-    # # data: numpy array with shape = (y, x, depth) 
-    # def draw_image_from_data(self, x, y, width, height, data: np.ndarray) -> None:
-    #     # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
-    #     #     raise ValueError("Pixel out of bound")
-    #     # if (x + width > self._col_dim) or (y + height > self._row_dim):
-    #     #     raise ValueError("Image exceeds display bounds")
+    # data: numpy array with shape = (y, x, depth) 
+    def draw_image_from_data(self, x, y, width, height, data: np.ndarray) -> None:
+        # if x < 0 or x >= self._col_dim or y < 0 or y >= self._row_dim:
+        #     raise ValueError("Pixel out of bound")
+        # if (x + width > self._col_dim) or (y + height > self._row_dim):
+        #     raise ValueError("Image exceeds display bounds")
         
-    #     data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
-    #     r = data[:, :, 2].astype(np.uint16)
-    #     g = data[:, :, 1].astype(np.uint16)
-    #     b = data[:, :, 0].astype(np.uint16)
-    #     color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-    #     self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
-    #     self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
+        data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
+        r = data[:, :, 2].astype(np.uint16)
+        g = data[:, :, 1].astype(np.uint16)
+        b = data[:, :, 0].astype(np.uint16)
+        color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+        self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
+        self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
     def fill_screen(self, color) -> None:
         if color is None:

@@ -1,7 +1,7 @@
 import multiprocessing
 import time
 import sqlite3
-# from picamera2 import Picamera2, Preview
+from picamera2 import Picamera2, Preview
 
 
 from pages.pages_utils import theme_colors, PageConfig, IconPaths
@@ -9,15 +9,23 @@ from value_manager import ValueManager
 from pages.page import Page
 
 
+'''
+The drawing is done at lines 222 & 251 & 257 & 275
+the x, y, height, width for draw_image functions may require some change
+'''
+
+
 class FilmPageConfig:
-    TABLE_NAME = 'saved_imgs'
-    SAVE_PATH = f'../images/'
+    TABLE_NAME = 'saved_videos'
+    SAVE_PATH = f'../videos/'
 
 
 class FilmPageStates:
     SHOW_CURRENT = 0
-    SHOW_SAVED = 1
-    LEAVE = 2
+    RECORD_CURRENT = 1
+    SHOW_SAVED = 2
+    PLAY_SAVED = 3
+    LEAVE = 4
 
 
 class FilmPage(Page):
@@ -30,6 +38,7 @@ class FilmPage(Page):
         self.busy = ValueManager(int(False))
         self.display_completed = ValueManager(int(False))
         self.saved_display_id = ValueManager(-1)
+        self.prev_saved_display_id = ValueManager(-1)
         self.saved_len = ValueManager(-1)
         self.max_id = ValueManager(-1)
         
@@ -39,7 +48,7 @@ class FilmPage(Page):
         
         # Camera
         self.camera = None
-        self.saved_images = None
+        self.saved_videos = None
         self._initiate()
     
     
@@ -48,13 +57,13 @@ class FilmPage(Page):
         # Get existing images
         self.cursor.execute(
             f'''
-            SELECT img_name, img_path 
+            SELECT video_name, video_path 
             FROM {FilmPageConfig.TABLE_NAME}
             WHERE is_active == 1
             ORDER BY created_at DESC;
             '''
         )
-        self.saved_images = self.cursor.fetchall()
+        self.saved_videos = self.cursor.fetchall()
         
         # Update parameters
         self.cursor.execute(
@@ -65,11 +74,12 @@ class FilmPage(Page):
         )
         max_id_data = self.cursor.fetchall()
         self.max_id.overwrite(max_id_data[0][0])
-        self.saved_len.overwrite(len(self.saved_images))
-        self.saved_display_id.overwrite(len(self.saved_images) - 1)
+        self.saved_len.overwrite(len(self.saved_videos))
+        self.saved_display_id.overwrite(len(self.saved_videos) - 1)
         
         # Initiate camera
-        # self.camera = Picamera2()
+        self.camera = Picamera2()
+        self.camera.configure(self.camera.create_video_configuration())
     
     
     def reset_states(self, args):
@@ -93,10 +103,12 @@ class FilmPage(Page):
 
             self.busy.overwrite(int(True))
             
+            # Get current states
             state = self.state.reveal()
             saved_display_id = self.saved_display_id.reveal()
             saved_len = self.saved_len.reveal()
             
+            # Write states by current states
             if task_info['task'] == 'MOVE_CURSOR_LEFT_DOWN':
                 if state == FilmPageStates.SHOW_SAVED:
                     saved_display_id += 1
@@ -111,11 +123,23 @@ class FilmPage(Page):
             
             elif task_info['task'] == 'ENTER_SELECT':
                 if state == FilmPageStates.SHOW_CURRENT:
-                    # Toggle states to take picutre and go to show_saved state
+                    # Toggle states to record video and go to show_saved state
                     self.prev_state.overwrite(state)
-                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
+                    self.state.overwrite(FilmPageStates.RECORD_CURRENT)
                     self.saved_display_id.overwrite(saved_len)
                     self.saved_len.overwrite(saved_len + 1)
+                elif state == FilmPageStates.RECORD_CURRENT:
+                    # Start recording video
+                    self.prev_state.overwrite(state)
+                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
+                elif state == FilmPageStates.SHOW_SAVED:
+                    # Start playing video
+                    self.prev_state.overwrite(state)
+                    self.state.overwrite(FilmPageStates.PLAY_SAVED)
+                elif state == FimPageStates.PLAY_SAVED:
+                    # End playing video
+                    self.prev_state.overwrite(state)
+                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
             
             elif task_info['task'] == 'OUT_RESUME':
                 if state == FilmPageStates.SHOW_CURRENT:
@@ -132,60 +156,133 @@ class FilmPage(Page):
             self.busy.overwrite(int(False))
     
     
+    def _record_video(self, file_path_tuple):
+        # Record video; executed as a separate process
+        file_path = file_path_tuple[0]
+        self.camera.start()
+        self.camera.video_record(file_path, format='h264') as video:
+            while self.states.reveal() == FilePageStates.RECORD_CURRENT:
+                time.sleep(0.1)
+        self.camera.stop()
+        
+    
+    def _capture_first_frame(self, filepath):
+        # Returns the first frame of the video as a numpy array
+        video_capture = cv2.VideoCapture(filepath)
+        if not video_capture.isOpened():
+            raise Exception(f"Error: could not open video file '{filepath}'")
+        _, frame = video_capture.read()
+        video_capture.release()
+        return frame
+    
+    def _initiate_play_saved(self, filepath):
+        # Gets fps and initiates the video_capture handle for playing saved videos
+        video_capture = cv2.VideoCapture(filepath)
+        if not video_capture.isOpened():
+            raise Exception(f"Error: could not open video file '{filepath}'")
+        
+        total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = video_capture.get(cv2.CAP_PRO_FPS)
+        return video_capture, fps, total_frames
+
+    
+    def _end_play_saved(self, video_capture):
+        video_capture.release()
+        
+    
+    
     def _display(self):
+        
+        # For SHOW_SAVED
+        first_frame = None
+        
+        # For PLAY_SAVED
+        video_start_time, video_capture, fps, total_frames = None, None, None, None
+        
         while True:
             self.screen.fill_screen(theme_colors.Primary)
             
+            # Get current states
             state = self.state.reveal()
             prev_state = self.prev_state.reveal()
             saved_display_id = self.saved_display_id.reveal()
+            prev_saved_display_id = self.prev_saved_display_id.reveal()
+            
+            # Perform operations on components based on states
+            if state == FilmPageStates.SHOW_CURRENT:
                 
-            if state == FilmPageStates.SHOW_SAVED:
-                if prev_state == FilmPageStates.SHOW_CURRENT:
-                    # Take the picture
+                # Reset display_id to last last taken video
+                if prev_state == FilmPageStates.SHOW_SAVED:
+                    self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
+                
+                # Display current camera captured footage
+                self.camera.start()
+                frame = self.camera.capture_array()
+                self.camera.stop()
+                self.screen.draw_image_from_data(0, 0, 160, 128, frame)
+                
+            elif state == FilmPagesStates.RECORD_CURRENT:
+                if prev_state == FilmePageStates.SHOW_CURRENT:
+                    # Update parametres
                     max_id = self.max_id.reveal()
-                    img_name = f'img{max_id + 1}.png'
-                    # self.camera.start_preview(Preview.NULL)
-                    # self.camera.start_and_capture_file(FilmPageConfig.SAVE_PATH + img_name)
+                    video_name = f'img{max_id + 1}.png'
+                    vidoe_path = FilmPageConfig.SAVE_PATH + video_name
+                    self.saved_videos.append((video_name, video_path))
+                    self.max_id.overwrite(max_id + 1)
 
                     # Update the new path to sql table
                     try:
                         self.cursor.execute(
                             f'''
-                            INSERT INTO {FilmPageConfig.TABLE_NAME} (img_name, img_path)
-                            VALUES ('{img_name}', '{FilmPageConfig.SAVE_PATH + img_name}');
+                            INSERT INTO {FilmPageConfig.TABLE_NAME} (video_name, video_path)
+                            VALUES ('{video_name}', '{video_path}');
                             '''
                         )     
                         self.conn.commit()
                     except Exception as e:
                         print(f'An error ocurred: {e}')
                         
-                    # Update parametres
-                    self.saved_images.append((img_name, FilmPageConfig.SAVE_PATH + img_name))
-                    self.max_id.overwrite(max_id + 1)
-
+                    # Record the video
+                    recording_process = multiprocessing.Process(target=self._record_video, args=(video_path,))
+                    recording_process.start()
+                
+                # Display the current captured footage
+                frame = self.camera.capture_array()
+                self.screen.draw_image_from_data(0, 0, 160, 128, frame)
+            
+            elif state == FilmPageStates.SHOW_SAVED:
                 # Show the last-captured picture
-                self.screen.draw_image(0, 0, 160, 128, self.saved_images[saved_display_id][1])
-                    
-                
-            elif state == FilmPageStates.SHOW_CURRENT:
+                if first_frame == None or prev_saved_display_id != saved_display_id:
+                    first_frame = self._capture_first_frame(self.saved_videos[saved_display_id][1])
+                self.screen.draw_image_from_data(0, 0, 160, 128, first_frame)
+            
+            elif state == FilmPageStates.PLAY_SAVED:
                 if prev_state == FilmPageStates.SHOW_SAVED:
-                    self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
+                    video_capture, fps, total_frames = self._initiate_play_saved(self.saved_videos[saved_display_id][1])
+                    video_start_time = time.time()
                 
-                # self.camera.start()
-                # frame = self.camera.capture_array()
-                # self.camera.stop()
-                # self.screen.draw_image_from_data(0, 0, 160, 128, frame)
+                video_played_time = time.time() - video_start_time
+                frame_number = int(fps * video_played_time)
                 
-                ###
-                self.screen.draw_image(0, 0, 160, 128, '../images/current_image.png')
-                ###
+                if frame_number >= total_frames:
+                    # End state PLAY_SAVED if the video is done
+                    self._terminate_play_saved(video_capture)
+                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
+                else:
+                    # Get video frame
+                    video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+                    _, frame = video_capture.read()
+                    self.screen.draw_image_from_data(0, 0, 160, 128, frame)
+                
             
             elif state == FilmPageStates.LEAVE:
                 break
             
+            # Overwrite previous state with current state
             self.prev_state.overwrite(state)
+            self.prev_saved_display_id.overwrite(saved_display_id)
             
+            # Update screen
             self.screen.update()
             time.sleep(0.01)
             self.screen.clear()

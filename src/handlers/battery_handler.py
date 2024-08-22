@@ -8,9 +8,9 @@ from value_manager import ValueManager
 
 '''
 BatteryManager functions utilized:
-    * set_battery_charging
-    * get_battery_percentage()
-    * get_battery_charging()
+    * set_battery_charging(): lines 75 & 80
+    * get_battery_percentage(): line 41
+    * get_battery_charging(): line 42
 '''
 
 

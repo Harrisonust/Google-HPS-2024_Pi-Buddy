@@ -2,12 +2,18 @@ import multiprocessing
 import time
 import os
 import sqlite3
-# from picamera2 import Picamera2, Preview
+from picamera2 import Picamera2, Preview
 
 
 from pages.pages_utils import theme_colors, PageConfig, IconPaths
 from value_manager import ValueManager
 from pages.page import Page
+
+
+'''
+The drawing is done at lines 175 and 185
+the x, y, height, width for draw_image functions may require some change
+'''
 
 
 class PhotographPageConfig:
@@ -70,7 +76,7 @@ class PhotographPage(Page):
         self.saved_display_id.overwrite(len(self.saved_images) - 1)
         
         # Initiate camera
-        # self.camera = Picamera2()
+        self.camera = Picamera2()
     
     
     def reset_states(self, args):
@@ -100,12 +106,14 @@ class PhotographPage(Page):
             
             if task_info['task'] == 'MOVE_CURSOR_LEFT_DOWN':
                 if state == PhotographPageStates.SHOW_SAVED:
+                    # Go to next image
                     saved_display_id += 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)
             
             elif task_info['task'] == 'MOVE_CURSOR_RIGHT_UP':
                 if state == PhotographPageStates.SHOW_SAVED:
+                    # Go to previous image
                     saved_display_id -= 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)
@@ -146,8 +154,8 @@ class PhotographPage(Page):
                     # Take the picture
                     max_id = self.max_id.reveal()
                     img_name = f'img{max_id + 1}.png'
-                    # self.camera.start_preview(Preview.NULL)
-                    # self.camera.start_and_capture_file(PhotographPageConfig.SAVE_PATH + img_name)
+                    self.camera.start_preview(Preview.NULL)
+                    self.camera.start_and_capture_file(PhotographPageConfig.SAVE_PATH + img_name)
 
                     # Update the new path to sql table
                     try:
@@ -173,15 +181,12 @@ class PhotographPage(Page):
                 if prev_state == PhotographPageStates.SHOW_SAVED:
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
                 
-                # self.camera.start()
-                # frame = self.camera.capture_array()
-                # self.camera.stop()
-                # self.screen.draw_image_from_data(0, 0, 160, 128, frame)
+                self.camera.start()
+                frame = self.camera.capture_array()
+                self.camera.stop()
+                self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
-                ###
-                self.screen.draw_image(0, 0, 160, 128, '../images/current_image.png')
-                ###
-            
+                
             elif state == PhotographPageStates.LEAVE:
                 break
             
