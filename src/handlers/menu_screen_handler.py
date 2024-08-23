@@ -7,6 +7,7 @@ from handlers.handler import Handler
 from value_manager import ValueManager
 from pages import *
 
+from pin_defines import *
 
 # PageId indexes
 class PageId:
@@ -16,9 +17,9 @@ class PageId:
     TimePage = 3
     WeatherPage = 4
     TodoPage = 5
-    PhotographPage = 6
-    FilmPage = 7
-    BatteryPage = 8
+    #PhotographPage = 6
+    #FilmPage = 7
+    BatteryPage = 6
     
 
 class MenuScreenHandler(Handler):
@@ -28,7 +29,7 @@ class MenuScreenHandler(Handler):
         self.run_input_process = False
         self.task_queue = task_queue
         
-        self.screen = Screen(col_dim=160, row_dim=128)
+        self.screen = Screen(col_dim=160, row_dim=128, pin_dc=PIN_LCD_DC, pin_rst=PIN_LCD_RST)
         self.screen.clear()
         
         self.pages = [
@@ -38,8 +39,8 @@ class MenuScreenHandler(Handler):
             TimePage(self.screen),
             WeatherPage(self.screen),
             TodoPage(self.screen),
-            PhotographPage(self.screen),
-            FilmPage(self.screen),
+            #PhotographPage(self.screen),
+            #FilmPage(self.screen),
             BatteryPage(self.screen)
         ]
         

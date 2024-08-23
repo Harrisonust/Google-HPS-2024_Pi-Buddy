@@ -1,5 +1,5 @@
 import multiprocessing
-
+import threading, queue
 
 from handlers import *
 from test_functions import *
@@ -8,9 +8,9 @@ import RPi.GPIO as GPIO
 class TaskQueue:
     def __init__(self):
         # Use a multiprocessing manager to create a shared list for tasks
-        self.tasks = multiprocessing.Queue()
+        self.tasks = queue.Queue()
         # Create a lock to synchronize access to the task queue
-        self.lock = multiprocessing.Lock()
+        self.lock = threading.Lock()
     
     def append(self, task_info):
         # Append a new task to the task queue in a safe manner
@@ -42,8 +42,8 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
-            'encoders': TestEncodersHandler(self.task_queue, debug=self.debug),
+            'battery': BatteryHandler(self.task_queue, debug=self.debug),
+            'encoders': EncodersHandler(self.task_queue, debug=self.debug),
             'menu_screen': MenuScreenHandler(self.task_queue, debug=self.debug)
         }
     
@@ -51,7 +51,7 @@ class Control:
         self._start_listening()
         
         # Stat a process to execute tasks from the queue 
-        process = multiprocessing.Process(target=self._execute_tasks)
+        process = threading.Thread(target=self._execute_tasks)
         process.start()
         
         
@@ -66,7 +66,7 @@ class Control:
         for handler_name in self.handlers:
             handler = self.handlers[handler_name]
             if handler.run_input_process:
-                process = multiprocessing.Process(target=handler.listen)
+                process = threading.Thread(target=handler.listen)
                 process.start()
 
 
@@ -77,14 +77,13 @@ class Control:
                 # Pop task from task_queue
                 task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
-                process = multiprocessing.Process(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
+                process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.start()             
 
                 
    
 if __name__ == '__main__':
     # Debug option
-    debug = True
     test_function = battery_charge_discharge_test
     
     GPIO.setmode(GPIO.BCM)

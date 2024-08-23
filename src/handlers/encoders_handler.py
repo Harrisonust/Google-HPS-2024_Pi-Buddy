@@ -5,10 +5,11 @@ from components.encoder import Encoder
 from handlers.handler import Handler
 from value_manager import ValueManager
 
+from pin_defines import *
 
 class EncoderConfig(Enum):
     READ_PERIOD = 0.01      # Define the period to read left and right encoder positions
-    VALID_DISPLACEMENT = 5  # Define the threshold for valid displacement
+    VALID_DISPLACEMENT = 1  # Define the threshold for valid displacement
 
 
 class EncodersHandler(Handler):
@@ -19,8 +20,8 @@ class EncodersHandler(Handler):
         self.task_queue = task_queue
         
         
-        self.glide_encoder = Encoder(0, 5)
-        self.select_encoder = Encoder(0, 5)
+        self.glide_encoder = Encoder(PIN_MENU_ENC1A, PIN_MENU_ENC1B)
+        self.select_encoder = Encoder(PIN_MENU_ENC2A, PIN_MENU_ENC2B)
         
         self.glide_encoder_prev_pos = self.glide_encoder.get_position()
         self.select_encoder_prev_pos = self.select_encoder.get_position()
@@ -32,8 +33,7 @@ class EncodersHandler(Handler):
             # Get cur_pos values
             glide_encoder_cur_pos = self.glide_encoder.get_position()
             select_encoder_cur_pos = self.select_encoder.get_position()
-            
-            if select_encoder_cur_pos - self.select_encoder_prev_pos > EncoderConfig.VALID_DISPLACEMENT.value:
+            if select_encoder_cur_pos - self.select_encoder_prev_pos >= EncoderConfig.VALID_DISPLACEMENT.value:
                 # ENTER_SELECT
                 self.task_queue.append({
                     'requester_name': 'encoders',
@@ -42,7 +42,7 @@ class EncodersHandler(Handler):
                     'task_priority': 1
                 })
             
-            elif self.select_encoder_prev_pos - select_encoder_cur_pos > EncoderConfig.VALID_DISPLACEMENT.value:
+            elif self.select_encoder_prev_pos - select_encoder_cur_pos >= EncoderConfig.VALID_DISPLACEMENT.value:
                 # OUT_RESUME
                 self.task_queue.append({
                     'requester_name': 'encoders',
@@ -51,7 +51,7 @@ class EncodersHandler(Handler):
                     'task_priority': 1
                 })
             
-            elif glide_encoder_cur_pos - self.glide_encoder_prev_pos > EncoderConfig.VALID_DISPLACEMENT.value:
+            elif glide_encoder_cur_pos - self.glide_encoder_prev_pos >= EncoderConfig.VALID_DISPLACEMENT.value:
                 # MOVE_CURSOR_RIGHT_UP
                 self.task_queue.append({
                     'requester_name': 'encoders',
@@ -60,7 +60,7 @@ class EncodersHandler(Handler):
                     'task_priority': 1
                 })
             
-            elif self.glide_encoder_prev_pos - glide_encoder_cur_pos > EncoderConfig.VALID_DISPLACEMENT.value:
+            elif self.glide_encoder_prev_pos - glide_encoder_cur_pos >= EncoderConfig.VALID_DISPLACEMENT.value:
                 self.task_queue.append({
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
@@ -71,7 +71,6 @@ class EncodersHandler(Handler):
             else:
                 # NO ACTION
                 pass
-            
             # Update prev_pos values from cur_pos values
             self.glide_encoder_prev_pos = glide_encoder_cur_pos
             self.select_encoder_prev_pos = select_encoder_cur_pos

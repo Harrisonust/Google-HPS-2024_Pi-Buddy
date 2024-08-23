@@ -160,7 +160,7 @@ class FilmPage(Page):
         # Record video; executed as a separate process
         file_path = file_path_tuple[0]
         self.camera.start()
-        self.camera.video_record(file_path, format='h264') as video:
+        with self.camera.video_record(file_path, format='h264') as video:
             while self.states.reveal() == FilePageStates.RECORD_CURRENT:
                 time.sleep(0.1)
         self.camera.stop()

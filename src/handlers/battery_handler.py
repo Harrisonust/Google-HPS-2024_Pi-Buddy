@@ -32,14 +32,14 @@ class BatteryHandler(Handler):
         
         # Set as class variables because they may be of use in the future (?) 
         self.battery_level = ValueManager(0)
-        self.battery_charging = ValueManager()
+        self.battery_charging = ValueManager(int(False))
         
     
     def listen(self):
         # Continuously listen to battery power level
         while True:
             self.battery_level.overwrite(self.battery.get_battery_percentage())
-            self.battery_charging.overwrite(self.battery.get_battery_charging())
+            self.battery_charging.overwrite(self.battery.get_external_power_to_battery())
             
             # Write task to menu_screen to update battery level and charging statuses
             self.task_queue.append({
@@ -47,8 +47,8 @@ class BatteryHandler(Handler):
                 'handler_name': 'menu_screen',
                 'task': 'UPDATE_BATTERY_STATE',
                 'task_priority': 1,
-                'battery_level': self.battery_level,
-                'battery_charging': self.battery_charging        
+                'battery_level': self.battery_level.reveal(),
+                'battery_charging': self.battery_charging.reveal()        
             })
             
             # Wait for a defined period before checking again

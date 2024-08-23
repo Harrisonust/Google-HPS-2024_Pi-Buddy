@@ -6,7 +6,7 @@ from .menu_screen_handler import MenuScreenHandler
 
 __all__ = [
     'BatteryHandler',
-    'TestEncodersHandler',
-    # 'EncodersHandler'
+    #'TestEncodersHandler',
+    'EncodersHandler',
     'MenuScreenHandler'
 ]

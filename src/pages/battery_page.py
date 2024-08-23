@@ -161,8 +161,8 @@ class BatteryPage(Page):
         if not self.busy.reveal():
             self.busy.overwrite(int(True))
         
-            
             if task_info['task'] == 'UPDATE_BATTERY_STATE':
+                print(task_info) 
                 self.battery_level.overwrite(task_info['battery_level'])
                 self.battery_charging.overwrite(task_info['battery_charging'])
             

@@ -1,4 +1,5 @@
 import multiprocessing
+import threading
 import time
 import RPi.GPIO as GPIO
 
@@ -114,7 +115,7 @@ class MenuPage(Page):
     
     def start_display(self):
         # Start display process for menu page
-        display_process = multiprocessing.Process(target=self._display)
+        display_process = threading.Thread(target=self._display)
         display_process.start()
     
     
@@ -251,7 +252,6 @@ class MenuPage(Page):
             for option_box in self.option_boxes:
                 option_box.draw()
             self.screen.update()
-            time.sleep(0.01)
             self.screen.clear()
         
         self.display_completed.overwrite(int(True))
