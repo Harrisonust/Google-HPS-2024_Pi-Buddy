@@ -12,9 +12,10 @@ ENV/
 .VENV/
 
 # Photographed images and filmed videos
-photographs/
-videos/
-
+src/images/
+src/videos/
+src/database/database.db
+            
 # Distribution / packaging
 build/
 dist/

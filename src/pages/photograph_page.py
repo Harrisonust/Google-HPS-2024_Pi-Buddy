@@ -1,4 +1,5 @@
 import multiprocessing
+import threading
 import time
 import os
 import sqlite3
@@ -18,7 +19,7 @@ the x, y, height, width for draw_image functions may require some change
 
 class PhotographPageConfig:
     TABLE_NAME = 'saved_imgs'
-    SAVE_PATH = f'../images/'
+    SAVE_PATH = f'./images/'
 
 
 class PhotographPageStates:
@@ -41,16 +42,21 @@ class PhotographPage(Page):
         self.max_id = ValueManager(-1)
         
         # Handlers for SQL database
-        self.conn = sqlite3.connect(PageConfig.DB_PATH)
-        self.cursor = self.conn.cursor()
+        # self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        # self.cursor = self.conn.cursor()
         
         # Camera
-        self.camera = None
+        self.camera = Picamera2()
+        config = self.camera.create_video_configuration(main={"size": (160, 128), "format": "RGB888"})
+        self.camera.configure(config)
         self.saved_images = None
         self._initiate()
     
     
     def _initiate(self):
+        
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
         
         # Get existing images
         self.cursor.execute(
@@ -71,12 +77,13 @@ class PhotographPage(Page):
             '''
         )
         max_id_data = self.cursor.fetchall()
-        self.max_id.overwrite(max_id_data[0][0])
+        if len(self.saved_images) != 0:
+            self.max_id.overwrite(max_id_data[0][0])
         self.saved_len.overwrite(len(self.saved_images))
         self.saved_display_id.overwrite(len(self.saved_images) - 1)
         
         # Initiate camera
-        self.camera = Picamera2()
+        # self.camera = Picamera2()
     
     
     def reset_states(self, args):
@@ -91,7 +98,7 @@ class PhotographPage(Page):
 
     
     def start_display(self):
-        display_process = multiprocessing.Process(target=self._display)
+        display_process = threading.Thread(target=self._display)
         display_process.start()
     
     
@@ -142,9 +149,12 @@ class PhotographPage(Page):
     
     
     def _display(self):
+
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
+        
+        self.camera.start()
         while True:
-            self.screen.fill_screen(theme_colors.Primary)
-            
             state = self.state.reveal()
             prev_state = self.prev_state.reveal()
             saved_display_id = self.saved_display_id.reveal()
@@ -154,8 +164,7 @@ class PhotographPage(Page):
                     # Take the picture
                     max_id = self.max_id.reveal()
                     img_name = f'img{max_id + 1}.png'
-                    self.camera.start_preview(Preview.NULL)
-                    self.camera.start_and_capture_file(PhotographPageConfig.SAVE_PATH + img_name)
+                    self.camera.capture_file(PhotographPageConfig.SAVE_PATH + img_name)
 
                     # Update the new path to sql table
                     try:
@@ -181,9 +190,7 @@ class PhotographPage(Page):
                 if prev_state == PhotographPageStates.SHOW_SAVED:
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
                 
-                self.camera.start()
                 frame = self.camera.capture_array()
-                self.camera.stop()
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
                 
@@ -193,8 +200,8 @@ class PhotographPage(Page):
             self.prev_state.overwrite(state)
             
             self.screen.update()
-            time.sleep(0.01)
             self.screen.clear()
             
         self.display_completed.overwrite(int(True))        
         
+        self.camera.stop()
