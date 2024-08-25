@@ -41,11 +41,6 @@ class PhotographPage(Page):
         self.saved_len = ValueManager(-1)
         self.max_id = ValueManager(-1)
         
-        # Camera
-        self.camera = Picamera2()
-        config = self.camera.create_video_configuration(main={"size": (160, 128), "format": "RGB888"})
-        self.camera.configure(config)
-        self.camera.start()
         self.saved_images = None
         self._initiate()
     
@@ -144,8 +139,14 @@ class PhotographPage(Page):
     
     def _display(self):
 
-        #self.conn = sqlite3.connect(PageConfig.DB_PATH)
-        #self.cursor = self.conn.cursor()
+        # Camera
+        self.camera = Picamera2()
+        config = self.camera.create_video_configuration(main={"size": (160, 128), "format": "RGB888"})
+        self.camera.configure(config)
+        self.camera.start()
+        
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
         
         while True:
             state = self.state.reveal()
@@ -189,6 +190,7 @@ class PhotographPage(Page):
                 break
             
             self.prev_state.overwrite(state)
+
             self.screen.update()
             self.screen.clear()
             
@@ -196,3 +198,4 @@ class PhotographPage(Page):
         self.display_completed.overwrite(int(True))        
         
         self.camera.stop()
+        self.camera.close()

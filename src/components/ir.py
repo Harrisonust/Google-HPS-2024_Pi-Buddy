@@ -25,7 +25,7 @@ class IR:
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
-    ir = IR(14)
+    ir = IR(26)
     while 1:
         print(ir.get_state())
         time.sleep(0.1)

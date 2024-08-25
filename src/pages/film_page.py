@@ -1,13 +1,15 @@
 import multiprocessing
+import threading
 import time
 import sqlite3
 from picamera2 import Picamera2, Preview
-
+from picamera2.encoders import H264Encoder
+from picamera2.outputs import FfmpegOutput
 
 from pages.pages_utils import theme_colors, PageConfig, IconPaths
 from value_manager import ValueManager
 from pages.page import Page
-
+import cv2
 
 '''
 The drawing is done at lines 222 & 251 & 257 & 275
@@ -17,7 +19,7 @@ the x, y, height, width for draw_image functions may require some change
 
 class FilmPageConfig:
     TABLE_NAME = 'saved_videos'
-    SAVE_PATH = f'../videos/'
+    SAVE_PATH = f'./videos/'
 
 
 class FilmPageStates:
@@ -42,17 +44,18 @@ class FilmPage(Page):
         self.saved_len = ValueManager(-1)
         self.max_id = ValueManager(-1)
         
+        
+
+        # Camera
+        self.saved_videos = None
+        self._initiate()
+   
+
+    def _initiate(self):
+        
         # Handlers for SQL database
         self.conn = sqlite3.connect(PageConfig.DB_PATH)
         self.cursor = self.conn.cursor()
-        
-        # Camera
-        self.camera = None
-        self.saved_videos = None
-        self._initiate()
-    
-    
-    def _initiate(self):
         
         # Get existing images
         self.cursor.execute(
@@ -73,13 +76,11 @@ class FilmPage(Page):
             '''
         )
         max_id_data = self.cursor.fetchall()
-        self.max_id.overwrite(max_id_data[0][0])
+        if len(self.saved_videos) != 0: 
+            self.max_id.overwrite(max_id_data[0][0])
         self.saved_len.overwrite(len(self.saved_videos))
         self.saved_display_id.overwrite(len(self.saved_videos) - 1)
         
-        # Initiate camera
-        self.camera = Picamera2()
-        self.camera.configure(self.camera.create_video_configuration())
     
     
     def reset_states(self, args):
@@ -136,7 +137,7 @@ class FilmPage(Page):
                     # Start playing video
                     self.prev_state.overwrite(state)
                     self.state.overwrite(FilmPageStates.PLAY_SAVED)
-                elif state == FimPageStates.PLAY_SAVED:
+                elif state == FilmPageStates.PLAY_SAVED:
                     # End playing video
                     self.prev_state.overwrite(state)
                     self.state.overwrite(FilmPageStates.SHOW_SAVED)
@@ -158,13 +159,14 @@ class FilmPage(Page):
     
     def _record_video(self, file_path_tuple):
         # Record video; executed as a separate process
-        file_path = file_path_tuple[0]
-        self.camera.start()
-        with self.camera.video_record(file_path, format='h264') as video:
-            while self.states.reveal() == FilePageStates.RECORD_CURRENT:
-                time.sleep(0.1)
-        self.camera.stop()
-        
+        encoder = H264Encoder(1000000)
+        file_path = FfmpegOutput(file_path_tuple)
+        self.camera.start_recording(encoder, output=file_path)
+        print(f"start recording {file_path_tuple}")
+        while self.state.reveal() == FilmPageStates.RECORD_CURRENT:
+            time.sleep(0.1)
+        print("stop recording")
+        self.camera.stop_recording()
     
     def _capture_first_frame(self, filepath):
         # Returns the first frame of the video as a numpy array
@@ -186,12 +188,22 @@ class FilmPage(Page):
         return video_capture, fps, total_frames
 
     
-    def _end_play_saved(self, video_capture):
-        video_capture.release()
-        
+    #def _end_play_saved(self, video_capture):
+    #    video_capture.release()
     
     
     def _display(self):
+        
+        # Initiate camera
+        self.camera = Picamera2()
+        config = self.camera.create_video_configuration(main={'size': (160, 128), "format": "RGB888"})
+        self.camera.configure(config)
+        
+        self.camera.start()
+        
+        # Handlers for SQL database
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
         
         # For SHOW_SAVED
         first_frame = None
@@ -199,6 +211,7 @@ class FilmPage(Page):
         # For PLAY_SAVED
         video_start_time, video_capture, fps, total_frames = None, None, None, None
         
+
         while True:
             self.screen.fill_screen(theme_colors.Primary)
             
@@ -216,20 +229,18 @@ class FilmPage(Page):
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
                 
                 # Display current camera captured footage
-                self.camera.start()
                 frame = self.camera.capture_array()
-                self.camera.stop()
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
-            elif state == FilmPagesStates.RECORD_CURRENT:
-                if prev_state == FilmePageStates.SHOW_CURRENT:
+            elif state == FilmPageStates.RECORD_CURRENT:
+                if prev_state == FilmPageStates.SHOW_CURRENT:
                     # Update parametres
                     max_id = self.max_id.reveal()
-                    video_name = f'img{max_id + 1}.png'
-                    vidoe_path = FilmPageConfig.SAVE_PATH + video_name
+                    video_name = f'img{max_id + 1}.mp4'
+                    video_path = FilmPageConfig.SAVE_PATH + video_name
                     self.saved_videos.append((video_name, video_path))
                     self.max_id.overwrite(max_id + 1)
-
+                    print(f"243 {video_path}")
                     # Update the new path to sql table
                     try:
                         self.cursor.execute(
@@ -243,7 +254,7 @@ class FilmPage(Page):
                         print(f'An error ocurred: {e}')
                         
                     # Record the video
-                    recording_process = multiprocessing.Process(target=self._record_video, args=(video_path,))
+                    recording_process = threading.Thread(target=self._record_video, args=(video_path,))
                     recording_process.start()
                 
                 # Display the current captured footage
@@ -289,3 +300,5 @@ class FilmPage(Page):
             
         self.display_completed.overwrite(int(True))        
         
+        #self.camera.stop()
+        self.camera.close()

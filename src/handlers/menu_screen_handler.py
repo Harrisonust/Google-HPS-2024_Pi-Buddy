@@ -18,8 +18,8 @@ class PageId:
     WeatherPage = 4
     TodoPage = 5
     PhotographPage = 6
-    #FilmPage = 7
-    BatteryPage = 7
+    FilmPage = 7
+    BatteryPage = 8
     
 
 class MenuScreenHandler(Handler):
@@ -40,7 +40,7 @@ class MenuScreenHandler(Handler):
             WeatherPage(self.screen),
             TodoPage(self.screen),
             PhotographPage(self.screen),
-            #FilmPage(self.screen),
+            FilmPage(self.screen),
             BatteryPage(self.screen)
         ]
         

@@ -53,7 +53,7 @@ class Control:
         # Stat a process to execute tasks from the queue 
         process = threading.Thread(target=self._execute_tasks)
         process.name = 'main execute task'
-        #process.start()
+        process.start()
 
         for thread in threading.enumerate():
             print(thread.name)
@@ -72,12 +72,14 @@ class Control:
         # Continuously check and execute tasks from the task queue
         while True:
             if self.task_queue.get_len() != 0:
+                
                 # Pop task from task_queue
                 task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
                 process.start()   
+            time.sleep(0.01)
 
                 
    

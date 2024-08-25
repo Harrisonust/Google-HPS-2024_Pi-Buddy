@@ -85,13 +85,10 @@ class DualChannelMotor:
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     motor_driver = DualChannelMotor(23, 24, 25, 1, 12, 16, pin_standby=None)
-    for duty in range(50, 110, 10):
-        if duty % 20 == 10:
-            motor_driver.left_motor.set_rotation(Rotation.CLOCKWISE)
-            motor_driver.right_motor.set_rotation(Rotation.CLOCKWISE)
-        else:
-            motor_driver.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-            motor_driver.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
+    motor_driver.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
+    motor_driver.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
+    duty = 90 
+    while 1:    
         print(f'rotation: {motor_driver.left_motor.get_rotation()} duty {duty}')
         motor_driver.left_motor.set_duty(duty)
         motor_driver.right_motor.set_duty(duty)

@@ -8,7 +8,7 @@ from value_manager import ValueManager
 from pin_defines import *
 
 class EncoderConfig(Enum):
-    READ_PERIOD = 0.01      # Define the period to read left and right encoder positions
+    READ_PERIOD = 0.1      # Define the period to read left and right encoder positions
     VALID_DISPLACEMENT = 1  # Define the threshold for valid displacement
 
 
@@ -33,6 +33,7 @@ class EncodersHandler(Handler):
             # Get cur_pos values
             glide_encoder_cur_pos = self.glide_encoder.get_position()
             select_encoder_cur_pos = self.select_encoder.get_position()
+            #print(glide_encoder_cur_pos, select_encoder_cur_pos)
             if select_encoder_cur_pos - self.select_encoder_prev_pos >= EncoderConfig.VALID_DISPLACEMENT.value:
                 # ENTER_SELECT
                 self.task_queue.append({
