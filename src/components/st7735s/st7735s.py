@@ -4,8 +4,7 @@ from enum import Enum
 from PIL import Image, ImageDraw, ImageFont
 import spidev
 import RPi.GPIO as GPIO
-from components.st7735s.st7735s_reg import *
-# from st7735s_reg import *
+from .st7735s_reg import *
 import numpy as np
 import os
 import cv2
