@@ -52,14 +52,11 @@ class Control:
         
         # Stat a process to execute tasks from the queue 
         process = threading.Thread(target=self._execute_tasks)
-        process.start()
-        
-        
-        if self.debug:
-            # Run test_function if self.debug is set to True
-            test_process = multiprocessing.Process(target=test_function, args=(self.task_queue,))
-            test_process.start()
-        
+        process.name = 'main execute task'
+        #process.start()
+
+        for thread in threading.enumerate():
+            print(thread.name)
 
     def _start_listening(self):
         # Start listening processes for input handlers
@@ -67,6 +64,7 @@ class Control:
             handler = self.handlers[handler_name]
             if handler.run_input_process:
                 process = threading.Thread(target=handler.listen)
+                process.name = f'{handler_name} listen'
                 process.start()
 
 
@@ -78,7 +76,8 @@ class Control:
                 task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
-                process.start()             
+                process.name = f'{task_info["handler_name"]} execute'
+                process.start()   
 
                 
    

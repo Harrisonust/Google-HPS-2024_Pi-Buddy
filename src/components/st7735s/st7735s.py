@@ -24,7 +24,7 @@ class RGB565Color:
     VIOLET  = 0xC01F
 
 class Screen:
-    def __init__(self, spi_bus=0, spi_device=0, pin_dc=24, pin_rst=25, pin_cs=None, speed_hz=20000000, col_dim=128, row_dim=128):
+    def __init__(self, spi_bus=0, spi_device=0, pin_dc=14, pin_rst=15, pin_cs=None, speed_hz=20000000, col_dim=128, row_dim=128):
         self._spi = spidev.SpiDev()
         self._spi.open(spi_bus, spi_device)
         self._spi.max_speed_hz = speed_hz
@@ -351,7 +351,6 @@ if __name__ == '__main__':
 
     # img = cv2.imread("./google.jpg")
     while 1:
-        
         screen.draw_pixel(0, 0, RGB565Color.WHITE)
         screen.draw_pixel(1, 0, RGB565Color.WHITE)
         screen.draw_pixel(0, 1, RGB565Color.WHITE)

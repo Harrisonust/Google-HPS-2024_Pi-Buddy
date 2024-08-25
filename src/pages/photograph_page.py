@@ -41,14 +41,11 @@ class PhotographPage(Page):
         self.saved_len = ValueManager(-1)
         self.max_id = ValueManager(-1)
         
-        # Handlers for SQL database
-        # self.conn = sqlite3.connect(PageConfig.DB_PATH)
-        # self.cursor = self.conn.cursor()
-        
         # Camera
         self.camera = Picamera2()
         config = self.camera.create_video_configuration(main={"size": (160, 128), "format": "RGB888"})
         self.camera.configure(config)
+        self.camera.start()
         self.saved_images = None
         self._initiate()
     
@@ -82,10 +79,6 @@ class PhotographPage(Page):
         self.saved_len.overwrite(len(self.saved_images))
         self.saved_display_id.overwrite(len(self.saved_images) - 1)
         
-        # Initiate camera
-        # self.camera = Picamera2()
-    
-    
     def reset_states(self, args):
         self.state.overwrite(PhotographPageStates.SHOW_CURRENT)
         self.prev_state.overwrite(PhotographPageStates.SHOW_SAVED)
@@ -99,6 +92,7 @@ class PhotographPage(Page):
     
     def start_display(self):
         display_process = threading.Thread(target=self._display)
+        display_process.name = 'photo display'
         display_process.start()
     
     
@@ -150,10 +144,9 @@ class PhotographPage(Page):
     
     def _display(self):
 
-        self.conn = sqlite3.connect(PageConfig.DB_PATH)
-        self.cursor = self.conn.cursor()
+        #self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        #self.cursor = self.conn.cursor()
         
-        self.camera.start()
         while True:
             state = self.state.reveal()
             prev_state = self.prev_state.reveal()
@@ -189,19 +182,17 @@ class PhotographPage(Page):
             elif state == PhotographPageStates.SHOW_CURRENT:
                 if prev_state == PhotographPageStates.SHOW_SAVED:
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
-                
                 frame = self.camera.capture_array()
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
-                
                 
             elif state == PhotographPageStates.LEAVE:
                 break
             
             self.prev_state.overwrite(state)
-            
             self.screen.update()
             self.screen.clear()
             
+            print(f"fps: {self.screen.get_fps()}")
         self.display_completed.overwrite(int(True))        
         
         self.camera.stop()

@@ -116,6 +116,7 @@ class MenuPage(Page):
     def start_display(self):
         # Start display process for menu page
         display_process = threading.Thread(target=self._display)
+        display_process.name = 'menu page display'
         display_process.start()
     
     
