@@ -26,9 +26,10 @@ class FilmPageConfig:
 class FilmPageStates:
     SHOW_CURRENT = 0
     RECORD_CURRENT = 1
-    SHOW_SAVED = 2
-    PLAY_SAVED = 3
-    LEAVE = 4
+    END_RECORD = 2
+    SHOW_SAVED = 3
+    PLAY_SAVED = 4
+    LEAVE = 5
 
 
 class FilmPage(Page):
@@ -133,7 +134,7 @@ class FilmPage(Page):
                 elif state == FilmPageStates.RECORD_CURRENT:
                     # Start recording video
                     self.prev_state.overwrite(state)
-                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
+                    self.state.overwrite(FilmPageStates.END_RECORD)
                 elif state == FilmPageStates.SHOW_SAVED:
                     # Start playing video
                     self.prev_state.overwrite(state)
@@ -166,8 +167,8 @@ class FilmPage(Page):
         print(f"start recording {file_path_tuple}")
         while self.state.reveal() == FilmPageStates.RECORD_CURRENT:
             time.sleep(0.1)
-        print("stop recording")
         self.camera.stop_recording()
+        self.state.overwrite(FilmPageStates.SHOW_SAVED)
     
     def _capture_first_frame(self, filepath):
         # Returns the first frame of the video as a numpy array
@@ -185,12 +186,12 @@ class FilmPage(Page):
             raise Exception(f"Error: could not open video file '{filepath}'")
         
         total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-        fps = video_capture.get(cv2.CAP_PRO_FPS)
+        fps = video_capture.get(cv2.CAP_PROP_FPS)
         return video_capture, fps, total_frames
 
     
-    #def _end_play_saved(self, video_capture):
-    #    video_capture.release()
+    def _terminate_play_saved(self, video_capture):
+        video_capture.release()
     
     
     def _display(self):
@@ -224,7 +225,7 @@ class FilmPage(Page):
             
             # Perform operations on components based on states
             if state == FilmPageStates.SHOW_CURRENT:
-                
+                print("show current")
                 # Reset display_id to last last taken video
                 if prev_state == FilmPageStates.SHOW_SAVED:
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
@@ -234,6 +235,7 @@ class FilmPage(Page):
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
             elif state == FilmPageStates.RECORD_CURRENT:
+                print("record current")
                 if prev_state == FilmPageStates.SHOW_CURRENT:
                     # Update parametres
                     max_id = self.max_id.reveal()
@@ -262,10 +264,11 @@ class FilmPage(Page):
                 frame = self.camera.capture_array()
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 self.screen.draw_circle(150, 10, 6, color=theme_colors.Danger) 
+            
             elif state == FilmPageStates.SHOW_SAVED:
                 print("show saved")
                 # Show the last-captured picture
-                if first_frame == None or prev_saved_display_id != saved_display_id:
+                if first_frame is None or prev_saved_display_id != saved_display_id:
                     first_frame = self._capture_first_frame(self.saved_videos[saved_display_id][1])
                 self.screen.draw_image_from_data(0, 0, 160, 128, first_frame)
             
@@ -277,6 +280,7 @@ class FilmPage(Page):
                 
                 video_played_time = time.time() - video_start_time
                 frame_number = int(fps * video_played_time)
+                print(frame_number, total_frames)
                 
                 if frame_number >= total_frames:
                     # End state PLAY_SAVED if the video is done
@@ -286,6 +290,7 @@ class FilmPage(Page):
                     # Get video frame
                     video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
                     _, frame = video_capture.read()
+                    print(frame.shape)
                     self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
             
@@ -305,3 +310,4 @@ class FilmPage(Page):
         
         #self.camera.stop()
         self.camera.close()
+
