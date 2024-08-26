@@ -54,9 +54,10 @@ class Control:
         process = threading.Thread(target=self._execute_tasks)
         process.name = 'main execute task'
         process.start()
-
-        for thread in threading.enumerate():
-            print(thread.name)
+        
+        print("Current running threads: ")
+        for index, thread in enumerate(threading.enumerate()):
+            print(index, thread.name)
 
     def _start_listening(self):
         # Start listening processes for input handlers

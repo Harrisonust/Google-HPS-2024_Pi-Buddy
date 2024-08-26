@@ -10,7 +10,7 @@ class Encoder:
         self.__position = 0
         
         GPIO.setup((self.__pin_a, self.__pin_b), GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(self.__pin_a, GPIO.FALLING, callback=self.__enc_callback)
+        GPIO.add_event_detect(self.__pin_a, GPIO.FALLING, callback=self.__enc_callback, bouncetime=5)
         
     def __enc_callback(self, pin):
         state = GPIO.input(self.__pin_b)

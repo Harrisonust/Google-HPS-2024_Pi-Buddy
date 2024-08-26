@@ -2,6 +2,7 @@ import multiprocessing
 import threading
 import time
 import sqlite3
+
 from picamera2 import Picamera2, Preview
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FfmpegOutput
@@ -260,14 +261,16 @@ class FilmPage(Page):
                 # Display the current captured footage
                 frame = self.camera.capture_array()
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
-            
+                self.screen.draw_circle(150, 10, 6, color=theme_colors.Danger) 
             elif state == FilmPageStates.SHOW_SAVED:
+                print("show saved")
                 # Show the last-captured picture
                 if first_frame == None or prev_saved_display_id != saved_display_id:
                     first_frame = self._capture_first_frame(self.saved_videos[saved_display_id][1])
                 self.screen.draw_image_from_data(0, 0, 160, 128, first_frame)
             
             elif state == FilmPageStates.PLAY_SAVED:
+                print("play saved")
                 if prev_state == FilmPageStates.SHOW_SAVED:
                     video_capture, fps, total_frames = self._initiate_play_saved(self.saved_videos[saved_display_id][1])
                     video_start_time = time.time()
