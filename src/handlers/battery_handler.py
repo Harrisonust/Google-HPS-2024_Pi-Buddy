@@ -20,8 +20,7 @@ class BatteryOutputState(Enum):
     
 
 class BatteryHandler(Handler):   
-    def __init__(self, task_queue, debug=False):
-        self.debug = debug
+    def __init__(self, task_queue):
         
         self.run_input_process = True   # Indicate that this handler listens to input
         self.task_queue = task_queue

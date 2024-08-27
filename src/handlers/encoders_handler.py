@@ -13,9 +13,7 @@ class EncoderConfig(Enum):
 
 
 class EncodersHandler(Handler):
-    def __init__(self, task_queue, debug=False):
-        self.debug = debug
-        
+    def __init__(self, task_queue):
         self.run_input_process = True
         self.task_queue = task_queue
         

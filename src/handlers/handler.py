@@ -5,9 +5,9 @@ from value_manager import ValueManager
 
 
 class Handler:
-    def __init__(self):
+    def __init__(self, task_queue):
         self.run_input_process = None       # Required; indicator if this handler listens to input
-        self.task_queue = None              # Required; task queue to be assigned
+        self.task_queue = task_queue        # Required; task queue to be assigned
         
         self.component = None               # Required, can have multiple; component driver
         

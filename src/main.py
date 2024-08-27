@@ -1,9 +1,10 @@
 import multiprocessing
 import threading, queue
+import RPi.GPIO as GPIO
+import time
 
 from handlers import *
-from test_functions import *
-import RPi.GPIO as GPIO
+
 
 class TaskQueue:
     def __init__(self):
@@ -32,9 +33,7 @@ class TaskQueue:
 
 
 class Control:
-    def __init__(self, debug=False, test_function=None):
-        # Debug option
-        self.debug = debug
+    def __init__(self):
         
         # Initialize the task queue
         self.task_queue = TaskQueue()
@@ -42,22 +41,21 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            'battery': BatteryHandler(self.task_queue, debug=self.debug),
-            'encoders': EncodersHandler(self.task_queue, debug=self.debug),
-            'menu_screen': MenuScreenHandler(self.task_queue, debug=self.debug)
+            # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
+            # 'encoders': EncodersHandler(self.task_queue, debug=self.debug),
+            'encoders': TestEncodersHandler(self.task_queue),
+            'menu_screen': MenuScreenHandler(self.task_queue)
         }
     
         # Start listening processes for each handler
         self._start_listening()
         
         # Stat a process to execute tasks from the queue 
+        self._execute_tasks()
         process = threading.Thread(target=self._execute_tasks)
         process.name = 'main execute task'
         process.start()
         
-        print("Current running threads: ")
-        for index, thread in enumerate(threading.enumerate()):
-            print(index, thread.name)
 
     def _start_listening(self):
         # Start listening processes for input handlers
@@ -70,25 +68,22 @@ class Control:
 
 
     def _execute_tasks(self):
+        print('EXECUTE TASKS')
         # Continuously check and execute tasks from the task queue
         while True:
             if self.task_queue.get_len() != 0:
-                
+                print('e')
                 # Pop task from task_queue
                 task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
                 process.start()   
-            time.sleep(0.01)
+            time.sleep(0.1)
 
                 
    
 if __name__ == '__main__':
-    # Debug option
-    test_function = battery_charge_discharge_test
     
     GPIO.setmode(GPIO.BCM)
-    # Initialize the Control class, which starts all processes
-    # Control(debug=debug, test_function=test_function)
     Control()

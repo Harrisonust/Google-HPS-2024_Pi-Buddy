@@ -11,20 +11,20 @@ from pin_defines import *
 
 # PageId indexes
 class PageId:
-    MenuPage = 0
-    SetTimerPage = 1 
-    TimerPage = 2
-    TimePage = 3
-    WeatherPage = 4
-    TodoPage = 5
-    PhotographPage = 6
-    FilmPage = 7
-    BatteryPage = 8
+    EmotionPage =       0
+    MenuPage =          1
+    SetTimerPage =      2 
+    TimerPage =         3
+    TimePage =          4
+    WeatherPage =       5
+    TodoPage =          6
+    BatteryPage =       7
+    PhotographPage =    8
+    FilmPage =          9
     
 
 class MenuScreenHandler(Handler):
-    def __init__(self, task_queue, debug=False):
-        self.debug = debug
+    def __init__(self, task_queue):
 
         self.run_input_process = False
         self.task_queue = task_queue
@@ -32,17 +32,44 @@ class MenuScreenHandler(Handler):
         self.screen = Screen(col_dim=160, row_dim=128, pin_dc=PIN_LCD_DC, pin_rst=PIN_LCD_RST)
         self.screen.clear()
         
-        self.pages = [
-            MenuPage(self.screen),
-            SetTimerPage(self.screen),
-            TimerPage(self.screen),
-            TimePage(self.screen),
-            WeatherPage(self.screen),
-            TodoPage(self.screen),
-            PhotographPage(self.screen),
-            FilmPage(self.screen),
-            BatteryPage(self.screen)
-        ]
+        self.page_id2key = {
+            PageId.EmotionPage:     'EmotionPage',
+            PageId.MenuPage:        'MenuPage',
+            PageId.SetTimerPage:    'SetTimerPage',
+            PageId.TimerPage:       'TimerPage',
+            PageId.TimePage:        'TimePage',
+            PageId.WeatherPage:     'WeatherPage',
+            PageId.TodoPage:        'TodoPage',
+            PageId.BatteryPage:     'BatteryPage',
+            PageId.PhotographPage:  'PhotographyPage',
+            PageId.FilmPage:        'FilmPage',
+        }
+        
+        self.page_key2id = {
+            'EmotionPage':          PageId.EmotionPage,
+            'MenuPage':             PageId.MenuPage,
+            'SetTimerPage':         PageId.SetTimerPage,
+            'TimerPage':            PageId.TimerPage,
+            'TimePage':             PageId.TimePage,
+            'WeatherPage':          PageId.WeatherPage,
+            'TodoPage':             PageId.TodoPage,
+            'BatteryPage':          PageId.BatteryPage,
+            'PhotographPage':       PageId.PhotographPage,
+            'FilmPage':             PageId.FilmPage,
+        }
+        
+        self.pages = {
+            # 'EmotionPage':          EmotionPage(self.screen),
+            'MenuPage':             MenuPage(self.screen),
+            'SetTimerPage':         SetTimerPage(self.screen),
+            'TimerPage':            TimerPage(self.screen),
+            'TimePage':             TimePage(self.screen),
+            'WeatherPage':          WeatherPage(self.screen),
+            'TodoPage':             TodoPage(self.screen),
+            'BatteryPage':          BatteryPage(self.screen),
+            # 'PhotographPage':       PhotographPage(self.screen),
+            # 'FilmPage':             FilmPage(self.screen),
+        }
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         
@@ -55,10 +82,9 @@ class MenuScreenHandler(Handler):
         # self.current_page_id = ValueManager(PageId.PhotographPage)
         # self.current_page_id = ValueManager(PageId.BatteryPage)
         
-        
         self.current_page_priority = ValueManager(0)
         
-        self.pages[self.current_page_id.reveal()].start_display()
+        self.pages[self.page_id2key[self.current_page_id.reveal()]].start_display()
         
     
     def listen(self):
@@ -71,40 +97,15 @@ class MenuScreenHandler(Handler):
         
         else:
             self.menu_screen_handler_busy.overwrite(int(True))
-            new_page_info = self.pages[self.current_page_id.reveal()].handle_task(task_info)
+            new_page_info = self.pages[self.page_id2key[self.current_page_id.reveal()]].handle_task(task_info)
 
             if new_page_info:
                 new_page, msg_to_new_page = new_page_info         
-                if new_page == 'MenuPage':
-                    self.current_page_id.overwrite(PageId.MenuPage)
-                    
-                elif new_page == 'SetTimerPage':
-                    self.current_page_id.overwrite(PageId.SetTimerPage)
-                    
-                elif new_page == 'TimerPage':
-                    self.current_page_id.overwrite(PageId.TimerPage)
-                
-                elif new_page == 'TimePage':
-                    self.current_page_id.overwrite(PageId.TimePage)
-                    
-                elif new_page == 'WeatherPage':
-                    self.current_page_id.overwrite(PageId.WeatherPage)
-                
-                elif new_page == 'TodoPage':
-                    self.current_page_id.overwrite(PageId.TodoPage)
-                
-                elif new_page == 'PhotographPage':
-                    self.current_page_id.overwrite(PageId.PhotographPage)
-                
-                elif new_page == 'FilmPage':
-                    self.current_page_id.overwrite(PageId.FilmPage)
-                    
-                elif new_page == 'BatteryPage':
-                    self.current_page_id.overwrite(PageId.BatteryPage)
-                
+                self.current_page_id.overwrite(self.page_key2id[new_page])
                 current_page_id = self.current_page_id.reveal()
-                self.pages[current_page_id].reset_states(msg_to_new_page)
-                self.pages[current_page_id].start_display()
+                current_page_key = self.page_id2key[current_page_id]
+                self.pages[current_page_key].reset_states(msg_to_new_page)
+                self.pages[current_page_key].start_display()
                         
             self.menu_screen_handler_busy.overwrite(int(False))
         

@@ -77,7 +77,8 @@ class MenuPageOptionBox(OptionBox):
 
 
 class MenuPage(Page):
-    def __init__(self, screen):        
+    def __init__(self, screen):     
+   
         self.screen = screen
         
         # Screen states
@@ -103,7 +104,7 @@ class MenuPage(Page):
         self.option_box_height = None
         self.content_height = None
         self._initiate_option_boxes()
-        
+
     
     def reset_states(self, args):
         self.cursor_direction.overwrite(MenuPageCursorDirection.NONE)
@@ -204,7 +205,7 @@ class MenuPage(Page):
         
     def _display(self):
         while True:
-            
+            # print(self.screen.get_fps())
             cursor_direction = self.cursor_direction.reveal()
             select_triggered = self.select_triggered.reveal()
             hovered_id = self.hovered_id.reveal()
@@ -249,12 +250,13 @@ class MenuPage(Page):
                 self.select_transition_state.overwrite(select_transition_state + 1)
                 
             # Draw and update screen
-            self.screen.fill_screen(self.background_color)
+            self.screen.fill_screen(theme_colors.Primary)
             for option_box in self.option_boxes:
                 option_box.draw()
             self.screen.update()
             self.screen.clear()
+            time.sleep(0.01)
         
         self.display_completed.overwrite(int(True))
-    
+
 
