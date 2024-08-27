@@ -221,7 +221,12 @@ class SetTimerPage(Page):
                         while True:
                             if self.display_completed.reveal():
                                 time_value_pipe = self.time_value_pipe.reveal()
-                                return 'TimerPage', self._decode_time_value_pipe(time_value_pipe)
+                                # return 'TimerPage', self._decode_time_value_pipe(time_value_pipe)
+                                return {
+                                    'type': 'NEW_PAGE',
+                                    'page': 'TimerPage',
+                                    'args': self._decode_time_value_pipe(time_value_pipe),
+                                }
                         
                     elif self.hoverable_tags[hover_id] == 'reset':
                         self.reset_values.overwrite(int(True))
@@ -230,11 +235,27 @@ class SetTimerPage(Page):
                         self.state.overwrite(SetTimerPageState.END_DISPLAY)
                         while True:
                             if self.display_completed.reveal():
-                                return 'MenuPage', None
+                                # return 'MenuPage', None
+                                return {
+                                    'type': 'NEW_PAGE',
+                                    'page': 'MenuPage',
+                                    'args': None,
+                                }
                 
             elif task_info['task'] == 'OUT_RESUME':
                 if state == SetTimerPageState.SELECT_TIME_DIGIT:
                     self.state.overwrite(SetTimerPageState.HOVER_TIME_DIGIT)
+            
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(SetTimerPageState.END_DISPLAY)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
             
             self.set_timer_page_busy.overwrite(int(False))
     

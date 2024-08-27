@@ -1,4 +1,4 @@
-# from .emotion_page import EmotionPage
+from .emotion_page import EmotionPage
 from .menu_page import MenuPage
 from .set_timer_page import SetTimerPage
 from .timer_page import TimerPage
@@ -10,7 +10,7 @@ from .todo_page import TodoPage
 from .battery_page import BatteryPage
 
 __all__ = [
-    # 'EmotionPage',
+    'EmotionPage',
     'MenuPage',
     'SetTimerPage',
     'TimerPage',

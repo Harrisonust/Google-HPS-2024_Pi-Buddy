@@ -228,7 +228,12 @@ class TimerPage(Page):
             if page_transition:
                 while True:
                     if self.display_completed.reveal():
-                        return page_transition, None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': page_transition,
+                            'args': None,
+                        }
+                        # return page_transition, None
             
             self.busy.overwrite(int(False))
         

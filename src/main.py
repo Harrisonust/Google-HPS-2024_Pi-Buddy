@@ -44,7 +44,8 @@ class Control:
             # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
             # 'encoders': EncodersHandler(self.task_queue, debug=self.debug),
             'encoders': TestEncodersHandler(self.task_queue),
-            'menu_screen': MenuScreenHandler(self.task_queue)
+            'menu_screen': MenuScreenHandler(self.task_queue),
+            'emotion': EmotionHandler(self.task_queue),
         }
     
         # Start listening processes for each handler
@@ -68,11 +69,9 @@ class Control:
 
 
     def _execute_tasks(self):
-        print('EXECUTE TASKS')
         # Continuously check and execute tasks from the task queue
         while True:
             if self.task_queue.get_len() != 0:
-                print('e')
                 # Pop task from task_queue
                 task_info = self.task_queue.pop()    
                 # Start a new process to handle the output for the task

@@ -141,24 +141,62 @@ class MenuPage(Page):
                     if self.display_completed.reveal():
                         next_page_title = self.option_box_information[self.hovered_id.reveal()][0]
                         if next_page_title == 'Weather':
-                            return 'WeatherPage', None
+                            # return 'WeatherPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'WeatherPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Timer':
-                            return 'SetTimerPage', None
+                            # return 'SetTimerPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'SetTimerPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Time':
-                            return 'TimePage', None
+                            # return 'TimePage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'TimePage',
+                                'args': None,
+                            }
                         if next_page_title == 'Todo List':
-                            return 'TodoPage', None
+                            # return 'TodoPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'MenuPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Photograph':
-                            return 'PhotographPage', None
+                            # return 'PhotographPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'MenuPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Film':
-                            return 'FilmPage', None
+                            # return 'FilmPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'FilmPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Battery':
-                            return 'BatteryPage', None
+                            # return 'BatteryPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'BatteryPage',
+                                'args': None,
+                            }
                     
-                        return None, None
+                        # return None, None
                 
-            elif task_info['task'] == 'OUT_RESUME':
-                pass
+            elif task_info['task'] == 'OUT_RESUME' or task_info['task'] == 'PAGE_EXPIRED':
+                self.select_triggered.overwrite(int(True))
+                while True:
+                    if self.display_completed.reveal():
+                        return 'EmotionPage', None
             
     
     

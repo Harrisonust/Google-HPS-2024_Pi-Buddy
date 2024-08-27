@@ -166,7 +166,22 @@ class WeatherPage(Page):
                 self.state.overwrite(WeatherPageStates.EXITING)
                 while True:
                     if self.display_completed.reveal():
-                        return 'MenuPage', None
+                        # return 'MenuPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'MenuPage',
+                            'args': None,
+                        }
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(WeatherPageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
             
             self.weather_page_busy.overwrite(int(False))
             

@@ -59,7 +59,7 @@ class MenuScreenHandler(Handler):
         }
         
         self.pages = {
-            # 'EmotionPage':          EmotionPage(self.screen),
+            'EmotionPage':          EmotionPage(self.screen),
             'MenuPage':             MenuPage(self.screen),
             'SetTimerPage':         SetTimerPage(self.screen),
             'TimerPage':            TimerPage(self.screen),
@@ -72,8 +72,16 @@ class MenuScreenHandler(Handler):
         }
         
         self.menu_screen_handler_busy = ValueManager(int(False))
+        self.current_page_priority = ValueManager(0)
+        self.current_page_id = ValueManager(PageId.EmotionPage)
         
-        self.current_page_id = ValueManager(PageId.MenuPage)
+        self.task_queue.append({
+            'requester_name': 'menu_screen',
+            'handler_name': 'emotion',
+            'task': 'START_EMOTION'
+        })
+        
+        # self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
         # self.current_page_id = ValueManager(PageId.TimePage)
@@ -82,7 +90,7 @@ class MenuScreenHandler(Handler):
         # self.current_page_id = ValueManager(PageId.PhotographPage)
         # self.current_page_id = ValueManager(PageId.BatteryPage)
         
-        self.current_page_priority = ValueManager(0)
+        
         
         self.pages[self.page_id2key[self.current_page_id.reveal()]].start_display()
         
@@ -97,15 +105,18 @@ class MenuScreenHandler(Handler):
         
         else:
             self.menu_screen_handler_busy.overwrite(int(True))
-            new_page_info = self.pages[self.page_id2key[self.current_page_id.reveal()]].handle_task(task_info)
+            return_values = self.pages[self.page_id2key[self.current_page_id.reveal()]].handle_task(task_info)
 
-            if new_page_info:
-                new_page, msg_to_new_page = new_page_info         
-                self.current_page_id.overwrite(self.page_key2id[new_page])
-                current_page_id = self.current_page_id.reveal()
-                current_page_key = self.page_id2key[current_page_id]
-                self.pages[current_page_key].reset_states(msg_to_new_page)
-                self.pages[current_page_key].start_display()
+            if return_values is not None:
+                if return_values['type'] == 'NEW_TASK':
+                    self.task_queue.append(return_values['task'])
+                    
+                elif return_values['type'] == 'NEW_PAGE':
+                    self.current_page_id.overwrite(self.page_key2id[return_values['page']])
+                    current_page_id = self.current_page_id.reveal()
+                    current_page_key = self.page_id2key[current_page_id]
+                    self.pages[current_page_key].reset_states(return_values['args'])
+                    self.pages[current_page_key].start_display()
                         
             self.menu_screen_handler_busy.overwrite(int(False))
         

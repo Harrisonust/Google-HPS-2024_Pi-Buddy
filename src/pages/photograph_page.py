@@ -128,7 +128,12 @@ class PhotographPage(Page):
                     # Leave camera page
                     while True:
                         if self.display_completed.reveal():
-                            return 'MenuPage', None
+                            # return 'MenuPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'MenuPage',
+                                'args': None,
+                            }
                 elif state == PhotographPageStates.SHOW_SAVED:
                     # Resume to show current camera captured footage
                     self.prev_state.overwrite(state)

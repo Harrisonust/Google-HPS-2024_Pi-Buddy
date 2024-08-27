@@ -12,16 +12,45 @@ class TestEncodersHandler(Handler):
         self.run_input_process = False
         self.task_queue = task_queue
         
-        self.conn = sqlite3.connect('database/todo.db')
-        self.cursor = self.conn.cursor()
+        self.task_updated = ValueManager(int(False))
 
         listen_key_input_thread = threading.Thread(target=self._listen_key_input)
         listen_key_input_thread.start()
+        
+        timer_thread = threading.Thread(target=self._timer)
+        timer_thread.start()
+    
+    
+    def _timer(self):
+        # A timer to keep track of how long there had been no tasks from the encoder
+        timer_start = time.time()
+        time_with_no_encoder_updates = 0
+        while True:
+            
+            if self.task_updated.reveal():
+                timer_start = time.time()
+                self.task_updated.overwrite(int(False))
+            
+            time_with_no_encoder_updates = time.time() - timer_start
+            
+            if time_with_no_encoder_updates > 10:
+                timer_start = time.time()
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'menu_screen',
+                    'task': 'PAGE_EXPIRED',
+                    'task_priority': 1
+                })
+            
+            time.sleep(0.5)
+            
+    
     
     def _listen_key_input(self):
         while True:
             user_input = input('move_cursor_left_down(a)/move_cursor_right_up(d)/enter_select(s)/out_resume(w):')
             if user_input == 'a':
+                self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
@@ -30,6 +59,7 @@ class TestEncodersHandler(Handler):
                 })
             
             elif user_input == 'd':
+                self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
@@ -38,6 +68,7 @@ class TestEncodersHandler(Handler):
                 })
             
             elif user_input == 's':
+                self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
@@ -46,6 +77,7 @@ class TestEncodersHandler(Handler):
                 })
             
             elif user_input == 'w':
+                self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
                     'handler_name': 'menu_screen',
@@ -53,27 +85,7 @@ class TestEncodersHandler(Handler):
                     'task_priority': 1
                 })
             
-            # FOR DEBUGGIN ONLY!!
-            # adds a new task to the sql table
-            elif user_input == '+':
-                try:
-                    self.cursor.execute(
-                        f'''
-                        INSERT INTO todo (task_name, due_date, priority, is_active)
-                        VALUES ('Dummy task for testing', '2024-08-21', 1, 1)
-                        '''
-                    )
-                    self.conn.commit()
-                    
-                except Exception as e:
-                    print(f'An error ocurred: {e}')
-                
-                self.task_queue.append({
-                    'requester_name': 'encoders',
-                    'handler_name': 'menu_screen',
-                    'task': 'RELOAD_SQL_TABLE',
-                    'task_priority': 1
-                })
+        
         time.sleep(0.01)
     
     def listen(self):

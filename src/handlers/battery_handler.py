@@ -40,7 +40,7 @@ class BatteryHandler(Handler):
             self.battery_level.overwrite(self.battery.get_battery_percentage())
             self.battery_charging.overwrite(self.battery.get_external_power_to_battery())
             
-            # Write task to menu_screen to update battery level and charging statuses
+            # Write task to menu_screen and emotion_handler to update battery level and charging statuses
             self.task_queue.append({
                 'requester_name': 'battery',
                 'handler_name': 'menu_screen',
@@ -50,8 +50,17 @@ class BatteryHandler(Handler):
                 'battery_charging': self.battery_charging.reveal()        
             })
             
+            self.task_queue.append({
+                'requester_name': 'battery',
+                'handler_name': 'emotion',
+                'task': 'UPDATE_BATTERY_STATE',
+                'task_priority': 1,
+                'battery_level': self.battery_level.reveal(),
+                'battery_charging': self.battery_charging.reveal() 
+            })
+            
             # Wait for a defined period before checking again
-            time.sleep(5)
+            time.sleep(60)
     
     
     def handle_task(self, task_info):

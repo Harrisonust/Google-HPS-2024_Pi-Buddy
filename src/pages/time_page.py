@@ -50,7 +50,7 @@ class DateTime():
                               TimePageConfig.TIME_TEXT_SIZE, TimePageConfig.TIME_COLOR)
         self.screen.draw_text(TimePageConfig.DATE_X, TimePageConfig.DATE_Y, formatted_date_str,
                               TimePageConfig.DATE_TEXT_SIZE, TimePageConfig.DATE_COLOR)
-
+    
 
 class TimePage(Page):
     def __init__(self, screen):
@@ -89,7 +89,23 @@ class TimePage(Page):
                 self.state.overwrite(TimePageStates.EXITING)
                 while True:
                     if self.display_completed.reveal():
-                        return 'MenuPage', None
+                        # return 'MenuPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'MenuPage',
+                            'args': None,
+                        }
+                        
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(TimePageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
 
             self.busy.overwrite(int(False))
         
@@ -103,8 +119,6 @@ class TimePage(Page):
             
             self.screen.fill_screen(TimePageConfig.BACKGROUND_COLOR)
             
-            # self.screen.draw_vertical_line(80, 0, 128)
-            # self.screen.draw_horizontal_line(0, 64, 160)
             
             self.date_time_components.draw()
             self.screen.update()

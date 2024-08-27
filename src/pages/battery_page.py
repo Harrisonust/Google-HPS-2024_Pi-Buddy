@@ -177,11 +177,26 @@ class BatteryPage(Page):
             
             elif task_info['task'] == 'OUT_RESUME':
                 self.state.overwrite(BatteryPageStates.LEAVE)
-                
                 # Return to menu when display is done
                 while True:
                     if self.display_completed.reveal():
-                        return 'MenuPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'MenuPage',
+                            'args': None,
+                        }
+                        # return 'MenuPage', None
+            
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(BatteryPageStates.LEAVE)
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
+                        # return 'EmotionPage', None
             
             self.busy.overwrite(int(False))
 
