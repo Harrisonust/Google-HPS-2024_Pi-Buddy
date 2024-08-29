@@ -176,7 +176,28 @@ class FilmPage(Page):
                 # End recording video
                 self.prev_state.overwrite(state)
                 self.state.overwrite(FilmPageStates.END_RECORD)
-
+            
+            elif task_info['task'] == 'SWITCH_PAGE' and (state == FilmPageStates.SHOW_CURRENT or state == FilmPageStates.SHOW_SAVED):
+                self.state.overwrite(FilmPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args'],
+                        }
+            
+            elif task_info['task'] == 'PAGE_EXPIRED' and (state == FilmPageStates.SHOW_CURRENT or state == FilmPageStates.SHOW_SAVED):
+                self.state.overwrite(FilmPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None
+                        }
             self.busy.overwrite(int(False))
     
     
