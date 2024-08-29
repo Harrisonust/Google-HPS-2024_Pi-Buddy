@@ -8,7 +8,7 @@ from handlers.handler import Handler
 
 class TestEncodersHandler(Handler):
     
-    def __init__(self, task_queue, debug=False):
+    def __init__(self, task_queue):
         self.run_input_process = False
         self.task_queue = task_queue
         
@@ -74,6 +74,7 @@ class TestEncodersHandler(Handler):
                     'task': 'RELOAD_SQL_TABLE',
                     'task_priority': 1
                 })
+        time.sleep(0.01)
     
     def listen(self):
         pass

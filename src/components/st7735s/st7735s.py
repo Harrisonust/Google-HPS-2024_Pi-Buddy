@@ -1,13 +1,20 @@
+import numpy as np
+import os
+import sys
+import cv2
 import time
 import math
 from enum import Enum
 from PIL import Image, ImageDraw, ImageFont
 import spidev
 import RPi.GPIO as GPIO
-from .st7735s_reg import *
-import numpy as np
-import os
-import cv2
+
+# Adds the absolute directory of 'st7735s.py' to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
+
+from st7735s_reg import *
+
 
 class RGB565Color:
     # https://rgbcolorpicker.com/565
