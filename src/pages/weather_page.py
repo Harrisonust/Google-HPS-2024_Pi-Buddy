@@ -91,10 +91,10 @@ class WeatherPageIcon:
                 if key in weather_str:
                     self.icon_path = self.weather_state_day_dict[key]
                     return
-        
-        for key in self.weather_state_night_dict:
+        else: 
+            for key in self.weather_state_night_dict:
                 if key in weather_str:
-                    self.icon_path = self.weather_state_day_dict[key]
+                    self.icon_path = self.weather_state_night_dict[key]
                     return
         
         self.icon_path = None
