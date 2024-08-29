@@ -16,7 +16,7 @@ class Handler:
     
     def listen(self):
         # Required if self.run_input_process == True; method to be overriden by subclasses to listen to input
-        raise TypeError(f'Invvalid call to "listen" function')
+        raise TypeError(f'Invalid call to "listen" function')
     
     
     def handle_task(self):

@@ -1,12 +1,12 @@
-# from .battery_handler import BatteryHandler
-# from .encoders_handler import EncodersHandler
+from .battery_handler import BatteryHandler
+from .encoders_handler import EncodersHandler
 from .test_encoders_handler import TestEncodersHandler
 from .menu_screen_handler import MenuScreenHandler
 
 
 __all__ = [
-    # 'BatteryHandler',
+    'BatteryHandler',
     'TestEncodersHandler',
-    # 'EncodersHandler',
+    'EncodersHandler',
     'MenuScreenHandler'
 ]

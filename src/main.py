@@ -1,9 +1,9 @@
-import multiprocessing
 import threading, queue
 import RPi.GPIO as GPIO
 import time
 
-from handlers import *
+# from handlers import *
+from handlers.audio_handler import AudioHandler
 
 
 class TaskQueue:
@@ -43,8 +43,9 @@ class Control:
         self.handlers = {
             # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
             # 'encoders': EncodersHandler(self.task_queue, debug=self.debug),
-            'encoders': TestEncodersHandler(self.task_queue),
-            'menu_screen': MenuScreenHandler(self.task_queue)
+            # 'encoders': TestEncodersHandler(self.task_queue),
+            # 'menu_screen': MenuScreenHandler(self.task_queue),
+            'audio': AudioHandler(self.task_queue)
         }
     
         # Start listening processes for each handler
@@ -68,7 +69,6 @@ class Control:
 
 
     def _execute_tasks(self):
-        print('EXECUTE TASKS')
         # Continuously check and execute tasks from the task queue
         while True:
             if self.task_queue.get_len() != 0:
