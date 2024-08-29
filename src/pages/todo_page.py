@@ -139,9 +139,9 @@ class TodoPage(Page):
     def __init__(self, screen):
         self.screen = screen
         
-        # Handlers for SQL database
-        self.conn = sqlite3.connect(PageConfig.DB_PATH)
-        self.cursor = self.conn.cursor()
+        # # Handlers for SQL database
+        # self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        # self.cursor = self.conn.cursor()
         
         # States
         self.busy = ValueManager(int(False))
@@ -150,6 +150,7 @@ class TodoPage(Page):
         self.scroll = ValueManager(TodoPageScroll.NONE) 
         self.select = ValueManager(int(False))
         self.leave = ValueManager(int(False))
+        self.update = ValueManager(int(False))
         
         # Components to draw
         self.tasks = None     
@@ -159,6 +160,9 @@ class TodoPage(Page):
     
     
     def _initiate_tasks(self):
+        # Handlers for SQL database
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
         
         # Get active tasks from SQL database
         self.cursor.execute(
@@ -256,7 +260,6 @@ class TodoPage(Page):
                 self.leave.overwrite(int(True))
                 while True:
                     if self.display_completed.reveal():
-                        # return 'MenuPage', None
                         return {
                             'type': 'NEW_PAGE',
                             'page': 'MenuPage',
@@ -267,18 +270,34 @@ class TodoPage(Page):
                 self.leave.overwrite(int(True))
                 while True:
                     if self.display_completed.reveal():
-                        # return 'EmotionPage', None
                         return {
                             'type': 'NEW_PAGE',
                             'page': 'EmotionPage',
                             'args': None,
                         }
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.leave.overwrite(int(True))
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
+                        }
+            
+            elif task_info['task'] == 'RELOAD_TODO_TASK':
+                self.update.overwrite(int(True))
                     
             
             self.busy.overwrite(int(False))
 
 
     def _display(self):
+        # Handlers for SQL database
+        self.conn = sqlite3.connect(PageConfig.DB_PATH)
+        self.cursor = self.conn.cursor()
+        
         while True:
             
             self.screen.fill_screen(theme_colors.Primary)
@@ -286,6 +305,16 @@ class TodoPage(Page):
             if self.leave.reveal():
                 self.leave.overwrite(int(False))
                 break
+            
+            elif self.update.reveal():
+                # Reset the flags before updating data from the database
+                self.hovered_id.overwrite(0)
+                self.scroll.overwrite(int(False))
+                self.select.overwrite(int(False))
+                self._initiate_tasks()
+                
+                # Put down update flag
+                self.update.overwrite(int(False))
             
             elif self.task_components != []:
                 

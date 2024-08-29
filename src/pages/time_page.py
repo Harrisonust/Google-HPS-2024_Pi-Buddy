@@ -89,7 +89,6 @@ class TimePage(Page):
                 self.state.overwrite(TimePageStates.EXITING)
                 while True:
                     if self.display_completed.reveal():
-                        # return 'MenuPage', None
                         return {
                             'type': 'NEW_PAGE',
                             'page': 'MenuPage',
@@ -100,11 +99,20 @@ class TimePage(Page):
                 self.state.overwrite(TimePageStates.EXITING)
                 while True:
                     if self.display_completed.reveal():
-                        # return 'EmotionPage', None
                         return {
                             'type': 'NEW_PAGE',
                             'page': 'EmotionPage',
                             'args': None,
+                        }
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(TimePageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
                         }
 
             self.busy.overwrite(int(False))

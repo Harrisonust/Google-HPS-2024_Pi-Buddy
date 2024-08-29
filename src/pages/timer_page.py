@@ -219,11 +219,17 @@ class TimerPage(Page):
                     self.state.overwrite(TimerPageStates.COUNTING)
                 elif state == TimerPageStates.TIMEUP:
                     self.state.overwrite(TimerPageStates.DISCARD)
-                    page_transition = 'MenuPage'
+                    page_transition, page_args = 'MenuPage', None
             
             elif task_info['task'] == 'OUT_RESUME':
                 self.state.overwrite(TimerPageStates.DISCARD)
-                page_transition = 'MenuPage'
+                page_transition, page_args = 'MenuPage', None
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(TimerPageStates.DISCARD)
+                page_transition, page_args = task_info['page_key'], task_info['args']
+            
+            
                 
             if page_transition:
                 while True:
@@ -233,7 +239,6 @@ class TimerPage(Page):
                             'page': page_transition,
                             'args': None,
                         }
-                        # return page_transition, None
             
             self.busy.overwrite(int(False))
         

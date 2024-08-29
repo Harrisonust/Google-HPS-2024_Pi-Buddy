@@ -1,4 +1,4 @@
-import multiprocessing
+# import multiprocessing
 import threading, queue
 import RPi.GPIO as GPIO
 import time
@@ -46,6 +46,7 @@ class Control:
             'encoders': TestEncodersHandler(self.task_queue),
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),
+            'audio_control': AudioControlHandler(self.task_queue)
         }
     
         # Start listening processes for each handler
@@ -73,12 +74,12 @@ class Control:
         while True:
             if self.task_queue.get_len() != 0:
                 # Pop task from task_queue
-                task_info = self.task_queue.pop()    
+                task_info = self.task_queue.pop()
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
                 process.start()   
-            time.sleep(0.1)
+            time.sleep(0.001)
 
                 
    

@@ -85,6 +85,14 @@ class TestEncodersHandler(Handler):
                     'task_priority': 1
                 })
             
+            elif user_input == 't':
+                self.task_updated.overwrite(int(True))
+                self.task_queue.append({
+                    'requester_name': 'encoders',
+                    'handler_name': 'audio_control',
+                    'task': 'FUNCTION_CALLED',
+                })
+            
         
         time.sleep(0.01)
     

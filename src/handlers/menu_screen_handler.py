@@ -75,12 +75,6 @@ class MenuScreenHandler(Handler):
         self.current_page_priority = ValueManager(0)
         self.current_page_id = ValueManager(PageId.EmotionPage)
         
-        self.task_queue.append({
-            'requester_name': 'menu_screen',
-            'handler_name': 'emotion',
-            'task': 'START_EMOTION'
-        })
-        
         # self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)

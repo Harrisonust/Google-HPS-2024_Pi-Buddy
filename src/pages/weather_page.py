@@ -183,6 +183,17 @@ class WeatherPage(Page):
                             'args': None,
                         }
             
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(WeatherPageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
+                        }
+            
             self.weather_page_busy.overwrite(int(False))
             
 

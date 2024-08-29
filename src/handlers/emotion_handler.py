@@ -17,29 +17,29 @@ class EmotionHandlerConfig:
 
     # MUST MATCH EmotionPageConfig AT EMOTION_PAGE.PY
     emotion_2_key = {
-        'joyful': 7,
-        'depressed': 1,
-        'hungry': 2,
-        'energetic': 3,
-        'sleepy': 4,
-        'curious': 5,
-        'scared': 6
+        'joyful': 1,
+        'depressed': 2,
+        'hungry': 3,
+        'energetic': 4,
+        'sleepy': 5,
+        'curious': 6,
+        'scared': 7
     }
     key_2_emotion = {
-        7: 'joyful',
-        1: 'depressed',
-        2: 'hungry',
-        3: 'energetic',
-        4: 'sleepy',
-        5: 'curious',
-        6: 'scared'
+        1: 'joyful',
+        2: 'depressed',
+        3: 'hungry',
+        4: 'energetic',
+        5: 'sleepy',
+        6: 'curious',
+        7: 'scared'
     }
     
 
 class EmotionHandler(Handler):
     def __init__(self, task_queue):
         
-        self.run_input_process = False
+        self.run_input_process = True
         self.task_queue = task_queue
         
         self.depressed = ValueManager(int(False))
@@ -57,9 +57,13 @@ class EmotionHandler(Handler):
         # 'hungry' is True 
         self.prioritized_emotion = ValueManager(-1)  
         self.busy = ValueManager(int(False))
+        self.emotion_key = ValueManager(EmotionHandlerConfig.emotion_2_key['joyful'])   # The emotion sent to task_queue
         
         observe_process = multiprocessing.Process(target=self._observe_time_weather)
         observe_process.start()
+        
+        # flood_emotion_tasks_process = multiprocessing.Process(target=self._flood_emotion_tasks)
+        # flood_emotion_tasks_process.start()
         
     
     def _observe_time_weather(self):
@@ -86,35 +90,52 @@ class EmotionHandler(Handler):
             weather = location_data['WeatherElement']['Weather']
             
             
-            # 'depressed' is updated by wether it's monday or raining
-            if day == 'Monday' or '陰' in weather:
-                self.depressed.overwrite(int(True))
-            else:
-                self.depressed.overwrite(int(False))
+            # # 'depressed' is updated by wether it's monday or raining
+            # if day == 'Monday' or '陰' in weather:
+            #     self.depressed.overwrite(int(True))
+            # else:
+            #     self.depressed.overwrite(int(False))
             
-            # 'joyful' is updated by wether it's sunny
-            if '晴' in weather:
-                self.joyful.overwrite(int(True))
-            else:
-                self.joyful.overwrite(int(False))
+            # # 'joyful' is updated by wether it's sunny
+            # if '晴' in weather:
+            #     self.joyful.overwrite(int(True))
+            # else:
+            #     self.joyful.overwrite(int(False))
                 
-            # 'sleepy' is updated True at late night or early mornings
-            if hour >= 22 or hour <= 7:
-                self.sleepy.overwrite(int(True))
-            else:
-                self.sleepy.overwrite(int(False))
+            # # 'sleepy' is updated True at late night or early mornings
+            # if hour >= 22 or hour <= 7:
+            #     self.sleepy.overwrite(int(True))
+            # else:
+            #     self.sleepy.overwrite(int(False))
             
-            # 'energetic' is updated True at Saturdays and Sundays
-            if day == 'Saturday' or day == 'Sunday':
-                self.energetic.overwrite(int(True))
-            else:
-                self.energetic.overwrite(int(False))
+            # # 'energetic' is updated True at Saturdays and Sundays
+            # if day == 'Saturday' or day == 'Sunday':
+            #     self.energetic.overwrite(int(True))
+            # else:
+            #     self.energetic.overwrite(int(False))
             
-            # Updates every 15 minutes
-            time.sleep(60 * 15)
+            # Updates every minutes
+            time.sleep(60)
+            
+            
+    def listen(self):
+        # Sends the current emotion as task to task queue once per
+        while True:
+            self.task_queue.append({
+                'requester_name': 'emotion',
+                'handler_name': 'menu_screen',
+                'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
+            })
+            # print('EmotionHandler Sent:', {
+            #     'requester_name': 'emotion',
+            #     'handler_name': 'menu_screen',
+            #     'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
+            # })
+            time.sleep(1)
     
     
-    def _get_new_emotion(self):
+    
+    def _get_new_emotion_key(self):
         # Priority-wise: 'hungry' > 'prioritized_emotion' > 'scared' > 'curious' > 'depressed' == 'joyful' == 'energetic' == 'sleepy'
         
         new_emotion = 'joyful'
@@ -126,7 +147,7 @@ class EmotionHandler(Handler):
         
         # 'prioritized_emotion'
         elif self.prioritized_emotion.reveal() != -1:
-            new_emotion = EmotionHandlerConfig.key_2_emotion(self.prioritized_emotion.reveal())
+            new_emotion = EmotionHandlerConfig.key_2_emotion[self.prioritized_emotion.reveal()]
             self.prioritized_emotion.overwrite(-1)
             
         # 'scared'
@@ -154,15 +175,16 @@ class EmotionHandler(Handler):
             if lottery_box:
                 random.shuffle(lottery_box)
                 new_emotion = lottery_box[0]
-
             # 'depressed', 'joyful', 'energetic', 'sleepy' are updated in observe_time_weather
             # therefore, no overwrite-s here
 
-        return new_emotion
+        return EmotionHandlerConfig.emotion_2_key[new_emotion]
+    
+    
     
     def handle_task(self, task_info):
         if not self.busy.reveal():
-            print('EmotionHandler Recieved: ', task_info)
+            # print('EmotionHandler Recieved: ', task_info)
 
             self.busy.overwrite(int(True))
             
@@ -180,18 +202,10 @@ class EmotionHandler(Handler):
             elif task_info['task'] == 'SET_EMOTION':
                 self.prioritized_emotion.overwrite(EmotionHandlerConfig.emotion_2_key[task_info['args']])
             
-            # Send new emotion to task queue for display
-            elif task_info['task'] == 'EMOTION_RECIEVED' or task_info['task'] == 'START_EMOTION':
-                emotion = self._get_new_emotion()
-                self.task_queue.append({
-                    'requester_name': 'emotion',
-                    'handler_name': 'menu_screen',
-                    'task': f'SHOW_{emotion.upper()}'
-                })
-                print('EmotionHandler Sent:', {
-                    'requester_name': 'emotion',
-                    'handler_name': 'menu_screen',
-                    'task': f'SHOW_{emotion.upper()}'
-                })
+            # Update emotion when the previous one had been received
+            elif task_info['task'] == 'EMOTION_RECIEVED':
+                new_emotion_key = self._get_new_emotion_key()
+                self.emotion_key.overwrite(new_emotion_key)
+            
                
             self.busy.overwrite(int(False))
