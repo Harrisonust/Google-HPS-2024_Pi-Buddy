@@ -95,6 +95,7 @@ class FilmPage(Page):
             self.saved_len.overwrite(-1)
             self.max_id.overwrite(-1)
             self._initiate()
+            self.saved_display_id.overwrite(self.saved_len.reveal())
         
         else:
             self.state.overwrite(FilmPageStates.SHOW_CURRENT)
