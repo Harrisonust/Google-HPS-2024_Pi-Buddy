@@ -6,7 +6,7 @@ from value_manager import ValueManager
 
 
 
-class AudioHander(Handler):
+class AudioHandler(Handler):
     
     def __init__(self, task_queue):
         self.run_input_process = True
