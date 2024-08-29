@@ -316,7 +316,9 @@ class Screen:
         #     raise ValueError("Pixel out of bound")
         # if (x + width > self._col_dim) or (y + height > self._row_dim):
         #     raise ValueError("Image exceeds display bounds")
-        
+        if data is None:
+            return
+
         data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
         r = data[:, :, 2].astype(np.uint16)
         g = data[:, :, 1].astype(np.uint16)

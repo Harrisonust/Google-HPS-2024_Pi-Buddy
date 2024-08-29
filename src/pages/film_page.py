@@ -169,6 +169,7 @@ class FilmPage(Page):
             time.sleep(0.1)
         self.camera.stop_recording()
         self.state.overwrite(FilmPageStates.SHOW_SAVED)
+        self.camera.start()
     
     def _capture_first_frame(self, filepath):
         # Returns the first frame of the video as a numpy array
@@ -280,7 +281,6 @@ class FilmPage(Page):
                 
                 video_played_time = time.time() - video_start_time
                 frame_number = int(fps * video_played_time)
-                print(frame_number, total_frames)
                 
                 if frame_number >= total_frames:
                     # End state PLAY_SAVED if the video is done
@@ -290,7 +290,6 @@ class FilmPage(Page):
                     # Get video frame
                     video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
                     _, frame = video_capture.read()
-                    print(frame.shape)
                     self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
             
