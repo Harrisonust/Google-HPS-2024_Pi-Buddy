@@ -87,6 +87,7 @@ class PhotographPage(Page):
             self.saved_len.overwrite(-1)                                    # will be overwritten in _initiate()
             self.max_id.overwrite(-1)                                       # will be overwritten in _initiate()
             self._initiate()
+            self.saved_display_id.overwrite(self.saved_len.reveal())
         else:
             self.state.overwrite(PhotographPageStates.SHOW_CURRENT)
             self.prev_state.overwrite(PhotographPageStates.SHOW_SAVED)
@@ -191,7 +192,6 @@ class PhotographPage(Page):
             state = self.state.reveal()
             prev_state = self.prev_state.reveal()
             saved_display_id = self.saved_display_id.reveal()
-                
             if state == PhotographPageStates.SHOW_SAVED:
                 if prev_state == PhotographPageStates.SHOW_CURRENT:
                     # Take the picture

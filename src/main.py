@@ -41,8 +41,7 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            # 'battery': BatteryHandler(self.task_queue, debug=self.debug),
-            # 'encoders': EncodersHandler(self.task_queue, debug=self.debug),
+            'battery': BatteryHandler(self.task_queue),
             'encoders': TestEncodersHandler(self.task_queue),
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),

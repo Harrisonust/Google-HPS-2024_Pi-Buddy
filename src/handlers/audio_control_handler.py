@@ -13,8 +13,8 @@ class AudioControlHandler(Handler):
         
         
         ### FOR DEBUGGING & TESTING ###
-        self.function_in_test = self.add_todo
-        self.args_to_function_in_test = ('Finish Photopage',)
+        self.function_in_test = self.page_switching
+        self.args_to_function_in_test = ('Battery', )
         
         self.task_handler_busy = ValueManager(int(False))
 
