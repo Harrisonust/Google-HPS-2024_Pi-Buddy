@@ -4,14 +4,12 @@ import time
 import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
-import command_handler
 
+from handlers.command_handler import process_response
 from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
 from value_manager import ValueManager
-
-
 
 
 class AudioHandler(Handler):
@@ -48,6 +46,9 @@ class AudioHandler(Handler):
                     response_text = np.random.choice(self.greetings)
                     print(response_text)
                     os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                    #tts = gTTS(text=response_text, lang='en', slow = False)
+                    #tts.save("output.wav")
+                    #os.system("mpg321 output.wav")
                     self.listen_and_respond(source)
             except sr.UnknownValueError:
                 pass
@@ -113,11 +114,14 @@ class AudioHandler(Handler):
                 model = genai.GenerativeModel(model, system_instruction=system_instructions)
                 config = genai.GenerationConfig(temperature=temperature, stop_sequences=[stop_sequence])
                 response = model.generate_content(contents=[prompt], generation_config=config)
-                response_text = command_handler.process_response(response.text)
+                response_text = process_response(response.text)
                 print(response_text)
 
                 print("Speaking...")
                 os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
+                #tts = gTTS(text=response_text, lang='en', slow = False)
+                #tts.save("output.wav")
+                #os.system("mpg321 output.wav")
 
                 if not audio:
                     self.listen_for_wake_word(source)
