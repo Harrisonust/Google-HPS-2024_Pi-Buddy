@@ -85,7 +85,7 @@ class AudioHandler(Handler):
                                       'Please note that you are capable of all these commands and ' + \
                                       'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming"' + \
                                       'Dictionary:'+ \
-                                      '  "switch to weather page": "!Command1 &weather"'+ \
+                                      '  "switch to weather page": "!Command1 &Weather"'+ \
                                       '  "switch to time page": "!Command1 &Time"'+ \
                                       '  "switch to timer page": "!Command1 &Timer"'+ \
                                       '  "switch to photograph page": "!Command1 &Photograph"'+ \
