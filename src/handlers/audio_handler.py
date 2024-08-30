@@ -30,32 +30,32 @@ class AudioHandler(Handler):
             "Hi, how can I assist you?"
         ]
 
-        with sr.Microphone() as source:
-            #task = threading.Thread(target=self.listen_for_wake_word, args=(source,))
-            #task.start()
+        task = threading.Thread(target=self.listen_for_wake_word)
+        task.start()
     
     # Listen for the wake word "hey"
-    #def listen_for_wake_word(self, source):
+    def listen_for_wake_word(self):
+        with sr.Microphone() as source:
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
-        #while True:
-            try:
-                print("Listening audio")
-                audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
-                text = self.r.recognize_google(audio)
-                print(text)
-                if "hey" in text.lower():
-                    print("Wake word detected.")
-                    response_text = np.random.choice(self.greetings)
-                    print(response_text)
-                    os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
-                    #tts = gTTS(text=response_text, lang='en', slow = False)
-                    #tts.save("output.wav")
-                    #os.system("aplay output.wav")
-                    self.listen_and_respond(source)
-            except sr.UnknownValueError:
-                print('input not recognized')
-            time.sleep(0.5)
+            while True:
+                try:
+                    print("Listening audio")
+                    audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
+                    text = self.r.recognize_google(audio)
+                    print(text)
+                    if "hey" in text.lower():
+                        print("Wake word detected.")
+                        response_text = np.random.choice(self.greetings)
+                        print(response_text)
+                        os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                        #tts = gTTS(text=response_text, lang='en', slow = False)
+                        #tts.save("output.wav")
+                        #os.system("aplay output.wav")
+                        self.listen_and_respond(source)
+                except sr.UnknownValueError:
+                    print('input not recognized')
+                time.sleep(0.5)
             
 
     # Listen for input and respond with OpenAI API
