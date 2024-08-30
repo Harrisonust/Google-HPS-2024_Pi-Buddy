@@ -140,7 +140,7 @@ class AudioControlHandler(Handler):
             print(f'An error occurred: {e}')
 
 
-    def process_response(response_text: str):
+    def process_response(self, response_text: str):
         # Regular expressions to find !CommandX, &args, and #{emotion}
         command_pattern = r"!Command(\d+)"
         arg_pattern = r"&(\w+)"
@@ -157,30 +157,30 @@ class AudioControlHandler(Handler):
             if command_number == 1:
                 page = args[0] if args else None
                 additional_args = args[1:] if len(args) > 1 else None
-                page_switching(page, additional_args)
+                self.page_switching(page, additional_args)
             elif command_number == 2:
-                call_and_come()
+                self.call_and_come()
             elif command_number == 3:
                 emotion = args[0] if args else None
-                set_emotion(emotion)
+                self.set_emotion(emotion)
             elif command_number == 4:
                 seconds = int(args[0]) if len(args) > 0 else None
                 minutes = int(args[1]) if len(args) > 1 else None
                 hours = int(args[2]) if len(args) > 2 else None
-                set_count_down_timer(seconds, minutes, hours)
+                self.set_count_down_timer(seconds, minutes, hours)
             elif command_number == 5:
                 task_name = args[0] if args else None
-                add_todo(task_name)
+                self.add_todo(task_name)
             elif command_number == 6:
-                take_a_photo()
+                self.take_a_photo()
             elif command_number == 7:
                 seconds_of_video = int(args[0]) if args else None
-                start_recording(seconds_of_video)
+                self.start_recording(seconds_of_video)
             elif command_number == 8:
-                end_recording()
+                self.end_recording()
 
             if emotions:
-                set_emotion(emotions[0])
+                self.set_emotion(emotions[0])
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
