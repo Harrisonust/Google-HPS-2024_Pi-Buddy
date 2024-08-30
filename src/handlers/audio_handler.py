@@ -266,42 +266,42 @@ class AudioHandler(Handler):
             emotions = re.findall(emotion_pattern, response_text)
             
             # Call the appropriate command function based on command_number
-            if command_number == '!Command1':
-                page = args[0][1:] if args else None
-                additional_args = args[1:][1:] if len(args) > 1 else None
+            if command_number == 1:
+                page = args[0] if args else None
+                additional_args = args[1:] if len(args) > 1 else None
                 self.page_switching(page, additional_args)
                 print('Page switched to ' + page)
-            elif command_number == '!Command2':
+            elif command_number == 2:
                 self.call_and_come()
                 print('Call and come executed successfully')
-            elif command_number == '!Command3':
-                emotion = args[0][1:] if args else None
+            elif command_number == 3:
+                emotion = args[0] if args else None
                 self.set_emotion(emotion)
                 print('Emotion set to ' + str(emotion))
-            elif command_number == '!Command4':
-                seconds = int(args[0][1:]) if len(args) > 0 else None
-                minutes = int(args[1][1:]) if len(args) > 1 else None
-                hours = int(args[2][1:]) if len(args) > 2 else None
+            elif command_number == 4:
+                seconds = int(args[0]) if len(args) > 0 else None
+                minutes = int(args[1]) if len(args) > 1 else None
+                hours = int(args[2]) if len(args) > 2 else None
                 self.set_count_down_timer(seconds, minutes, hours)
                 print(f'Countdown timer set to {hours} hours, {minutes} minutes, and {seconds} seconds')
-            elif command_number == '!Command5':
-                task_name = args[0][1:] if args else None
+            elif command_number == 5:
+                task_name = args[0] if args else None
                 self.add_todo(task_name)
                 print('Task added: ' + task_name)
-            elif command_number == '!Command6':
+            elif command_number == 6:
                 self.take_a_photo()
                 print('Photo taken successfully')
-            elif command_number == '!Command7':
-                seconds_of_video = int(args[0][1:]) if args else None
+            elif command_number == 7:
+                seconds_of_video = int(args[0]) if args else None
                 self.start_recording(seconds_of_video)
                 print(f'Started recording for {seconds_of_video} seconds')
-            elif command_number == '!Command8':
+            elif command_number == 8:
                 self.end_recording()
                 print('Recording ended successfully')
 
             if emotions and command_number!=3:
-                self.set_emotion(emotions[0][1:])
-                print('I am' + str(emotions[0][1:]))
+                self.set_emotion(emotions[0])
+                print('I am' + str(emotions[0]))
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
