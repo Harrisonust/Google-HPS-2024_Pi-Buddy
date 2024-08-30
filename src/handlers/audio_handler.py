@@ -267,6 +267,8 @@ class AudioHandler(Handler):
         if command_match:
             command_number = int(command_match.group(1))
             args = re.findall(arg_pattern, response_text)
+            if command_number!=3:
+                emotions.clear()
             
             
             # Call the appropriate command function based on command_number
@@ -279,7 +281,7 @@ class AudioHandler(Handler):
                 self.call_and_come()
                 print('Call and come executed successfully')
             elif command_number == 3:
-                emotion = args[0] if args else None
+                emotion = emotions[0]
                 self.set_emotion(emotion)
                 print('Emotion set to ' + str(emotion))
             elif command_number == 4:
