@@ -45,10 +45,10 @@ class AudioHandler(Handler):
                     print("Wake word detected.")
                     response_text = np.random.choice(self.greetings)
                     print(response_text)
-                    os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
-                    #tts = gTTS(text=response_text, lang='en', slow = False)
-                    #tts.save("output.wav")
-                    #os.system("mpg321 output.wav")
+                    #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                    tts = gTTS(text=response_text, lang='en', slow = False)
+                    tts.save("output.wav")
+                    os.system("mpg321 output.wav")
                     self.listen_and_respond(source)
             except sr.UnknownValueError:
                 pass
@@ -119,9 +119,9 @@ class AudioHandler(Handler):
 
                 print("Speaking...")
                 os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                #tts = gTTS(text=response_text, lang='en', slow = False)
-                #tts.save("output.wav")
-                #os.system("mpg321 output.wav")
+                tts = gTTS(text=response_text, lang='en', slow = False)
+                tts.save("output.wav")
+                os.system("mpg321 output.wav")
 
                 if not audio:
                     self.listen_for_wake_word(source)
