@@ -25,7 +25,7 @@ class PageId:
 
 class MenuScreenHandler(Handler):
     def __init__(self, task_queue):
-
+        print('menu screen handler is initialized')
         self.run_input_process = False
         self.task_queue = task_queue
         
@@ -73,9 +73,9 @@ class MenuScreenHandler(Handler):
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         self.current_page_priority = ValueManager(0)
-        self.current_page_id = ValueManager(PageId.EmotionPage)
+        # self.current_page_id = ValueManager(PageId.EmotionPage)
         
-        # self.current_page_id = ValueManager(PageId.MenuPage)
+        self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
         # self.current_page_id = ValueManager(PageId.TimePage)

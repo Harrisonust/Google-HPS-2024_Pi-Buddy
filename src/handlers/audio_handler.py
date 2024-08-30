@@ -5,6 +5,8 @@ import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
 import threading
+from gtts import gTTS
+import re
 
 # from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
@@ -29,38 +31,39 @@ class AudioHandler(Handler):
         ]
 
         with sr.Microphone() as source:
-            task = threading.Thread(target=self.listen_for_wake_word, args=(source,))
-            task.start()
+            #task = threading.Thread(target=self.listen_for_wake_word, args=(source,))
+            #task.start()
     
     # Listen for the wake word "hey"
-    def listen_for_wake_word(self, source):
-
-        print("Adjusting for ambient noise, please wait...")
-        #self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
-        while True:
+    #def listen_for_wake_word(self, source):
+            print("Adjusting for ambient noise, please wait...")
+            self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
+        #while True:
             try:
-                audio = self.r.listen(source, timeout=0.5)
-                print("Listening for 'Hey'...")
+                print("Listening audio")
+                audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
                 text = self.r.recognize_google(audio)
+                print(text)
                 if "hey" in text.lower():
                     print("Wake word detected.")
                     response_text = np.random.choice(self.greetings)
                     print(response_text)
-                    #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
-                    tts = gTTS(text=response_text, lang='en', slow = False)
-                    tts.save("output.wav")
-                    os.system("mpg321 output.wav")
+                    os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                    #tts = gTTS(text=response_text, lang='en', slow = False)
+                    #tts.save("output.wav")
+                    #os.system("aplay output.wav")
                     self.listen_and_respond(source)
             except sr.UnknownValueError:
-                pass
+                print('unkonwn input')
             time.sleep(0.5)
+            
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
         print("Listening...")
 
         while True:
-            audio = self.r.listen(source)
+            audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
@@ -115,15 +118,16 @@ class AudioHandler(Handler):
                 model = genai.GenerativeModel(model, system_instruction=system_instructions)
                 config = genai.GenerationConfig(temperature=temperature, stop_sequences=[stop_sequence])
                 response = model.generate_content(contents=[prompt], generation_config=config)
+                print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 # response_text = process_response(response.text)
                 print(response_text)
 
                 print("Speaking...")
-                #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                tts = gTTS(text=response_text, lang='en', slow = False)
-                tts.save("output.wav")
-                os.system("mpg321 output.wav")
+                os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
+                #tts = gTTS(text=response_text, lang='en', slow = False)
+                #tts.save("output.wav")
+                #os.system("mpg321 output.wav")
 
                 if not audio:
                     self.listen_for_wake_word(source)
