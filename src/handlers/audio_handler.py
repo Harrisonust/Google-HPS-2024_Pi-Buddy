@@ -4,6 +4,7 @@ import time
 import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
+import threading
 
 # from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
@@ -27,21 +28,19 @@ class AudioHandler(Handler):
             "Hi, how can I assist you?"
         ]
 
-    # def listen(self):
-        # Use the default microphone as the audio source
         with sr.Microphone() as source:
-            print("Listening for 'Hey'...")
-            self.listen_for_wake_word(source)
+            task = threading.Thread(target=self.listen_for_wake_word, args=(source,))
+            task.start()
     
     # Listen for the wake word "hey"
     def listen_for_wake_word(self, source):
-        print("Listening for 'Hey'...")
 
+        print("Adjusting for ambient noise, please wait...")
+        #self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
         while True:
-            print("Adjusting for ambient noise, please wait...")
-            self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
-            audio = self.r.listen(source)
             try:
+                audio = self.r.listen(source, timeout=0.5)
+                print("Listening for 'Hey'...")
                 text = self.r.recognize_google(audio)
                 if "hey" in text.lower():
                     print("Wake word detected.")
