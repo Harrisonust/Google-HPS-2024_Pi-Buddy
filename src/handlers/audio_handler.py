@@ -30,7 +30,6 @@ class AudioHandler(Handler):
     # def listen(self):
         # Use the default microphone as the audio source
         with sr.Microphone() as source:
-            print("Listening for 'Hey'...")
             self.listen_for_wake_word(source)
     
     # Listen for the wake word "hey"
