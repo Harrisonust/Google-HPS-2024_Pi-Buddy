@@ -13,7 +13,7 @@ __all__ = [
     'AudioControlHandler',
 
     'BatteryHandler',
-    # 'TestEncodersHandler',
+    'TestEncodersHandler',
     # 'EncodersHandler',
     'MenuScreenHandler'
 ]
