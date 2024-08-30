@@ -5,7 +5,7 @@ import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
 
-from handlers.command_handler import process_response
+from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
@@ -118,7 +118,7 @@ class AudioHandler(Handler):
                 print(response_text)
 
                 print("Speaking...")
-                os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
+                #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
                 tts = gTTS(text=response_text, lang='en', slow = False)
                 tts.save("output.wav")
                 os.system("mpg321 output.wav")
