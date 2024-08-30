@@ -54,7 +54,7 @@ class AudioHandler(Handler):
                     #os.system("aplay output.wav")
                     self.listen_and_respond(source)
             except sr.UnknownValueError:
-                print('unkonwn input')
+                print('input not recognized')
             time.sleep(0.5)
             
 
@@ -72,7 +72,7 @@ class AudioHandler(Handler):
 
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
-                prompt = 'hi cody'
+                prompt = text
                 system_instructions = 'You are Cody, a friendly AI desktop pet. ' + \
                                       'You are mostly optimistic, but also easily moody. ' + \
                                       'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #curious, #scared) ' + \
