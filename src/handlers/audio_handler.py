@@ -263,10 +263,11 @@ class AudioHandler(Handler):
         
         # Find and process command
         command_match = re.search(command_pattern, response_text)
+        emotions = re.findall(emotion_pattern, response_text)
         if command_match:
             command_number = int(command_match.group(1))
             args = re.findall(arg_pattern, response_text)
-            emotions = re.findall(emotion_pattern, response_text)
+            
             
             # Call the appropriate command function based on command_number
             if command_number == 1:
@@ -302,9 +303,9 @@ class AudioHandler(Handler):
                 self.end_recording()
                 print('Recording ended successfully')
 
-            #if emotions and command_number!=3:
-            #    self.set_emotion(emotions[0])
-            #    print('I am ' + str(emotions[0]))
+            if emotions and command_number!=3:
+                self.set_emotion(emotions[0])
+                print('I am ' + str(emotions[0]))
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
