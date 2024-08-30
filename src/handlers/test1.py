@@ -4,9 +4,6 @@ import time
 import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
-import threading
-from gtts import gTTS
-import re
 
 # from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
@@ -30,40 +27,40 @@ class AudioHandler(Handler):
             "Hi, how can I assist you?"
         ]
 
+    # def listen(self):
+        # Use the default microphone as the audio source
         with sr.Microphone() as source:
-            #task = threading.Thread(target=self.listen_for_wake_word, args=(source,))
-            #task.start()
+            self.listen_for_wake_word(source)
     
     # Listen for the wake word "hey"
-    #def listen_for_wake_word(self, source):
+    def listen_for_wake_word(self, source):
+        print("Listening for 'Hey'...")
+
+        while True:
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
-        #while True:
+            audio = self.r.listen(source)
             try:
-                print("Listening audio")
-                audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
                 text = self.r.recognize_google(audio)
-                print(text)
                 if "hey" in text.lower():
                     print("Wake word detected.")
                     response_text = np.random.choice(self.greetings)
                     print(response_text)
-                    os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
-                    #tts = gTTS(text=response_text, lang='en', slow = False)
-                    #tts.save("output.wav")
-                    #os.system("aplay output.wav")
+                    #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                    tts = gTTS(text=response_text, lang='en', slow = False)
+                    tts.save("output.wav")
+                    os.system("mpg321 output.wav")
                     self.listen_and_respond(source)
             except sr.UnknownValueError:
-                print('unkonwn input')
+                pass
             time.sleep(0.5)
-            
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
         print("Listening...")
 
         while True:
-            audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
+            audio = self.r.listen(source)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
@@ -118,16 +115,15 @@ class AudioHandler(Handler):
                 model = genai.GenerativeModel(model, system_instruction=system_instructions)
                 config = genai.GenerationConfig(temperature=temperature, stop_sequences=[stop_sequence])
                 response = model.generate_content(contents=[prompt], generation_config=config)
-                print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 # response_text = process_response(response.text)
                 print(response_text)
 
                 print("Speaking...")
-                os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                #tts = gTTS(text=response_text, lang='en', slow = False)
-                #tts.save("output.wav")
-                #os.system("mpg321 output.wav")
+                #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
+                tts = gTTS(text=response_text, lang='en', slow = False)
+                tts.save("output.wav")
+                os.system("mpg321 output.wav")
 
                 if not audio:
                     self.listen_for_wake_word(source)
@@ -301,6 +297,7 @@ class AudioHandler(Handler):
             if emotions and command_number!=3:
                 self.set_emotion(emotions[0])
                 print('I am' + str(emotions[0]))
+
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
