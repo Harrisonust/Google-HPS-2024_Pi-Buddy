@@ -39,7 +39,7 @@ class AudioHandler(Handler):
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
             while True:
-                try:
+                #try:
                     print("Listening audio")
                     audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
                     text = self.r.recognize_google(audio)
@@ -53,22 +53,23 @@ class AudioHandler(Handler):
                         #tts.save("output.wav")
                         #os.system("aplay output.wav")
                         self.listen_and_respond(source)
-                except sr.UnknownValueError:
-                    print('input not recognized')
-                time.sleep(0.5)
+                #except sr.UnknownValueError:
+                #    print('input not recognized')
+                    time.sleep(0.5)
             
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
-        print("Listening...")
+            print("Listening...")
 
-        while True:
+        #while True:
             audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
                 if not text:
-                    continue
+                    #continue
+                    return
 
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
@@ -136,12 +137,14 @@ class AudioHandler(Handler):
                 time.sleep(2)
                 print("Silence found, shutting up, listening...")
                 self.listen_for_wake_word(source)
-                break
+                #break
+                return
             except sr.RequestError as e:
                 print(f"Could not request results; {e}")
                 os.system(f"espeak 'Could not request results; {e}'")  # Use espeak to say the error
                 self.listen_for_wake_word(source)
-                break
+                #break
+                return
 
     def page_switching(self, page, args=None):
         # 1 
@@ -299,9 +302,9 @@ class AudioHandler(Handler):
                 self.end_recording()
                 print('Recording ended successfully')
 
-            if emotions and command_number!=3:
-                self.set_emotion(emotions[0])
-                print('I am ' + str(emotions[0]))
+            #if emotions and command_number!=3:
+            #    self.set_emotion(emotions[0])
+            #    print('I am ' + str(emotions[0]))
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
