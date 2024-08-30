@@ -301,7 +301,7 @@ class AudioHandler(Handler):
 
             if emotions and command_number!=3:
                 self.set_emotion(emotions[0])
-                print('I am' + str(emotions[0]))
+                print('I am ' + str(emotions[0]))
             
             # Remove the processed parts from response_text
             response_text = re.sub(command_pattern, '', response_text)
