@@ -7,12 +7,8 @@ sudo apt upgrade -y
 
 sudo apt remove python3-rpi.gpio
 
-<<<<<<< Updated upstream
-sudo apt install -y git python3-pip python3-venv python3-rpi-lgpio i2c-tools sqlite3 mpg321 libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0 ffmpeg
-=======
 sudo apt install -y git python3-pip python3-venv python3-rpi-lgpio i2c-tools sqlite3 mpg321 libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0 ffmpeg python3-pyaudio flac python3-espeak espeak
 
->>>>>>> Stashed changes
 sudo apt install -y python3-picamera2 --no-install-recommends
 
 python3 -m venv --system-site-packages .venv 
@@ -59,3 +55,8 @@ pcm.mono_capture {
     ttable.1.0 0
 }" > /etc/asound.conf
 
+# respeaker
+git clone https://github.com/respeaker/seeed-voicecard ~/seeed-voicecard/
+cd ~/seeed-voicecard
+sudo ./install.sh
+sudo reboot
