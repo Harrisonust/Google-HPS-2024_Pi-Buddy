@@ -1,6 +1,6 @@
 import time
 from  smbus2 import SMBus, i2c_msg
-from vl53l1x_reg import *
+from .vl53l1x_reg import *
 
 class VL53L1X:
     def __init__(self):
