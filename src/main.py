@@ -51,7 +51,7 @@ class Control:
         }
         
         if reset_database:
-            reset_db(reset_todo=True, reset_images=True, reset_videos=True)
+            reset_db(reset_todo=False, reset_images=True, reset_videos=True)
     
         # Start listening processes for each handler
         self._start_listening()
