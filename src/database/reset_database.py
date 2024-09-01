@@ -4,23 +4,28 @@ import os
 
 def reset_db(reset_todo=False, reset_images=False, reset_videos=False):
     
-    conn = sqlite3.connect()
-    cursor = self.conn.cursor()
+    conn = sqlite3.connect('database/database.db')
+    cursor = conn.cursor()
 
     if reset_todo:
-        reset_todo(conn, cursor)
+        _reset_todo(conn, cursor)
     if reset_images:
-        reset_images(conn, cursor)
+        _reset_images(conn, cursor)
     if reset_videos:
-        reset_videos(conn, cursor)
+        _reset_videos(conn, cursor)
 
 
-def reset_todo(conn, cursor):
+def _reset_todo(conn, cursor):
     try:
         # Create todo SQL table
         cursor.execute(
             '''
             DROP TABLE IF EXISTS todo;
+            '''
+        )
+        conn.commit()
+        cursor.execute(
+            '''
             CREATE TABLE todo (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 task_name TEXT NOT NULL,
@@ -37,13 +42,17 @@ def reset_todo(conn, cursor):
         print(f'An error ocurred when resetting todo: {e}')
 
 
-def reset_images(conn, cursor):
+def _reset_images(conn, cursor):
     try:
         # Create images SQL table
         cursor.execute(
             '''
             DROP TABLE IF EXISTS saved_imgs;
-
+            '''
+        )
+        conn.commit()
+        cursor.execute(
+            '''
             CREATE TABLE saved_imgs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 img_name TEXT NOT NULL,
@@ -69,7 +78,7 @@ def reset_images(conn, cursor):
             # Write existing files into SQL table
             for image_file in image_files:
                 cursor.execute(
-                    '''
+                    f'''
                     INSERT INTO saved_imgs (img_name, img_path)
                     VALUES (\'{image_file.split("/")[-1]}\', \'{image_file}\');
                     '''
@@ -80,13 +89,17 @@ def reset_images(conn, cursor):
         print(f'An error occurred when resetting images')
     
     
-def reset_videos(conn, cursor):
+def _reset_videos(conn, cursor):
     try:
         # Create images SQL table
         cursor.execute(
             '''
             DROP TABLE IF EXISTS saved_videos;
-
+            '''
+        )
+        conn.commit()
+        cursor.execute(
+            '''
             CREATE TABLE saved_videos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 video_name TEXT NOT NULL,
@@ -112,7 +125,7 @@ def reset_videos(conn, cursor):
             # Write existing files into SQL table
             for video_file in video_files:
                 cursor.execute(
-                    '''
+                    f'''
                     INSERT INTO saved_videos (video_name, video_path)
                     VALUES (\'{video_file.split("/")[-1]}\', \'{video_file}\');
                     '''

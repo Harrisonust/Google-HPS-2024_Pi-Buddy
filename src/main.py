@@ -34,7 +34,7 @@ class TaskQueue:
 
 
 class Control:
-    def __init__(self, reset_database):
+    def __init__(self, reset_database=False):
         
         # Initialize the task queue
         self.task_queue = TaskQueue()
@@ -90,4 +90,4 @@ class Control:
 if __name__ == '__main__':
     
     GPIO.setmode(GPIO.BCM)
-    Control()
+    Control(reset_database=True)
