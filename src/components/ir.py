@@ -11,7 +11,7 @@ class IR:
 
     # triggers if distance is less than a pre-defined threshold
     def is_triggered(self) -> bool: 
-        return self.__current_state == GPIO.LOW
+        return self.__current_state == GPIO.HIGH
 
     # returns 0 or 1; does pretty much the same thing as is_triggered
     def get_state(self) -> int:

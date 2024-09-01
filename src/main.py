@@ -43,7 +43,8 @@ class Control:
         self.handlers = {
             'battery': BatteryHandler(self.task_queue),
             'encoders': EncodersHandler(self.task_queue),
-            'menu_screen': MenuScreenHandler(self.task_queue)
+            'menu_screen': MenuScreenHandler(self.task_queue),
+            'robot_movement': RobotMovementHandler(self.task_queue),
         }
     
         # Start listening processes for each handler
@@ -54,7 +55,10 @@ class Control:
         process = threading.Thread(target=self._execute_tasks)
         process.name = 'main execute task'
         process.start()
-        
+       
+        for thread in threading.enumerate():
+            print(thread.name)
+
 
     def _start_listening(self):
         # Start listening processes for input handlers
@@ -76,7 +80,7 @@ class Control:
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
                 process.start()   
-            time.sleep(0.1)
+            time.sleep(0.001)
 
                 
    
