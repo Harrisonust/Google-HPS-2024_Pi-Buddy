@@ -24,10 +24,11 @@ class RobotMovementHandler:
         ir_task_handle.start()
         tof_task_handle.start()
 
+        self.robot_base_speed = 10
+
     def listen(self):
         while 1:
-            print(f"robot movement -- IR:{self.ir_is_triggered} TOF:{self.tof_distance}")
-            
+            #print(f"robot movement -- IR:{self.ir_is_triggered} TOF:{self.tof_distance}")
             if self.ir_is_triggered or (self.tof_distance != None and self.tof_distance < 50): 
                 self.robot_base.stop()
                 self.robot_base.move(-50)
@@ -42,7 +43,7 @@ class RobotMovementHandler:
                     self.robot_base.move(-50) # 50 mm
                 elif self.state == 'Call_and_come':
                     pass
-                time.sleep(0.1)
+            time.sleep(0.1)
 
     def ir_task(self):
         self.ir = IR(PIN_IR)
@@ -69,18 +70,19 @@ class RobotMovementHandler:
         else:
             self.robot_movement_busy.overwrite(True)
             if task_info['handler_name'] == 'robot_movement':
+                self.robot_base.set_speed(40)
                 if task_info['operation'] == 'move_forward':
                     print('in robot movement handler move forward')
-                    self.robot_base.move(10)
+                    self.robot_base.move(0)
                 elif task_info['operation'] == 'move_backward':
                     print('in robot movement handler move backward')
-                    self.robot_base.move(-10)
+                    self.robot_base.move(1)
                 elif task_info['operation'] == 'turn_left':
                     print('in robot movement handler turn left')
-                    self.robot_base.rotate(90)
+                    self.robot_base.rotate(0)
                 elif task_info['operation'] == 'turn_right':
                     print('in robot movement handler turn right')
-                    self.robot_base.rotate(-90)
+                    self.robot_base.rotate(1)
                 elif task_info['operation'] == 'stop_movement':
                     print('in robot movement handler stop movement')
                     self.robot_base.stop()

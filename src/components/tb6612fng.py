@@ -56,7 +56,6 @@ class SingleChannelMotor:
     def brake(self) -> None:
         GPIO.output(self._pin_in1, GPIO.HIGH)
         GPIO.output(self._pin_in2, GPIO.HIGH)
-        self.set_duty(0.0)
 
     def get_speed(self) -> float:
         if self._has_encoder == False: 
@@ -84,9 +83,6 @@ class DualChannelMotor:
             GPIO.setup(self._pin_standby, GPIO.OUT)
             self.enable()
         
-        self.move_constant = 0.01
-        self.rotate_constant = 0.01
-        
     # to be tested    
     def enable(self) -> None: 
         assert self._pin_standby is not None, "to use motor.enable(), please assign a pin to pin standby"
@@ -96,36 +92,26 @@ class DualChannelMotor:
     def disable(self) -> None:
         assert self._pin_standby is not None, "to use motor.enable(), please assign a pin to pin standby"
         GPIO.output(self._pin_standby, GPIO.LOW)
+    
+    def set_speed(self, duty):
+        self.left_motor.set_duty(duty)
+        self.right_motor.set_duty(duty)
 
-    def move(self, distance):
-        if distance == 0:
-            return
-
-        self.left_motor.set_duty(10)
-        self.right_motor.set_duty(10)
-        if distance > 0:
-            self.left_motor.set_rotation(Rotation.CLOCKWISE)
-            self.right_motor.set_rotation(Rotation.CLOCKWISE)
-        elif distance < 0:
+    def move(self, direction):
+        if direction == 0:
             self.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
             self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-        time.sleep(abs(distance * self.move_constant))
-        self.stop()
+        elif direction == 1:
+            self.left_motor.set_rotation(Rotation.CLOCKWISE)
+            self.right_motor.set_rotation(Rotation.CLOCKWISE)
         
-    def rotate(self, angle: float):
-        if angle == 0:
-            return
-
-        self.left_motor.set_duty(10)
-        self.right_motor.set_duty(10)
-        if angle > 0:
-            self.left_motor.set_rotation(Rotation.CLOCKWISE)
-            self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-        elif angle < 0:
+    def rotate(self, rotation):
+        if rotation == 0:
             self.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
             self.right_motor.set_rotation(Rotation.CLOCKWISE)
-        time.sleep(abs(angle * self.rotate_constant))
-        self.stop()
+        elif rotation == 1:
+            self.left_motor.set_rotation(Rotation.CLOCKWISE)
+            self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
         
     def stop(self):
         self.left_motor.brake()
