@@ -14,7 +14,7 @@ class RobotMovementHandler:
 
         self.robot_movement_busy = ValueManager(0)
         self.robot_base = DualChannelMotor(23, 24, 25, 1, 12, 16, pin_standby=None)
-        self.state = None
+        self.state = 'Teleop'
 
         self.tof_distance = None
         self.ir_is_triggered = None
@@ -34,7 +34,9 @@ class RobotMovementHandler:
                 self.robot_base.rotate(180)
                 time.sleep(0.1)
             else:
-                if self.state == 'Curious':
+                if self.state == 'Teleop':
+                    pass
+                elif self.state == 'Curious':
                     self.robot_base.random_walk()
                 elif self.state == 'Scared':
                     self.robot_base.move(-50) # 50 mm
@@ -66,5 +68,21 @@ class RobotMovementHandler:
 
         else:
             self.robot_movement_busy.overwrite(True)
-            
+            if task_info['handler_name'] == 'robot_movement':
+                if task_info['operation'] == 'move_forward':
+                    print('in robot movement handler move forward')
+                    self.robot_base.move(10)
+                elif task_info['operation'] == 'move_backward':
+                    print('in robot movement handler move backward')
+                    self.robot_base.move(-10)
+                elif task_info['operation'] == 'turn_left':
+                    print('in robot movement handler turn left')
+                    self.robot_base.rotate(90)
+                elif task_info['operation'] == 'turn_right':
+                    print('in robot movement handler turn right')
+                    self.robot_base.rotate(-90)
+                elif task_info['operation'] == 'stop_movement':
+                    print('in robot movement handler stop movement')
+                    self.robot_base.stop()
+
             self.robot_movement_busy.overwrite(False)

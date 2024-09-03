@@ -45,6 +45,7 @@ class Control:
             'encoders': EncodersHandler(self.task_queue),
             'menu_screen': MenuScreenHandler(self.task_queue),
             'robot_movement': RobotMovementHandler(self.task_queue),
+            'teleop': TeleopHandler(self.task_queue),
         }
     
         # Start listening processes for each handler
