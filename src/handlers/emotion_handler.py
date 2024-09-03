@@ -47,7 +47,7 @@ class EmotionHandler(Handler):
         self.hungry = ValueManager(int(False))
         self.energetic = ValueManager(int(False))
         self.sleepy = ValueManager(int(False))
-        self.curious = ValueManager(int(False))     # NOTHING WRITTEN TO TRIGGER YET
+        self.curious = ValueManager(int(True))      # The robot is curious as default
         self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
         
@@ -61,10 +61,7 @@ class EmotionHandler(Handler):
         
         observe_process = multiprocessing.Process(target=self._observe_time_weather)
         observe_process.start()
-        
-        # flood_emotion_tasks_process = multiprocessing.Process(target=self._flood_emotion_tasks)
-        # flood_emotion_tasks_process.start()
-        
+
     
     def _observe_time_weather(self):
         while True:
@@ -90,29 +87,29 @@ class EmotionHandler(Handler):
             weather = location_data['WeatherElement']['Weather']
             
             
-            # # 'depressed' is updated by wether it's monday or raining
-            # if day == 'Monday' or '陰' in weather:
-            #     self.depressed.overwrite(int(True))
-            # else:
-            #     self.depressed.overwrite(int(False))
+            # 'depressed' is updated by wether it's monday or raining
+            if day == 'Monday' or '陰' in weather:
+                self.depressed.overwrite(int(True))
+            else:
+                self.depressed.overwrite(int(False))
             
-            # # 'joyful' is updated by wether it's sunny
-            # if '晴' in weather:
-            #     self.joyful.overwrite(int(True))
-            # else:
-            #     self.joyful.overwrite(int(False))
+            # 'joyful' is updated by wether it's sunny
+            if '晴' in weather:
+                self.joyful.overwrite(int(True))
+            else:
+                self.joyful.overwrite(int(False))
                 
-            # # 'sleepy' is updated True at late night or early mornings
-            # if hour >= 22 or hour <= 7:
-            #     self.sleepy.overwrite(int(True))
-            # else:
-            #     self.sleepy.overwrite(int(False))
+            # 'sleepy' is updated True at late night or early mornings
+            if hour >= 22 or hour <= 7:
+                self.sleepy.overwrite(int(True))
+            else:
+                self.sleepy.overwrite(int(False))
             
-            # # 'energetic' is updated True at Saturdays and Sundays
-            # if day == 'Saturday' or day == 'Sunday':
-            #     self.energetic.overwrite(int(True))
-            # else:
-            #     self.energetic.overwrite(int(False))
+            # 'energetic' is updated True at Saturdays and Sundays
+            if day == 'Saturday' or day == 'Sunday':
+                self.energetic.overwrite(int(True))
+            else:
+                self.energetic.overwrite(int(False))
             
             # Updates every minutes
             time.sleep(60)
@@ -126,17 +123,12 @@ class EmotionHandler(Handler):
                 'handler_name': 'menu_screen',
                 'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
             })
-            # print('EmotionHandler Sent:', {
-            #     'requester_name': 'emotion',
-            #     'handler_name': 'menu_screen',
-            #     'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
-            # })
             time.sleep(1)
     
     
     
     def _get_new_emotion_key(self):
-        # Priority-wise: 'hungry' > 'prioritized_emotion' > 'scared' > 'curious' > 'depressed' == 'joyful' == 'energetic' == 'sleepy'
+        # Priority-wise: 'hungry' > 'prioritized_emotion' > 'scared' > 'curious' == 'depressed' == 'joyful' == 'energetic' == 'sleepy'
         
         new_emotion = 'joyful'
         
@@ -155,14 +147,11 @@ class EmotionHandler(Handler):
             new_emotion = 'scared'
             self.scared.overwrite(int(False))
         
-        # 'curious'
-        elif self.curious.reveal():
-            new_emotion = 'curious'
-            self.curious.overwrite(int(False))
-        
-        # 'depressed', 'joyful', 'energetic', 'sleepy'
+        # 'curious', 'depressed', 'joyful', 'energetic', 'sleepy'
         else:
             lottery_box = []
+            if self.curious.reveal():
+                lottery_box.append('curious')
             if self.depressed.reveal():
                 lottery_box.append('depressed')
             if self.joyful.reveal():
