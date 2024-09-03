@@ -29,7 +29,7 @@ class RobotMovementHandler:
     def listen(self):
         while 1:
             #print(f"robot movement -- IR:{self.ir_is_triggered} TOF:{self.tof_distance}")
-            if self.ir_is_triggered or (self.tof_distance != None and self.tof_distance < 50): 
+            if self.ir_is_triggered or (self.tof_distance != None and self.tof_distance < 100): 
                 self.robot_base.stop()
                 self.robot_base.move(-50)
                 self.robot_base.rotate(180)
