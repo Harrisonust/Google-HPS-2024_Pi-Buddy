@@ -4,6 +4,8 @@ import requests
 import random
 import multiprocessing
 from datetime import datetime
+import audioop
+import pyaudio
 
 
 from handlers.handler import Handler
@@ -36,6 +38,15 @@ class EmotionHandlerConfig:
     }
     
 
+class EmotionHandlerPyAudioSettings:
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    NUM_SAMPLES = 1024
+    TICK = 0.01
+    NOISE_THRESH = 250
+    
+
 class EmotionHandler(Handler):
     def __init__(self, task_queue):
         
@@ -50,6 +61,16 @@ class EmotionHandler(Handler):
         self.curious = ValueManager(int(True))      # The robot is curious as default
         self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
+        # PyAudio object to get noise
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(
+            format=EmotionHandlerPyAudioSettings.FORMAT,
+            channels=EmotionHandlerPyAudioSettings.CHANNELS,
+            rate=EmotionHandlerPyAudioSettings.RATE,
+            frames_per_buffer=EmotionHandlerPyAudioSettings.NUM_SAMPLES,
+            input=True,
+        )
+        self.buffer = []
         
         # The prioritized_emotion keeps id of a emtoin (as listed in emotion_2_key) to show;
         # the emotion will be shown regardless of the value of its corresponding state variable;
@@ -59,8 +80,45 @@ class EmotionHandler(Handler):
         self.busy = ValueManager(int(False))
         self.emotion_key = ValueManager(EmotionHandlerConfig.emotion_2_key['joyful'])   # The emotion sent to task_queue
         
-        observe_process = multiprocessing.Process(target=self._observe_time_weather)
-        observe_process.start()
+        # Updates once per minute
+        observe_time_weather_process = multiprocessing.Process(target=self._observe_time_weather)
+        observe_time_weather_process.start()
+        
+        # Updates frequently
+        observe_noise_process = multiprocessing.Process(target=self._observe_noise)
+        observe_noise_process.start()
+    
+    
+    def _get_volume(self):
+        available = 0
+        while True:
+            available = self.stream.get_read_available()
+            if available >= EmotionHandlerPyAudioSettings.NUM_SAMPLES:
+                break
+            
+            time.sleep(EmotionHandlerPyAudioSettings.TICK)
+        
+        data = self.stream.read(available)[- EmotionHandlerPyAudioSettings.NUM_SAMPLES:]
+        rms = audioop.rms(data, 2)
+        return rms
+    
+    
+    def _observe_noise(self):
+        while True:
+            
+            start = time.time()
+            buff = []
+            blocks = int(EmotionHandlerPyAudioSettings.RATE / EmotionHandlerPyAudioSettings.NUM_SAMPLES * 0.5)
+            while len(buff) < blocks:
+                buff.append(self._get_volume())
+            noise = sum(buff) / len(buff)
+            print('time', time.time() - start)
+            
+            if noise > EmotionHandlerPyAudioSettings.NOISE_THRESH:
+                self.scared.overwrite(int(True))
+            
+            # Updates frequently
+            time.sleep(0.01)
 
     
     def _observe_time_weather(self):
@@ -173,7 +231,6 @@ class EmotionHandler(Handler):
     
     def handle_task(self, task_info):
         if not self.busy.reveal():
-            # print('EmotionHandler Recieved: ', task_info)
 
             self.busy.overwrite(int(True))
             
