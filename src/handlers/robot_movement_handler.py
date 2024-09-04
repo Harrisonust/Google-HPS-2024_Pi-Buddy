@@ -87,4 +87,13 @@ class RobotMovementHandler:
                     print('in robot movement handler stop movement')
                     self.robot_base.stop()
 
+                elif task_info['task'] == 'SCARED':
+                    self.robot_base.back_move(1)
+                    time.sleep(5)
+                    self.robot_base.stop()
+                elif task_info['task'] == 'CURIOUS':
+                    self.robot_base.random_walk()
+                    time.sleep(5)
+                    self.robot_base.stop()
+
             self.robot_movement_busy.overwrite(False)

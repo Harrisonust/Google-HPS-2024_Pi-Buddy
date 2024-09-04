@@ -119,16 +119,14 @@ class DualChannelMotor:
 
     def random_walk(self):
         selection = random.randint(1, 5)
-        distance = random.randint(1, 10)
-        angle = random.randint(30, 120)
         if selection == 1:
-            self.move(distance)
+            self.move(0)
         elif selection == 2:
-            self.move(-1 * distance)
+            self.move(1)
         elif selection == 3:
-            self.rotate(angle)
+            self.rotate(0)
         elif selection == 4:
-            self.rotate(-1 * angle)
+            self.rotate(1)
         elif selection == 5: # do nothing
             self.stop()
         time.sleep(3)
