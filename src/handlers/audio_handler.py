@@ -48,10 +48,10 @@ class AudioHandler(Handler):
                         print("Wake word detected.")
                         response_text = np.random.choice(self.greetings)
                         print(response_text)
-                        os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
-                        #tts = gTTS(text=response_text, lang='en', slow = False)
-                        #tts.save("output.wav")
-                        #os.system("aplay output.wav")
+                        #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
+                        tts = gTTS(text=response_text, lang='en', slow = False)
+                        tts.save("output.wav")
+                        os.system("aplay output.wav")
                         self.listen_and_respond(source)
                 #except sr.UnknownValueError:
                 #    print('input not recognized')
@@ -60,16 +60,21 @@ class AudioHandler(Handler):
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
+         
+        while True:
             print("Listening...")
-
-        #while True:
             audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
+
                 if not text:
                     #continue
-                    return
+                    print("No speech detected, returning to wake word listening.")
+                    break
+                    #return
+                else:
+                    self.page_switching('QA','you',text)
 
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
@@ -124,12 +129,13 @@ class AudioHandler(Handler):
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 print(response_text)
+                self.page_switching('QA','Robot', text)
 
                 print("Speaking...")
-                os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                #tts = gTTS(text=response_text, lang='en', slow = False)
-                #tts.save("output.wav")
-                #os.system("mpg321 output.wav")
+                #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
+                tts = gTTS(text=response_text, lang='en', slow = False)
+                tts.save("output.wav")
+                os.system("mpg321 output.wav")
 
                 if not audio:
                     self.listen_for_wake_word(source)
