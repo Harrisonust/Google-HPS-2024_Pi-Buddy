@@ -136,7 +136,7 @@ if __name__ == '__main__':
     robot_base = DualChannelMotor(23, 24, 25, 1, 12, 16, pin_standby=None)
     robot_base.left_motor.set_rotation(Rotation.CLOCKWISE)
     robot_base.right_motor.set_rotation(Rotation.CLOCKWISE)
-    duty = 20 
+    duty = 90 
     robot_base.left_motor.set_duty(duty)
     robot_base.right_motor.set_duty(duty)
     test_start_time = time.time()
