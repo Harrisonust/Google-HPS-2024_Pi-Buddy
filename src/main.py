@@ -3,7 +3,7 @@ import threading, queue
 import RPi.GPIO as GPIO
 import time
 
-# from handlers import *
+from handlers import *
 from database.reset_database import reset_db
 
 
@@ -44,8 +44,8 @@ class Control:
         self.handlers = {
             # 'battery': BatteryHandler(self.task_queue),
             # 'encoders': TestEncodersHandler(self.task_queue),
-            # 'menu_screen': MenuScreenHandler(self.task_queue),
-            # 'emotion': EmotionHandler(self.task_queue),
+            'menu_screen': MenuScreenHandler(self.task_queue),
+            'emotion': EmotionHandler(self.task_queue),
             # 'audio': AudioHandler(self.task_queue),
             # 'audio_control': AudioControlHandler(self.task_queue)
         }

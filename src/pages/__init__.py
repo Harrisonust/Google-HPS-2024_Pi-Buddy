@@ -5,8 +5,8 @@ from .timer_page import TimerPage
 from .weather_page import WeatherPage
 from .time_page import TimePage
 from .todo_page import TodoPage
-from .photograph_page import PhotographPage
-from .film_page import FilmPage
+# from .photograph_page import PhotographPage
+# from .film_page import FilmPage
 from .battery_page import BatteryPage
 
 __all__ = [
@@ -17,7 +17,7 @@ __all__ = [
     'WeatherPage',
     'TimePage',
     'TodoPage',
-    'PhotographPage',
-    'FilmPage',
+    # 'PhotographPage',
+    # 'FilmPage',
     'BatteryPage'
 ]

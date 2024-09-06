@@ -22,8 +22,7 @@ class EmotionHandlerConfig:
         'hungry': 3,
         'energetic': 4,
         'sleepy': 5,
-        'curious': 6,
-        'scared': 7
+        'scared': 6
     }
     key_2_emotion = {
         1: 'joyful',
@@ -31,8 +30,7 @@ class EmotionHandlerConfig:
         3: 'hungry',
         4: 'energetic',
         5: 'sleepy',
-        6: 'curious',
-        7: 'scared'
+        6: 'scared'
     }
     
 
@@ -43,11 +41,10 @@ class EmotionHandler(Handler):
         self.task_queue = task_queue
         
         self.depressed = ValueManager(int(False))
-        self.joyful = ValueManager(int(True))       # The robot is joyful as default
+        self.joyful = ValueManager(int(False))       # The robot is joyful as default
         self.hungry = ValueManager(int(False))
         self.energetic = ValueManager(int(False))
         self.sleepy = ValueManager(int(False))
-        self.curious = ValueManager(int(False))     # NOTHING WRITTEN TO TRIGGER YET
         self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
         
@@ -155,10 +152,6 @@ class EmotionHandler(Handler):
             new_emotion = 'scared'
             self.scared.overwrite(int(False))
         
-        # 'curious'
-        elif self.curious.reveal():
-            new_emotion = 'curious'
-            self.curious.overwrite(int(False))
         
         # 'depressed', 'joyful', 'energetic', 'sleepy'
         else:
