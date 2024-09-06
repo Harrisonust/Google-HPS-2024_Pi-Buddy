@@ -82,7 +82,7 @@ class Screen:
         self.set_display_mode(1)    # Normal display mode
 
         self._write_command(MADCTL)
-        self._write_data([0x60])
+        self._write_data([0xA0])
         
         self.set_display_on_off(1)
         time.sleep(0.1)
