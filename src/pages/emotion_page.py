@@ -29,8 +29,9 @@ class EmotionPageConfig:
         6: './emotions/scared'      
     }
     
-    # id: (x_angle_displacement, y_angle_displacement, x_radius, y_radius, img1_freq)
+
     id_2_motion = {
+        # joyful
         1: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(0),
@@ -40,6 +41,8 @@ class EmotionPageConfig:
             'y_radius': 3,
             'img1_freq': 0.02
             },
+        
+        # depressed
         2: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(0),
@@ -49,6 +52,8 @@ class EmotionPageConfig:
             'y_radius': 1.5,
             'img1_freq': 0.02
             },
+        
+        # hungry
         3: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(90),
@@ -58,6 +63,8 @@ class EmotionPageConfig:
             'y_radius': 1.5,
             'img1_freq': 0
             },
+        
+        # energetic
         4: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(0),
@@ -67,6 +74,8 @@ class EmotionPageConfig:
             'y_radius': 7,
             'img1_freq': 0
             },
+        
+        # sleepy
         5: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(0),
@@ -76,6 +85,8 @@ class EmotionPageConfig:
             'y_radius': 1.5,
             'img1_freq': 0
             },
+
+        # scared
         6: {
             'x_angle_start': math.radians(0),
             'y_angle_start': math.radians(90),
