@@ -78,7 +78,7 @@ class AudioHandler(Handler):
                     break
                     #return
                 else:
-                    self.page_switching('QA','you',text)
+                    self.page_switching('QA', args={'who':'user','what':text})
 
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
@@ -133,7 +133,7 @@ class AudioHandler(Handler):
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 print(response_text)
-                self.page_switching('QA','Robot', text)
+                self.page_switching('QA', args={'who':'robot','what':text})
 
                 print("Speaking...")
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
