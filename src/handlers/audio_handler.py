@@ -62,8 +62,6 @@ class AudioHandler(Handler):
     def listen_and_respond(self, source):
         while True:
             print("Listening...")
-            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")  # Create a beep sound
-            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 500")  # Create a beep sound
             os.system("aplay beep.wav")
             try:
                 audio = self.r.listen(source, timeout=35, phrase_time_limit=15)
@@ -76,6 +74,9 @@ class AudioHandler(Handler):
                     break
                     #return
                 elif "bye" in text.lower():
+                    tts = gTTS(text='Goodbye', lang='en', slow = False)
+                    tts.save("output.wav")
+                    os.system("mpg321 output.wav")
                     break
                 else:
                     self.page_switching('QA',args={'who':'user','what':text})
@@ -87,7 +88,8 @@ class AudioHandler(Handler):
                                       'You are mostly optimistic, but also easily moody. ' + \
                                       'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #curious, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
-                                      'Pleas consider the dictionary below' + \
+                                      'Please don\'t include emojis' + \
+                                      'Please consider the dictionary below' + \
                                       'if !command3 is called, then there is no need to set #emotion' + \
                                       'If you catch any of the commands in the dictionary or anything insinuating these commands, ' + \
                                       'please include the corresponding text in the dictionary below at the start of your response. ' + \
@@ -133,7 +135,7 @@ class AudioHandler(Handler):
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 print(response_text)
-                self.page_switching('QA', args={'who':'robot','what':text})
+                self.page_switching('QA', args={'who':'robot','what':response_text})
 
                 print("Speaking...")
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
