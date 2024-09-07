@@ -39,7 +39,7 @@ class AudioHandler(Handler):
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
             while True:
-                #try:
+                try:
                     print("Listening audio")
                     audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
                     text = self.r.recognize_google(audio)
@@ -54,9 +54,9 @@ class AudioHandler(Handler):
                         os.system("mpg321 output.wav")
                         time.sleep(2)
                         self.listen_and_respond(source)
-                #except sr.UnknownValueError:
-                #    print('input not recognized')
-                    time.sleep(0.5)
+                except sr.UnknownValueError:
+                    print('input not recognized')
+                time.sleep(0.5)
             
 
     # Listen for input and respond with OpenAI API
