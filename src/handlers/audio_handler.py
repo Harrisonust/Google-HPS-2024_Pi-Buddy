@@ -74,6 +74,9 @@ class AudioHandler(Handler):
                     break
                     #return
                 elif "bye" in text.lower():
+                    tts = gTTS(text='Goodbye', lang='en', slow = False)
+                    tts.save("output.wav")
+                    os.system("mpg321 output.wav")
                     break
                 else:
                     self.page_switching('QA',args={'who':'user','what':text})
@@ -85,8 +88,9 @@ class AudioHandler(Handler):
                                       'You are mostly optimistic, but also easily moody. ' + \
                                       'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #curious, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
-                                      'Pleas consider the dictionary below' + \
-                                      'if !command3 is called, then there is no need to set #emotion' + \
+                                      'Please don\'t include emojis' + \
+                                      'Please consider the dictionary below' + \
+                                      'if any !command is called, then there is no need to set #emotion' + \
                                       'If you catch any of the commands in the dictionary or anything insinuating these commands, ' + \
                                       'please include the corresponding text in the dictionary below at the start of your response. ' + \
                                       'It should look like !command(number) as well as any arguments that are stated for that command number with &(arg_variable)' +\
@@ -130,14 +134,14 @@ class AudioHandler(Handler):
                 response = model.generate_content(contents=[prompt], generation_config=config)
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
-                print(response_text)
-                self.page_switching('QA', args={'who':'robot','what':response_text})
-
+                
                 print("Speaking...")
+                print(response_text)
+
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                tts = gTTS(text=response_text, lang='en', slow = False)
-                tts.save("output.wav")
-                os.system("mpg321 output.wav")
+                # tts = gTTS(text=response_text, lang='en', slow = False)
+                # tts.save("output.wav")
+                # os.system("mpg321 output.wav")
                 time.sleep(0.5)
 
                 if not audio:
@@ -275,12 +279,24 @@ class AudioHandler(Handler):
 
         # Find and process command
         command_match = re.search(command_pattern, response_text)
+        args = re.findall(arg_pattern, response_text)
         emotions = re.findall(emotion_pattern, response_text)
+        
+        # Remove the processed parts from response_text
+        response_text = re.sub(command_pattern, '', response_text)
+        response_text = re.sub(arg_pattern, '', response_text)
+        response_text = re.sub(emotion_pattern, '', response_text)
+
+        # Clean up the remaining text
+        leftover_text = response_text.strip()
+        self.page_switching('QA', args={'who':'robot','what':response_text})
+        tts = gTTS(text=response_text, lang='en', slow = False)
+        tts.save("output.wav")
+        os.system("mpg321 output.wav")
+                
+
         if command_match:
             command_number = int(command_match.group(1))
-            args = re.findall(arg_pattern, response_text)
-
-
             # Call the appropriate command function based on command_number
             if command_number == 1:
                 page = args[0] if args else None
@@ -318,13 +334,5 @@ class AudioHandler(Handler):
         elif emotions:
             self.set_emotion(emotions[0])
             print('I am ' + str(emotions[0]))
-
-        # Remove the processed parts from response_text
-        response_text = re.sub(command_pattern, '', response_text)
-        response_text = re.sub(arg_pattern, '', response_text)
-        response_text = re.sub(emotion_pattern, '', response_text)
-
-        # Clean up the remaining text
-        leftover_text = response_text.strip()
 
         return leftover_text
