@@ -62,6 +62,8 @@ class AudioHandler(Handler):
     def listen_and_respond(self, source):
         while True:
             print("Listening...")
+            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")  # Create a beep sound
+            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 500")  # Create a beep sound
             os.system("aplay beep.wav")
             try:
                 audio = self.r.listen(source, timeout=35, phrase_time_limit=15)
