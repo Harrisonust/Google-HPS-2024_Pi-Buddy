@@ -225,7 +225,6 @@ class EmotionPage(Page):
                 
                 
             self.screen.update()
-            # time.sleep(1)
             self.screen.clear()
         
         self.display_completed.overwrite(int(True))

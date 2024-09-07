@@ -4,6 +4,8 @@ import requests
 import random
 import multiprocessing
 from datetime import datetime
+import audioop
+import pyaudio
 
 
 from handlers.handler import Handler
@@ -34,6 +36,15 @@ class EmotionHandlerConfig:
     }
     
 
+class EmotionHandlerPyAudioSettings:
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+    NUM_SAMPLES = 1024
+    TICK = 0.01
+    NOISE_THRESH = 9000
+    
+
 class EmotionHandler(Handler):
     def __init__(self, task_queue):
         
@@ -47,6 +58,16 @@ class EmotionHandler(Handler):
         self.sleepy = ValueManager(int(False))
         self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
+        # PyAudio object to get noise
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(
+            format=EmotionHandlerPyAudioSettings.FORMAT,
+            channels=EmotionHandlerPyAudioSettings.CHANNELS,
+            rate=EmotionHandlerPyAudioSettings.RATE,
+            frames_per_buffer=EmotionHandlerPyAudioSettings.NUM_SAMPLES,
+            input=True,
+        )
+        self.buffer = []
         
         # The prioritized_emotion keeps id of a emtoin (as listed in emotion_2_key) to show;
         # the emotion will be shown regardless of the value of its corresponding state variable;
@@ -56,12 +77,46 @@ class EmotionHandler(Handler):
         self.busy = ValueManager(int(False))
         self.emotion_key = ValueManager(EmotionHandlerConfig.emotion_2_key['joyful'])   # The emotion sent to task_queue
         
-        observe_process = multiprocessing.Process(target=self._observe_time_weather)
-        observe_process.start()
+        # Updates once per minute
+        observe_time_weather_process = multiprocessing.Process(target=self._observe_time_weather)
+        observe_time_weather_process.start()
         
-        # flood_emotion_tasks_process = multiprocessing.Process(target=self._flood_emotion_tasks)
-        # flood_emotion_tasks_process.start()
+        # Updates frequently
+        observe_noise_process = multiprocessing.Process(target=self._observe_noise)
+        observe_noise_process.start()
+    
+    
+    def _get_volume(self):
+        available = 0
+        while True:
+            available = self.stream.get_read_available()
+            if available >= EmotionHandlerPyAudioSettings.NUM_SAMPLES:
+                break
+            
+            time.sleep(EmotionHandlerPyAudioSettings.TICK)
         
+        data = self.stream.read(available, exception_on_overflow = False)[- EmotionHandlerPyAudioSettings.NUM_SAMPLES:]
+        rms = audioop.rms(data, 2)
+        return rms
+    
+    
+    def _observe_noise(self):
+        while True:
+            
+            start = time.time()
+            buff = []
+            blocks = int(EmotionHandlerPyAudioSettings.RATE / EmotionHandlerPyAudioSettings.NUM_SAMPLES * 0.5)
+            while len(buff) < blocks:
+                buff.append(self._get_volume())
+            noise = sum(buff) / len(buff)
+            #print('time', time.time() - start)
+            #print(noise)
+            if noise > EmotionHandlerPyAudioSettings.NOISE_THRESH:
+                self.scared.overwrite(int(True))
+            
+            # Updates frequently
+            time.sleep(0.01)
+
     
     def _observe_time_weather(self):
         while True:
@@ -87,29 +142,29 @@ class EmotionHandler(Handler):
             weather = location_data['WeatherElement']['Weather']
             
             
-            # # 'depressed' is updated by wether it's monday or raining
-            # if day == 'Monday' or '陰' in weather:
-            #     self.depressed.overwrite(int(True))
-            # else:
-            #     self.depressed.overwrite(int(False))
+            # 'depressed' is updated by wether it's monday or raining
+            if day == 'Monday' or '陰' in weather:
+                self.depressed.overwrite(int(True))
+            else:
+                self.depressed.overwrite(int(False))
             
-            # # 'joyful' is updated by wether it's sunny
-            # if '晴' in weather:
-            #     self.joyful.overwrite(int(True))
-            # else:
-            #     self.joyful.overwrite(int(False))
+            # 'joyful' is updated by wether it's sunny
+            if '晴' in weather:
+                self.joyful.overwrite(int(True))
+            else:
+                self.joyful.overwrite(int(False))
                 
-            # # 'sleepy' is updated True at late night or early mornings
-            # if hour >= 22 or hour <= 7:
-            #     self.sleepy.overwrite(int(True))
-            # else:
-            #     self.sleepy.overwrite(int(False))
+            # 'sleepy' is updated True at late night or early mornings
+            if hour >= 22 or hour <= 7:
+                self.sleepy.overwrite(int(True))
+            else:
+                self.sleepy.overwrite(int(False))
             
-            # # 'energetic' is updated True at Saturdays and Sundays
-            # if day == 'Saturday' or day == 'Sunday':
-            #     self.energetic.overwrite(int(True))
-            # else:
-            #     self.energetic.overwrite(int(False))
+            # 'energetic' is updated True at Saturdays and Sundays
+            if day == 'Saturday' or day == 'Sunday':
+                self.energetic.overwrite(int(True))
+            else:
+                self.energetic.overwrite(int(False))
             
             # Updates every minutes
             time.sleep(60)
@@ -123,17 +178,12 @@ class EmotionHandler(Handler):
                 'handler_name': 'menu_screen',
                 'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
             })
-            # print('EmotionHandler Sent:', {
-            #     'requester_name': 'emotion',
-            #     'handler_name': 'menu_screen',
-            #     'task': f'SHOW_{EmotionHandlerConfig.key_2_emotion[self.emotion_key.reveal()].upper()}'
-            # })
             time.sleep(1)
     
     
     
     def _get_new_emotion_key(self):
-        # Priority-wise: 'hungry' > 'prioritized_emotion' > 'scared' > 'curious' > 'depressed' == 'joyful' == 'energetic' == 'sleepy'
+        # Priority-wise: 'hungry' > 'prioritized_emotion' > 'scared' > 'curious' == 'depressed' == 'joyful' == 'energetic' == 'sleepy'
         
         new_emotion = 'joyful'
         
@@ -152,10 +202,10 @@ class EmotionHandler(Handler):
             new_emotion = 'scared'
             self.scared.overwrite(int(False))
         
-        
-        # 'depressed', 'joyful', 'energetic', 'sleepy'
         else:
             lottery_box = []
+            if self.curious.reveal():
+                lottery_box.append('curious')
             if self.depressed.reveal():
                 lottery_box.append('depressed')
             if self.joyful.reveal():
@@ -177,7 +227,6 @@ class EmotionHandler(Handler):
     
     def handle_task(self, task_info):
         if not self.busy.reveal():
-            # print('EmotionHandler Recieved: ', task_info)
 
             self.busy.overwrite(int(True))
             
