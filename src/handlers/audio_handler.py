@@ -41,7 +41,7 @@ class AudioHandler(Handler):
             while True:
                 try:
                     print("Listening audio")
-                    audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
+                    audio = self.r.listen(source, timeout=5, phrase_time_limit=3)
                     text = self.r.recognize_google(audio)
                     print(text)
                     if "hey" in text.lower():
@@ -66,7 +66,7 @@ class AudioHandler(Handler):
             os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")
             os.system("aplay beep.wav")
             print("Listening...")
-            audio = self.r.listen(source, timeout=10, phrase_time_limit=3)
+            audio = self.r.listen(source, timeout=10, phrase_time_limit=10)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
