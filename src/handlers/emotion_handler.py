@@ -4,8 +4,8 @@ import requests
 import random
 import multiprocessing
 from datetime import datetime
-import audioop
-import pyaudio
+# import audioop
+# import pyaudio
 
 
 from handlers.handler import Handler
@@ -56,7 +56,7 @@ class EmotionHandler(Handler):
         self.hungry = ValueManager(int(False))
         self.energetic = ValueManager(int(False))
         self.sleepy = ValueManager(int(False))
-        self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
+        # self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
         # PyAudio object to get noise
         self.p = pyaudio.PyAudio()
@@ -82,40 +82,40 @@ class EmotionHandler(Handler):
         observe_time_weather_process.start()
         
         # Updates frequently
-        observe_noise_process = multiprocessing.Process(target=self._observe_noise)
-        observe_noise_process.start()
+        # observe_noise_process = multiprocessing.Process(target=self._observe_noise)
+        # observe_noise_process.start()
     
     
-    def _get_volume(self):
-        available = 0
-        while True:
-            available = self.stream.get_read_available()
-            if available >= EmotionHandlerPyAudioSettings.NUM_SAMPLES:
-                break
+    # def _get_volume(self):
+    #     available = 0
+    #     while True:
+    #         available = self.stream.get_read_available()
+    #         if available >= EmotionHandlerPyAudioSettings.NUM_SAMPLES:
+    #             break
             
-            time.sleep(EmotionHandlerPyAudioSettings.TICK)
+    #         time.sleep(EmotionHandlerPyAudioSettings.TICK)
         
-        data = self.stream.read(available, exception_on_overflow = False)[- EmotionHandlerPyAudioSettings.NUM_SAMPLES:]
-        rms = audioop.rms(data, 2)
-        return rms
+    #     data = self.stream.read(available, exception_on_overflow = False)[- EmotionHandlerPyAudioSettings.NUM_SAMPLES:]
+    #     rms = audioop.rms(data, 2)
+    #     return rms
     
     
-    def _observe_noise(self):
-        while True:
+    # def _observe_noise(self):
+    #     while True:
             
-            start = time.time()
-            buff = []
-            blocks = int(EmotionHandlerPyAudioSettings.RATE / EmotionHandlerPyAudioSettings.NUM_SAMPLES * 0.5)
-            while len(buff) < blocks:
-                buff.append(self._get_volume())
-            noise = sum(buff) / len(buff)
-            #print('time', time.time() - start)
-            print(noise)
-            if noise > EmotionHandlerPyAudioSettings.NOISE_THRESH:
-                self.scared.overwrite(int(True))
+    #         start = time.time()
+    #         buff = []
+    #         blocks = int(EmotionHandlerPyAudioSettings.RATE / EmotionHandlerPyAudioSettings.NUM_SAMPLES * 0.5)
+    #         while len(buff) < blocks:
+    #             buff.append(self._get_volume())
+    #         noise = sum(buff) / len(buff)
+    #         #print('time', time.time() - start)
+    #         print(noise)
+    #         if noise > EmotionHandlerPyAudioSettings.NOISE_THRESH:
+    #             self.scared.overwrite(int(True))
             
-            # Updates frequently
-            time.sleep(0.01)
+    #         # Updates frequently
+    #         time.sleep(0.01)
 
     
     def _observe_time_weather(self):
@@ -198,9 +198,9 @@ class EmotionHandler(Handler):
             self.prioritized_emotion.overwrite(-1)
             
         # 'scared'
-        elif self.scared.reveal():
-            new_emotion = 'scared'
-            self.scared.overwrite(int(False))
+        # elif self.scared.reveal():
+        #     new_emotion = 'scared'
+        #     self.scared.overwrite(int(False))
         
         else:
             lottery_box = []
