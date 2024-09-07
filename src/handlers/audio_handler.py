@@ -135,14 +135,13 @@ class AudioHandler(Handler):
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 print(response_text)
-                self.page_switching('QA', args={'who':'robot','what':response_text})
 
                 print("Speaking...")
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                tts = gTTS(text=response_text, lang='en', slow = False)
-                tts.save("output.wav")
-                os.system("mpg321 output.wav")
-                time.sleep(0.5)
+                # tts = gTTS(text=response_text, lang='en', slow = False)
+                # tts.save("output.wav")
+                # os.system("mpg321 output.wav")
+                 time.sleep(0.5)
 
                 if not audio:
                     self.listen_for_wake_word()
@@ -279,12 +278,24 @@ class AudioHandler(Handler):
 
         # Find and process command
         command_match = re.search(command_pattern, response_text)
+        args = re.findall(arg_pattern, response_text)
         emotions = re.findall(emotion_pattern, response_text)
+        
+        # Remove the processed parts from response_text
+        response_text = re.sub(command_pattern, '', response_text)
+        response_text = re.sub(arg_pattern, '', response_text)
+        response_text = re.sub(emotion_pattern, '', response_text)
+
+        # Clean up the remaining text
+        leftover_text = response_text.strip()
+        self.page_switching('QA', args={'who':'robot','what':response_text})
+        tts = gTTS(text=response_text, lang='en', slow = False)
+        tts.save("output.wav")
+        os.system("mpg321 output.wav")
+                
+
         if command_match:
             command_number = int(command_match.group(1))
-            args = re.findall(arg_pattern, response_text)
-
-
             # Call the appropriate command function based on command_number
             if command_number == 1:
                 page = args[0] if args else None
@@ -322,13 +333,5 @@ class AudioHandler(Handler):
         elif emotions:
             self.set_emotion(emotions[0])
             print('I am ' + str(emotions[0]))
-
-        # Remove the processed parts from response_text
-        response_text = re.sub(command_pattern, '', response_text)
-        response_text = re.sub(arg_pattern, '', response_text)
-        response_text = re.sub(emotion_pattern, '', response_text)
-
-        # Clean up the remaining text
-        leftover_text = response_text.strip()
 
         return leftover_text
