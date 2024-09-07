@@ -4,7 +4,11 @@ import time
 import speech_recognition as sr
 import numpy as np
 import google.generativeai as genai
+import threading
+from gtts import gTTS
+import re
 
+# from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
@@ -33,11 +37,11 @@ class AudioHandler(Handler):
     
     # Listen for the wake word "hey"
     def listen_for_wake_word(self, source):
-        print("Listening for 'Hey'...")
 
         while True:
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
+            print("Listening for 'Hey'...")
             audio = self.r.listen(source)
             try:
                 text = self.r.recognize_google(audio)
@@ -56,9 +60,9 @@ class AudioHandler(Handler):
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
-        print("Listening...")
 
         while True:
+            print("Listening...")
             audio = self.r.listen(source)
             try:
                 text = self.r.recognize_google(audio)

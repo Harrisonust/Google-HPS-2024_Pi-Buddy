@@ -37,7 +37,7 @@ class EmotionHandlerConfig:
     
 
 class EmotionHandlerPyAudioSettings:
-    FORMAT = pyaudio.paInt16
+    #FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 44100
     NUM_SAMPLES = 1024

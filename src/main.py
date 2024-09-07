@@ -46,7 +46,7 @@ class Control:
             'encoders': TestEncodersHandler(self.task_queue),
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),
-            #'audio': AudioHandler(self.task_queue),
+            'audio': AudioHandler(self.task_queue),
         }
         
         if reset_database:
