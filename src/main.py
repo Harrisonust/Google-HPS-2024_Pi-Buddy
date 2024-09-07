@@ -42,11 +42,11 @@ class Control:
         
         # Initialize handlers and pass the task queue to them
         self.handlers = {
-            'battery': BatteryHandler(self.task_queue),
+            # 'battery': BatteryHandler(self.task_queue),
             'encoders': EncodersHandler(self.task_queue),
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),
-            'audio': AudioHandler(self.task_queue),
+            # 'audio': AudioHandler(self.task_queue),
         }
         
         if reset_database:
