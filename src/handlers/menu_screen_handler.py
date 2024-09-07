@@ -21,11 +21,12 @@ class PageId:
     BatteryPage =       7
     PhotographPage =    8
     FilmPage =          9
+    QAPage =            10
     
 
 class MenuScreenHandler(Handler):
     def __init__(self, task_queue):
-
+        print('menu screen handler is initialized')
         self.run_input_process = False
         self.task_queue = task_queue
         
@@ -43,6 +44,7 @@ class MenuScreenHandler(Handler):
             PageId.BatteryPage:     'BatteryPage',
             PageId.PhotographPage:  'PhotographPage',
             PageId.FilmPage:        'FilmPage',
+            PageId.QAPage:          'QAPage',
         }
         
         self.page_key2id = {
@@ -56,6 +58,7 @@ class MenuScreenHandler(Handler):
             'BatteryPage':          PageId.BatteryPage,
             'PhotographPage':       PageId.PhotographPage,
             'FilmPage':             PageId.FilmPage,
+            'QAPage':               PageId.QAPage,
         }
         
         self.pages = {
@@ -67,15 +70,16 @@ class MenuScreenHandler(Handler):
             'WeatherPage':          WeatherPage(self.screen),
             'TodoPage':             TodoPage(self.screen),
             'BatteryPage':          BatteryPage(self.screen),
-            'PhotographPage':       PhotographPage(self.screen),
-            'FilmPage':             FilmPage(self.screen),
+            # 'PhotographPage':       PhotographPage(self.screen),
+            # 'FilmPage':             FilmPage(self.screen),
+            'QAPage':               QAPage(self.screen),
         }
         
         self.menu_screen_handler_busy = ValueManager(int(False))
         self.current_page_priority = ValueManager(0)
-        self.current_page_id = ValueManager(PageId.EmotionPage)
+        # self.current_page_id = ValueManager(PageId.EmotionPage)
         
-        # self.current_page_id = ValueManager(PageId.MenuPage)
+        self.current_page_id = ValueManager(PageId.MenuPage)
         # self.current_page_id = ValueManager(PageId.SetTimerPage)
         # self.current_page_id = ValueManager(PageId.TimerPage)
         # self.current_page_id = ValueManager(PageId.TimePage)

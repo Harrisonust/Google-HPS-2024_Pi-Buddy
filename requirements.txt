@@ -15,6 +15,6 @@ google-generativeai==0.7.2
 SpeechRecognition==3.10.4
 pyttsx3==2.91
 gTTS==2.5.3
-ultralytics[export]
-torch==2.3.0
-torchvision==0.18.0
+#ultralytics[export]
+#torch==2.3.0
+#torchvision==0.18.0

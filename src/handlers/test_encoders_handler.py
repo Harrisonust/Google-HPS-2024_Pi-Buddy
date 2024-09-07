@@ -89,7 +89,7 @@ class TestEncodersHandler(Handler):
                 self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
-                    'handler_name': 'audio_control',
+                    'handler_name': 'audio',
                     'task': 'FUNCTION_CALLED',
                 })
             
