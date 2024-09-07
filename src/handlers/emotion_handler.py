@@ -59,15 +59,15 @@ class EmotionHandler(Handler):
         # self.scared = ValueManager(int(False))      # NOTHING WRITTEN TO TRIGGER YET
         
         # PyAudio object to get noise
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(
-            format=EmotionHandlerPyAudioSettings.FORMAT,
-            channels=EmotionHandlerPyAudioSettings.CHANNELS,
-            rate=EmotionHandlerPyAudioSettings.RATE,
-            frames_per_buffer=EmotionHandlerPyAudioSettings.NUM_SAMPLES,
-            input=True,
-        )
-        self.buffer = []
+        # self.p = pyaudio.PyAudio()
+        # self.stream = self.p.open(
+        #     format=EmotionHandlerPyAudioSettings.FORMAT,
+        #     channels=EmotionHandlerPyAudioSettings.CHANNELS,
+        #     rate=EmotionHandlerPyAudioSettings.RATE,
+        #     frames_per_buffer=EmotionHandlerPyAudioSettings.NUM_SAMPLES,
+        #     input=True,
+        # )
+        # self.buffer = []
         
         # The prioritized_emotion keeps id of a emtoin (as listed in emotion_2_key) to show;
         # the emotion will be shown regardless of the value of its corresponding state variable;
