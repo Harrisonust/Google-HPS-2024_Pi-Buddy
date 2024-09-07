@@ -21,6 +21,7 @@ class PageId:
     BatteryPage =       7
     PhotographPage =    8
     FilmPage =          9
+    QAPage =            10
     
 
 class MenuScreenHandler(Handler):
@@ -43,6 +44,7 @@ class MenuScreenHandler(Handler):
             PageId.BatteryPage:     'BatteryPage',
             PageId.PhotographPage:  'PhotographPage',
             PageId.FilmPage:        'FilmPage',
+            PageId.QAPage:          'QAPage',
         }
         
         self.page_key2id = {
@@ -56,6 +58,7 @@ class MenuScreenHandler(Handler):
             'BatteryPage':          PageId.BatteryPage,
             'PhotographPage':       PageId.PhotographPage,
             'FilmPage':             PageId.FilmPage,
+            'QAPage':               PageId.QAPage,
         }
         
         self.pages = {
@@ -67,8 +70,9 @@ class MenuScreenHandler(Handler):
             'WeatherPage':          WeatherPage(self.screen),
             'TodoPage':             TodoPage(self.screen),
             'BatteryPage':          BatteryPage(self.screen),
-            'PhotographPage':       PhotographPage(self.screen),
-            'FilmPage':             FilmPage(self.screen),
+            # 'PhotographPage':       PhotographPage(self.screen),
+            # 'FilmPage':             FilmPage(self.screen),
+            'QAPage':               QAPage(self.screen),
         }
         
         self.menu_screen_handler_busy = ValueManager(int(False))

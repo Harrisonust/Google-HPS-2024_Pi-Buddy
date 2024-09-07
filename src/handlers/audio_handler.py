@@ -62,8 +62,6 @@ class AudioHandler(Handler):
     def listen_and_respond(self, source):
         while True:
             print("Listening...")
-            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")  # Create a beep sound
-            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 500")  # Create a beep sound
             os.system("aplay beep.wav")
             try:
                 audio = self.r.listen(source, timeout=35, phrase_time_limit=15)
@@ -133,7 +131,7 @@ class AudioHandler(Handler):
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
                 print(response_text)
-                self.page_switching('QA', args={'who':'robot','what':text})
+                self.page_switching('QA', args={'who':'robot','what':response_text})
 
                 print("Speaking...")
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response

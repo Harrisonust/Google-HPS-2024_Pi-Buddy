@@ -6,7 +6,7 @@ from value_manager import ValueManager
 from pages.pages_utils import PageConfig
 
 
-class AudioControlHandler(Handler):
+class TestAudioHandler(Handler):
     
     def __init__(self, task_queue):
         self.run_input_process = False
@@ -15,7 +15,7 @@ class AudioControlHandler(Handler):
         
         ### FOR DEBUGGING & TESTING ###
         self.function_in_test = self.page_switching
-        self.args_to_function_in_test = ('Battery', )
+        self.args_to_function_in_test = ('QA', {'who':'user', 'what':'Thats when ssh comes in handy. Use an ssh client program on another computer connected to the same network. Start an Xterm console window and use the above commands'})
         
         self.task_handler_busy = ValueManager(int(False))
 

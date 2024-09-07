@@ -53,10 +53,8 @@ class EmotionPage(Page):
 
 
     def handle_task(self, task_info):       
-        # print(task_info)
         if not self.busy.reveal():
             self.busy.overwrite(int(True))
-            # print('EmotionPage Recieved: ', task_info)
             
             if task_info['task'] == 'SWITCH_PAGE':
                 self.end_display.overwrite(int(True))
@@ -122,7 +120,6 @@ class EmotionPage(Page):
             
             # Leave display loop if command is so
             if end_display:
-                # self.screen.clear()
                 break
             
             # Draw emotion if available
