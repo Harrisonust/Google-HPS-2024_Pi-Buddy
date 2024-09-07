@@ -16,12 +16,12 @@ from value_manager import ValueManager
 
 
 class AudioHandler(Handler):
-    
+
     def __init__(self, task_queue):
         self.run_input_process = False
         # self.run_input_process = True
         self.task_queue = task_queue
-        
+
         self.r = sr.Recognizer()  # Set up the speech recognition engine
         self.greetings = [
             "Hello! What can I do for you today?",
@@ -32,7 +32,7 @@ class AudioHandler(Handler):
 
         task = threading.Thread(target=self.listen_for_wake_word)
         task.start()
-    
+
     # Listen for the wake word "hey"
     def listen_for_wake_word(self):
         with sr.Microphone() as source:
@@ -41,7 +41,7 @@ class AudioHandler(Handler):
             while True:
                 try:
                     print("Listening audio")
-                    audio = self.r.listen(source, timeout=5, phrase_time_limit=3)
+                    audio = self.r.listen(source, phrase_time_limit=5)
                     text = self.r.recognize_google(audio)
                     print(text)
                     if "hey" in text.lower():
@@ -52,38 +52,36 @@ class AudioHandler(Handler):
                         tts = gTTS(text=response_text, lang='en', slow = False)
                         tts.save("output.wav")
                         os.system("mpg321 output.wav")
-                        time.sleep(2)
                         self.listen_and_respond(source)
                 except sr.UnknownValueError:
                     print('input not recognized')
                 time.sleep(0.5)
-            
+
 
     # Listen for input and respond with OpenAI API
     def listen_and_respond(self, source):
-         
         while True:
-            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")
-            os.system("aplay beep.wav")
             print("Listening...")
-            audio = self.r.listen(source, timeout=10, phrase_time_limit=10)
+            os.system("aplay beep.wav")
             try:
+                audio = self.r.listen(source, timeout=35, phrase_time_limit=15)
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
-                os.system("sox -n -r 44100 -c 1 boop.wav synth 0.1 sine 500")
-                os.system(" beep.wav boop.wav")
+                os.system("aplay boop.wav")
                 if not text:
                     print("No speech detected, returning to wake word listening.")
                     #continue
                     break
                     #return
+                elif "bye" in text.lower():
+                    break
                 else:
-                    self.page_switching('QA', args={'who':'user','what':text})
+                    self.page_switching('QA',args={'who':'user','what':text})
 
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
                 prompt = text
-                system_instructions = 'You are Cody, a friendly AI desktop pet. ' + \
+                system_instructions = 'You are Pi-buddy, a friendly AI desktop pet. ' + \
                                       'You are mostly optimistic, but also easily moody. ' + \
                                       'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #curious, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
@@ -121,7 +119,7 @@ class AudioHandler(Handler):
                                       '  "start recording video": "!Command7"'+ \
                                       '  "start recording video for x seconds": "!Command7 &(x)"'+ \
                                       '  "end recording": "!Command8"',
-                
+
                 model = 'gemini-1.5-flash'
                 temperature = 0.5
                 stop_sequence = ''
@@ -140,25 +138,28 @@ class AudioHandler(Handler):
                 tts = gTTS(text=response_text, lang='en', slow = False)
                 tts.save("output.wav")
                 os.system("mpg321 output.wav")
-                time.sleep(4)
+                time.sleep(0.5)
 
                 if not audio:
-                    self.listen_for_wake_word(source)
+                    self.listen_for_wake_word()
+
             except sr.UnknownValueError:
                 time.sleep(2)
                 print("Silence found, shutting up, listening...")
-                self.listen_for_wake_word(source)
+                #self.listen_for_wake_word()
                 #break
-                return
+                #return
+                continue
             except sr.RequestError as e:
                 print(f"Could not request results; {e}")
                 os.system(f"espeak 'Could not request results; {e}'")  # Use espeak to say the error
-                self.listen_for_wake_word(source)
+                #self.listen_for_wake_word()
                 #break
-                return
+                #return
+                continue
 
     def page_switching(self, page, args=None):
-        # 1 
+        # 1
         print(f'page = {page}, args = {args}')
         # If no arguments are given, and the page is 'Timer', go to the 'SetTimer' page
         if page == 'Timer':
@@ -168,7 +169,7 @@ class AudioHandler(Handler):
                 args = self._get_time_val(
                     seconds_to_count_down = args[0]
                 )
-        
+
         self.task_queue.append({
             'requester_name': 'audio_control',
             'handler_name': 'menu_screen',
@@ -176,12 +177,12 @@ class AudioHandler(Handler):
             'page_key': page + 'Page',
             'args': args
         })
-    
-    
+
+
     def call_and_come(self):
         # -1
         pass
-    
+
 
     def set_emotion(self, emotion):
         # 3
@@ -192,21 +193,21 @@ class AudioHandler(Handler):
             'args': emotion,
         })
 
-    
+
     def set_count_down_timer(self, seconds_to_count_down=0, minutes_to_count_down=0, hours_to_count_down=0):
         # 2
         if seconds_to_count_down == 0 and minutes_to_count_down == 0 and hours_to_count_down == 0:
             raise ValueError("Error: arguments cannnot all be 'None' for 'set_count_down_timer'")
-        
+
         minutes_to_count_down += hours_to_count_down * 60
         seconds_to_count_down += minutes_to_count_down * 60
         self.page_switching('Timer', (seconds_to_count_down,))
 
-    
+
     def add_todo(self, task_name):
         # 5
         self._write_todo_task(task_name)
-        
+
         self.task_queue.append({
             'requester_name': 'audio_control',
             'handler_name': 'menu_screen',
@@ -218,12 +219,12 @@ class AudioHandler(Handler):
         # 4
         self.page_switching('Photograph', 'take_photo')
 
-    
+
     def start_recording(self):
         # 4
         self.page_switching('Film', 'start_recording')
 
-    
+
     def end_recording(self):
         # 4
         self.task_queue.append({
@@ -231,15 +232,15 @@ class AudioHandler(Handler):
             'handler_name': 'menu_screen',
             'task': 'END_RECORDING',
         })
-    
-    
+
+
     def _get_time_val(self, seconds_to_count_down=0, minutes_to_count_down=0, hours_to_count_down=0):
         minutes_to_count_down += seconds_to_count_down // 60
         seconds_to_count_down %= 60
         hours_to_count_down += minutes_to_count_down // 60
         minutes_to_count_down %= 60
         hours_to_count_down %= 100
-        
+
         return {
             'hr_h':  hours_to_count_down // 10,
             'hr_l':  hours_to_count_down % 10,
@@ -248,11 +249,11 @@ class AudioHandler(Handler):
             'sec_h': seconds_to_count_down // 10,
             'sec_l': seconds_to_count_down % 10
         }
-    
+
     def _write_todo_task(self, task_name):
         self.conn = sqlite3.connect(PageConfig.DB_PATH)
         self.cursor = self.conn.cursor()
-        
+
         try:
             self.cursor.execute(
                 f'''
@@ -261,7 +262,7 @@ class AudioHandler(Handler):
                 '''
             )
             self.conn.commit()
-        
+
         except Exception as e:
             print(f'An error occurred: {e}')
 
@@ -271,17 +272,15 @@ class AudioHandler(Handler):
         command_pattern = r"!Command(\d+)"
         arg_pattern = r"&(\w+)"
         emotion_pattern = r"#(\w+)"
-        
+
         # Find and process command
         command_match = re.search(command_pattern, response_text)
         emotions = re.findall(emotion_pattern, response_text)
         if command_match:
             command_number = int(command_match.group(1))
             args = re.findall(arg_pattern, response_text)
-            if command_number!=3:
-                emotions.clear()
-            
-            
+
+
             # Call the appropriate command function based on command_number
             if command_number == 1:
                 page = args[0] if args else None
@@ -316,16 +315,16 @@ class AudioHandler(Handler):
                 self.end_recording()
                 print('Recording ended successfully')
 
-            if emotions and command_number!=3:
-                self.set_emotion(emotions[0])
-                print('I am ' + str(emotions[0]))
-            
-            # Remove the processed parts from response_text
-            response_text = re.sub(command_pattern, '', response_text)
-            response_text = re.sub(arg_pattern, '', response_text)
-            response_text = re.sub(emotion_pattern, '', response_text)
-        
+        elif emotions:
+            self.set_emotion(emotions[0])
+            print('I am ' + str(emotions[0]))
+
+        # Remove the processed parts from response_text
+        response_text = re.sub(command_pattern, '', response_text)
+        response_text = re.sub(arg_pattern, '', response_text)
+        response_text = re.sub(emotion_pattern, '', response_text)
+
         # Clean up the remaining text
         leftover_text = response_text.strip()
-        
+
         return leftover_text
