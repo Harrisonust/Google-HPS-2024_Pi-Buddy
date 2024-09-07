@@ -108,7 +108,7 @@ class EmotionPage(Page):
         
         self.busy = ValueManager(int(False))
         self.end_display = ValueManager(int(False))
-        self.displaying_emotion_id = ValueManager(6)   # Shows 'joyful' as default
+        self.displaying_emotion_id = ValueManager(1)   # Shows 'joyful' as default
         self.display_completed = ValueManager(int(False))
         
         self.data = None
@@ -117,8 +117,9 @@ class EmotionPage(Page):
     
     def _load_data(self):
         self.data = dict()
-        for id, dir in id_2_dir:
+        for id in EmotionPageConfig.id_2_dir:
             self.data[id] = dict()
+            dir = EmotionPageConfig.id_2_dir[id]
             for filename in os.listdir(dir):
                 path = os.path.join(dir, filename)
                 self.data[id][filename.split('.')[0]] = cv2.imread(path)
@@ -220,7 +221,7 @@ class EmotionPage(Page):
                     y=int(math.sin(y_angle) * EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_radius']), 
                     width=160, 
                     height=128, 
-                    data=self.data[displaying_emotion_id]['default'] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else self.data[displaying_emotion_id]['blink']
+                    data=self.data[displaying_emotion_id]['blink'] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else self.data[displaying_emotion_id]['default']
                     # path=frame_paths[1] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else frame_paths[0]
                 )
                 frame_count += 1
