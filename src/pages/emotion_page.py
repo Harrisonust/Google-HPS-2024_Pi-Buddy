@@ -3,6 +3,7 @@ import time
 import random
 import math
 import os
+import cv2
 
 
 from value_manager import ValueManager
@@ -11,6 +12,9 @@ from pages.page import Page
 
 # MUST MATCH EmotionHandlerConfig AT EMOTION_HANDLER.PY
 class EmotionPageConfig:
+    
+    FRAME_COUNT = 30
+    
     task_2_id = {
         'SHOW_JOYFUL': 1,
         'SHOW_DEPRESSED' : 2,
@@ -28,7 +32,6 @@ class EmotionPageConfig:
         5: './emotions/sleepy',     
         6: './emotions/scared'      
     }
-    
 
     id_2_motion = {
         # joyful
@@ -107,6 +110,18 @@ class EmotionPage(Page):
         self.end_display = ValueManager(int(False))
         self.displaying_emotion_id = ValueManager(6)   # Shows 'joyful' as default
         self.display_completed = ValueManager(int(False))
+        
+        self.data = None
+        self._load_data()
+    
+    
+    def _load_data(self):
+        self.data = dict()
+        for id, dir in id_2_dir:
+            self.data[id] = dict()
+            for filename in os.listdir(dir):
+                path = os.path.join(dir, filename)
+                self.data[id][filename.split('.')[0]] = cv2.imread(path)
 
 
     def reset_states(self, args):
@@ -166,22 +181,11 @@ class EmotionPage(Page):
                 }
             else:
                 self.busy.overwrite(int(False))
-
-
-    def _load_frame_paths(self, frame_dir):
-        frame_paths = []
-        
-        for root, dirs, files in os.walk(frame_dir):
-            for file in files:
-                frame_paths.append(os.path.join(root, file))
-        
-        frame_paths.sort()        
-        return frame_paths
     
     
     def _display(self):
         
-        frame_paths, frame_count = None, None
+        frame_count = None
         x_angle, y_angle = 0, 0
         while True:
             
@@ -199,26 +203,26 @@ class EmotionPage(Page):
             elif displaying_emotion_id:
                 
                 # Paths had not been load
-                if frame_paths == None or frame_count == None:
-                    frame_paths = self._load_frame_paths(EmotionPageConfig.id_2_dir[displaying_emotion_id])
+                if frame_count == None:
                     frame_count = 0
                     x_angle = EmotionPageConfig.id_2_motion[displaying_emotion_id]['x_angle_start']
                     y_angle = EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_angle_start']
                 
                 # All frames iterated, reset and change state
-                elif frame_count == 30:
-                # elif frame_count == len(frame_paths):
-                    frame_paths, frame_count = None, None
+                elif frame_count == EmotionPageConfig.FRAME_COUNT:
+                    frame_count =None
                     self.displaying_emotion_id.overwrite(0)
                     continue
 
                 # Draw frame and move on to next
-                self.screen.draw_image(
+                self.screen.draw_image_from_data(
                     x=int(math.cos(x_angle) * EmotionPageConfig.id_2_motion[displaying_emotion_id]['x_radius']), 
                     y=int(math.sin(y_angle) * EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_radius']), 
                     width=160, 
                     height=128, 
-                    path=frame_paths[1] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else frame_paths[0])
+                    data=self.data[displaying_emotion_id]['default'] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else self.data[displaying_emotion_id]['blink']
+                    # path=frame_paths[1] if (random.random() < EmotionPageConfig.id_2_motion[displaying_emotion_id]['img1_freq']) else frame_paths[0]
+                )
                 frame_count += 1
                 x_angle += EmotionPageConfig.id_2_motion[displaying_emotion_id]['x_angle_displacement']
                 y_angle += EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_angle_displacement']
