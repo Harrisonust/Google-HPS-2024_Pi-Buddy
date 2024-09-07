@@ -86,14 +86,26 @@ class FilmPage(Page):
     
     
     def reset_states(self, args):
-        self.state.overwrite(FilmPageStates.SHOW_CURRENT)
-        self.prev_state.overwrite(FilmPageStates.SHOW_SAVED)
-        self.busy.overwrite(int(False))
-        self.display_completed.overwrite(int(False))
-        self.saved_display_id.overwrite(-1)
-        self.saved_len.overwrite(-1)
-        self.max_id.overwrite(-1)
-        self._initiate()
+        if args == 'start_recording':
+            self.state.overwrite(FilmPageStates.RECORD_CURRENT)
+            self.prev_state.overwrite(FilmPageStates.SHOW_CURRENT)
+            self.busy.overwrite(int(False))
+            self.display_completed.overwrite(int(False))
+            self.saved_display_id.overwrite(-1)
+            self.saved_len.overwrite(-1)
+            self.max_id.overwrite(-1)
+            self._initiate()
+            self.saved_display_id.overwrite(self.saved_len.reveal())
+        
+        else:
+            self.state.overwrite(FilmPageStates.SHOW_CURRENT)
+            self.prev_state.overwrite(FilmPageStates.SHOW_SAVED)
+            self.busy.overwrite(int(False))
+            self.display_completed.overwrite(int(False))
+            self.saved_display_id.overwrite(-1)
+            self.saved_len.overwrite(-1)
+            self.max_id.overwrite(-1)
+            self._initiate()
 
     
     def start_display(self):
@@ -132,7 +144,7 @@ class FilmPage(Page):
                     self.saved_display_id.overwrite(saved_len)
                     self.saved_len.overwrite(saved_len + 1)
                 elif state == FilmPageStates.RECORD_CURRENT:
-                    # Start recording video
+                    # End recording video
                     self.prev_state.overwrite(state)
                     self.state.overwrite(FilmPageStates.END_RECORD)
                 elif state == FilmPageStates.SHOW_SAVED:
@@ -150,12 +162,43 @@ class FilmPage(Page):
                     # Leave camera page
                     while True:
                         if self.display_completed.reveal():
-                            return 'MenuPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'MenuPage',
+                                'args': None,
+                            }
+                            # return 'MenuPage', None
                 elif state == FilmPageStates.SHOW_SAVED:
                     # Resume to show current camera captured footage
                     self.prev_state.overwrite(state)
                     self.state.overwrite(FilmPageStates.SHOW_CURRENT)
 
+            elif task_info['task'] == 'END_RECORDING' and state == FilmPageStates.RECORD_CURRENT:
+                # End recording video
+                self.prev_state.overwrite(state)
+                self.state.overwrite(FilmPageStates.END_RECORD)
+            
+            elif task_info['task'] == 'SWITCH_PAGE' and (state == FilmPageStates.SHOW_CURRENT or state == FilmPageStates.SHOW_SAVED):
+                self.state.overwrite(FilmPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args'],
+                        }
+            
+            elif task_info['task'] == 'PAGE_EXPIRED' and (state == FilmPageStates.SHOW_CURRENT or state == FilmPageStates.SHOW_SAVED):
+                self.state.overwrite(FilmPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None
+                        }
             self.busy.overwrite(int(False))
     
     
@@ -164,7 +207,7 @@ class FilmPage(Page):
         encoder = H264Encoder(1000000)
         file_path = FfmpegOutput(file_path_tuple)
         self.camera.start_recording(encoder, output=file_path)
-        print(f"start recording {file_path_tuple}")
+        # print(f"start recording {file_path_tuple}")
         while self.state.reveal() == FilmPageStates.RECORD_CURRENT:
             time.sleep(0.1)
         self.camera.stop_recording()
@@ -226,7 +269,7 @@ class FilmPage(Page):
             
             # Perform operations on components based on states
             if state == FilmPageStates.SHOW_CURRENT:
-                print("show current")
+                # print("show current")
                 # Reset display_id to last last taken video
                 if prev_state == FilmPageStates.SHOW_SAVED:
                     self.saved_display_id.overwrite(self.saved_len.reveal() - 1)
@@ -236,7 +279,7 @@ class FilmPage(Page):
                 self.screen.draw_image_from_data(0, 0, 160, 128, frame)
                 
             elif state == FilmPageStates.RECORD_CURRENT:
-                print("record current")
+                # print("record current")
                 if prev_state == FilmPageStates.SHOW_CURRENT:
                     # Update parametres
                     max_id = self.max_id.reveal()
@@ -244,7 +287,7 @@ class FilmPage(Page):
                     video_path = FilmPageConfig.SAVE_PATH + video_name
                     self.saved_videos.append((video_name, video_path))
                     self.max_id.overwrite(max_id + 1)
-                    print(f"243 {video_path}")
+                    # print(f"243 {video_path}")
                     # Update the new path to sql table
                     try:
                         self.cursor.execute(
@@ -267,14 +310,14 @@ class FilmPage(Page):
                 self.screen.draw_circle(150, 10, 6, color=theme_colors.Danger) 
             
             elif state == FilmPageStates.SHOW_SAVED:
-                print("show saved")
+                # print("show saved")
                 # Show the last-captured picture
                 if first_frame is None or prev_saved_display_id != saved_display_id:
                     first_frame = self._capture_first_frame(self.saved_videos[saved_display_id][1])
                 self.screen.draw_image_from_data(0, 0, 160, 128, first_frame)
             
             elif state == FilmPageStates.PLAY_SAVED:
-                print("play saved")
+                # print("play saved")
                 if prev_state == FilmPageStates.SHOW_SAVED:
                     video_capture, fps, total_frames = self._initiate_play_saved(self.saved_videos[saved_display_id][1])
                     video_start_time = time.time()

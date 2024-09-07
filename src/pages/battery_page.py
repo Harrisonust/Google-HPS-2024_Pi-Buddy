@@ -159,10 +159,10 @@ class BatteryPage(Page):
         
     def handle_task(self, task_info):
         if not self.busy.reveal():
+            print('battery received:', task_info)
             self.busy.overwrite(int(True))
         
             if task_info['task'] == 'UPDATE_BATTERY_STATE':
-                print(task_info) 
                 self.battery_level.overwrite(task_info['battery_level'])
                 self.battery_charging.overwrite(task_info['battery_charging'])
             
@@ -177,13 +177,38 @@ class BatteryPage(Page):
             
             elif task_info['task'] == 'OUT_RESUME':
                 self.state.overwrite(BatteryPageStates.LEAVE)
-                
                 # Return to menu when display is done
                 while True:
                     if self.display_completed.reveal():
-                        return 'MenuPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'MenuPage',
+                            'args': None,
+                        }
+            
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(BatteryPageStates.LEAVE)
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(BatteryPageStates.LEAVE)
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
+                        }
             
             self.busy.overwrite(int(False))
+        else:
+            print('battery busy:',task_info)
 
             
     

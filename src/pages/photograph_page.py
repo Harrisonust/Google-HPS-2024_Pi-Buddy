@@ -71,18 +71,32 @@ class PhotographPage(Page):
         max_id_data = self.cursor.fetchall()
         if len(self.saved_images) != 0:
             self.max_id.overwrite(max_id_data[0][0])
+        else:
+            self.max_id.overwrite(-1)
         self.saved_len.overwrite(len(self.saved_images))
         self.saved_display_id.overwrite(len(self.saved_images) - 1)
         
     def reset_states(self, args):
-        self.state.overwrite(PhotographPageStates.SHOW_CURRENT)
-        self.prev_state.overwrite(PhotographPageStates.SHOW_SAVED)
-        self.busy.overwrite(int(False))
-        self.display_completed.overwrite(int(False))
-        self.saved_display_id.overwrite(-1)
-        self.saved_len.overwrite(-1)
-        self.max_id.overwrite(-1)
-        self._initiate()
+        
+        if args == 'take_photo':
+            self.state.overwrite(PhotographPageStates.SHOW_SAVED)
+            self.prev_state.overwrite(PhotographPageStates.SHOW_CURRENT)
+            self.busy.overwrite(int(False))                                 # may have risks(?)
+            self.display_completed.overwrite(int(False))
+            self.saved_display_id.overwrite(-1)                             # will be overwritten in _initiate()
+            self.saved_len.overwrite(-1)                                    # will be overwritten in _initiate()
+            self.max_id.overwrite(-1)                                       # will be overwritten in _initiate()
+            self._initiate()
+            self.saved_display_id.overwrite(self.saved_len.reveal())
+        else:
+            self.state.overwrite(PhotographPageStates.SHOW_CURRENT)
+            self.prev_state.overwrite(PhotographPageStates.SHOW_SAVED)
+            self.busy.overwrite(int(False))
+            self.display_completed.overwrite(int(False))
+            self.saved_display_id.overwrite(-1)
+            self.saved_len.overwrite(-1)
+            self.max_id.overwrite(-1)
+            self._initiate()
 
     
     def start_display(self):
@@ -128,11 +142,37 @@ class PhotographPage(Page):
                     # Leave camera page
                     while True:
                         if self.display_completed.reveal():
-                            return 'MenuPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'MenuPage',
+                                'args': None,
+                            }
                 elif state == PhotographPageStates.SHOW_SAVED:
                     # Resume to show current camera captured footage
                     self.prev_state.overwrite(state)
                     self.state.overwrite(PhotographPageStates.SHOW_CURRENT)
+            
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(PhotographPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(PhotographPageStates.LEAVE)
+                # Leave camera page
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args'],
+                        }
 
             self.busy.overwrite(int(False))
     
@@ -152,7 +192,6 @@ class PhotographPage(Page):
             state = self.state.reveal()
             prev_state = self.prev_state.reveal()
             saved_display_id = self.saved_display_id.reveal()
-                
             if state == PhotographPageStates.SHOW_SAVED:
                 if prev_state == PhotographPageStates.SHOW_CURRENT:
                     # Take the picture
@@ -170,7 +209,7 @@ class PhotographPage(Page):
                         )     
                         self.conn.commit()
                     except Exception as e:
-                        print(f'An error ocurred: {e}')
+                        print(f'An error occurred: {e}')
                         
                     # Update parametres
                     self.saved_images.append((img_name, PhotographPageConfig.SAVE_PATH + img_name))

@@ -91,10 +91,10 @@ class WeatherPageIcon:
                 if key in weather_str:
                     self.icon_path = self.weather_state_day_dict[key]
                     return
-        
-        for key in self.weather_state_night_dict:
+        else: 
+            for key in self.weather_state_night_dict:
                 if key in weather_str:
-                    self.icon_path = self.weather_state_day_dict[key]
+                    self.icon_path = self.weather_state_night_dict[key]
                     return
         
         self.icon_path = None
@@ -166,7 +166,33 @@ class WeatherPage(Page):
                 self.state.overwrite(WeatherPageStates.EXITING)
                 while True:
                     if self.display_completed.reveal():
-                        return 'MenuPage', None
+                        # return 'MenuPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'MenuPage',
+                            'args': None,
+                        }
+            elif task_info['task'] == 'PAGE_EXPIRED':
+                self.state.overwrite(WeatherPageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None,
+                        }
+            
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.state.overwrite(WeatherPageStates.EXITING)
+                while True:
+                    if self.display_completed.reveal():
+                        # return 'EmotionPage', None
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
+                        }
             
             self.weather_page_busy.overwrite(int(False))
             

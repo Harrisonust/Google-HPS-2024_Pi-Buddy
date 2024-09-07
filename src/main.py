@@ -1,9 +1,10 @@
-import multiprocessing
+# import multiprocessing
 import threading, queue
 import RPi.GPIO as GPIO
 import time
 
 from handlers import *
+from database.reset_database import reset_db
 
 
 class TaskQueue:
@@ -33,7 +34,7 @@ class TaskQueue:
 
 
 class Control:
-    def __init__(self):
+    def __init__(self, reset_database=False):
         
         # Initialize the task queue
         self.task_queue = TaskQueue()
@@ -42,9 +43,14 @@ class Control:
         # Initialize handlers and pass the task queue to them
         self.handlers = {
             'battery': BatteryHandler(self.task_queue),
-            'encoders': EncodersHandler(self.task_queue),
-            'menu_screen': MenuScreenHandler(self.task_queue)
+            'encoders': TestEncodersHandler(self.task_queue),
+            'menu_screen': MenuScreenHandler(self.task_queue),
+            'emotion': EmotionHandler(self.task_queue),
+            #'audio': AudioHandler(self.task_queue),
         }
+        
+        if reset_database:
+            reset_db(reset_todo=False, reset_images=True, reset_videos=True)
     
         # Start listening processes for each handler
         self._start_listening()
@@ -71,16 +77,16 @@ class Control:
         while True:
             if self.task_queue.get_len() != 0:
                 # Pop task from task_queue
-                task_info = self.task_queue.pop()    
+                task_info = self.task_queue.pop()
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
                 process.start()   
-            time.sleep(0.1)
+            time.sleep(0.001)
 
                 
    
 if __name__ == '__main__':
     
     GPIO.setmode(GPIO.BCM)
-    Control()
+    Control(reset_database=True)

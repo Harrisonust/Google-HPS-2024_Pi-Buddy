@@ -141,25 +141,67 @@ class MenuPage(Page):
                     if self.display_completed.reveal():
                         next_page_title = self.option_box_information[self.hovered_id.reveal()][0]
                         if next_page_title == 'Weather':
-                            return 'WeatherPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'WeatherPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Timer':
-                            return 'SetTimerPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'SetTimerPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Time':
-                            return 'TimePage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'TimePage',
+                                'args': None,
+                            }
                         if next_page_title == 'Todo List':
-                            return 'TodoPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'TodoPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Photograph':
-                            return 'PhotographPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'PhotographPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Film':
-                            return 'FilmPage', None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'FilmPage',
+                                'args': None,
+                            }
                         if next_page_title == 'Battery':
-                            return 'BatteryPage', None
-                    
-                        return None, None
+                            return {
+                                'type': 'NEW_PAGE',
+                                'page': 'BatteryPage',
+                                'args': None,
+                            }
                 
-            elif task_info['task'] == 'OUT_RESUME':
-                pass
+            elif task_info['task'] == 'OUT_RESUME' or task_info['task'] == 'PAGE_EXPIRED':
+                self.select_triggered.overwrite(int(True))
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': 'EmotionPage',
+                            'args': None
+                        }
             
+            elif task_info['task'] == 'SWITCH_PAGE':
+                self.select_triggered.overwrite(int(True))
+                while True:
+                    if self.display_completed.reveal():
+                        return {
+                            'type': 'NEW_PAGE',
+                            'page': task_info['page_key'],
+                            'args': task_info['args']
+                        }
     
     
     def _initiate_option_boxes(self):
@@ -230,25 +272,8 @@ class MenuPage(Page):
                 
             # Check if select had been triggered
             elif select_triggered:
-                select_transition_state = self.select_transition_state.reveal()
-                
-                if select_transition_state == MenuPageSelectTransitionStage.REMOVE_OTHERS:
-                    for option_box_id, option_box in enumerate(self.option_boxes):
-                        if option_box_id != hovered_id:
-                            option_box.display = False
-                
-                elif select_transition_state == MenuPageSelectTransitionStage.REVERSE_SELECTED_COLOR:
-                    self.option_boxes[hovered_id].reverse_color()
-                
-                elif select_transition_state == MenuPageSelectTransitionStage.COLOR_BACKGROUND:
-                    self.option_boxes[hovered_id].show_border = False
-                    self.background_color = MenuPageOptionBoxConfig.HOVERED_COLOR
-                
-                elif select_transition_state == MenuPageSelectTransitionStage.END_DISPLAY:
-                    break
-                
-                self.select_transition_state.overwrite(select_transition_state + 1)
-                
+                break
+
             # Draw and update screen
             self.screen.fill_screen(theme_colors.Primary)
             for option_box in self.option_boxes:
