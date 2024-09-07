@@ -51,7 +51,8 @@ class AudioHandler(Handler):
                         #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
                         tts = gTTS(text=response_text, lang='en', slow = False)
                         tts.save("output.wav")
-                        os.system("aplay output.wav")
+                        os.system("mpg321 output.wav")
+                        time.sleep(2)
                         self.listen_and_respond(source)
                 #except sr.UnknownValueError:
                 #    print('input not recognized')
@@ -62,15 +63,18 @@ class AudioHandler(Handler):
     def listen_and_respond(self, source):
          
         while True:
+            os.system("sox -n -r 44100 -c 1 beep.wav synth 0.1 sine 1000")
+            os.system("aplay beep.wav")
             print("Listening...")
-            audio = self.r.listen(source, timeout=2, phrase_time_limit=3)
+            audio = self.r.listen(source, timeout=10, phrase_time_limit=3)
             try:
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
-
+                os.system("sox -n -r 44100 -c 1 boop.wav synth 0.1 sine 500")
+                os.system(" beep.wav boop.wav")
                 if not text:
-                    #continue
                     print("No speech detected, returning to wake word listening.")
+                    #continue
                     break
                     #return
                 else:
@@ -136,6 +140,7 @@ class AudioHandler(Handler):
                 tts = gTTS(text=response_text, lang='en', slow = False)
                 tts.save("output.wav")
                 os.system("mpg321 output.wav")
+                time.sleep(4)
 
                 if not audio:
                     self.listen_for_wake_word(source)
