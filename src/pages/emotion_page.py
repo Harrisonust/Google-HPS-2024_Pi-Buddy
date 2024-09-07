@@ -216,6 +216,7 @@ class EmotionPage(Page):
                     continue
 
                 # Draw frame and move on to next
+                print(displaying_emotion_id)
                 self.screen.draw_image_from_data(
                     x=int(math.cos(x_angle) * EmotionPageConfig.id_2_motion[displaying_emotion_id]['x_radius']), 
                     y=int(math.sin(y_angle) * EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_radius']), 

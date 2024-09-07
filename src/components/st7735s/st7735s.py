@@ -327,7 +327,9 @@ class Screen:
         #     raise ValueError("Image exceeds display bounds")
         if data is None:
             return
-
+        print(x, y, width, height)
+        print(type(data), data.shape)
+        print(cv2.INTER_AREA)
         data = cv2.resize(data, (width, height), interpolation=cv2.INTER_AREA)
         r = data[:, :, 2].astype(np.uint16)
         g = data[:, :, 1].astype(np.uint16)
