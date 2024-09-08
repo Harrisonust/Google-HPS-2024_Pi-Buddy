@@ -48,7 +48,7 @@ class Control:
             'emotion': EmotionHandler(self.task_queue),
             'audio': AudioHandler(self.task_queue),
             'robot_movement': RobotMovementHandler(self.task_queue),
-            'teleop': TeleopHandler(self.task_queue),
+            #'teleop': TeleopHandler(self.task_queue),
         }
         
         if reset_database:
