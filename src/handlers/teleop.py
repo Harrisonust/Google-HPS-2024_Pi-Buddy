@@ -41,8 +41,21 @@ class TeleopHandler:
             elif key == ' ':
                 self.stop_movement()
             elif key == 'q':
+                self.stop_movement()
                 print("Quitting...")
                 break 
+            elif key == 'c':
+                self.task_queue.append({
+                    'requester_name': 'emotion',
+                    'handler_name': 'robot_movement',
+                    'task': 'SHOW_CURIOUS',
+                })
+            elif key == 'v':
+                self.task_queue.append({
+                    'requester_name': 'emotion',
+                    'handler_name': 'robot_movement',
+                    'task': 'SHOW_SCARED',
+                })
 
     def move_forward(self):
         print("Moving forward")

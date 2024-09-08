@@ -5,7 +5,7 @@ from value_manager import ValueManager
 from components.ir import IR
 from pin_defines import *
 from components.vl53l1x.vl53l1x import VL53L1X
-from components.tb6612fng import DualChannelMotor
+from components.tb6612fng import DualChannelMotor, RobotBaseDirection, RobotBaseRotation
 
 class RobotMovementHandler:
     def __init__(self, task_queue):
@@ -14,7 +14,6 @@ class RobotMovementHandler:
 
         self.robot_movement_busy = ValueManager(0)
         self.robot_base = DualChannelMotor(23, 24, 25, 1, 12, 16, pin_standby=None)
-        self.state = 'Teleop'
 
         self.tof_distance = None
         self.ir_is_triggered = None
@@ -24,26 +23,19 @@ class RobotMovementHandler:
         ir_task_handle.start()
         tof_task_handle.start()
 
-        self.robot_base_speed = 10
+        self.robot_base_speed = 45
 
     def listen(self):
         while 1:
-            #print(f"robot movement -- IR:{self.ir_is_triggered} TOF:{self.tof_distance}")
             if self.ir_is_triggered or (self.tof_distance != None and self.tof_distance < 100): 
+                print(f"robot movement -- IR:{self.ir_is_triggered} TOF:{self.tof_distance}")
+                time.sleep(1)
+                self.robot_base.move(RobotBaseDirection.BACKWARD)
+                time.sleep(1)
+                self.robot_base.rotate(RobotBaseRotation.LEFT)
+                time.sleep(1)
                 self.robot_base.stop()
-                self.robot_base.move(-50)
-                self.robot_base.rotate(180)
-                time.sleep(0.1)
-            else:
-                if self.state == 'Teleop':
-                    pass
-                elif self.state == 'Curious':
-                    self.robot_base.random_walk()
-                elif self.state == 'Scared':
-                    self.robot_base.move(-50) # 50 mm
-                elif self.state == 'Call_and_come':
-                    pass
-            time.sleep(0.1)
+            time.sleep(0.01)
 
     def ir_task(self):
         self.ir = IR(PIN_IR)
@@ -65,35 +57,36 @@ class RobotMovementHandler:
     
     def handle_task(self, task_info):
         if self.robot_movement_busy.reveal():
+            #pass
             self.task_queue.append(task_info)
-
         else:
             self.robot_movement_busy.overwrite(True)
-            if task_info['handler_name'] == 'robot_movement':
-                self.robot_base.set_speed(40)
+            self.robot_base.set_speed(self.robot_base_speed)
+            if task_info['handler_name'] == 'robot_movement' and task_info['requester_name'] == 'teleop':
                 if task_info['operation'] == 'move_forward':
                     print('in robot movement handler move forward')
-                    self.robot_base.move(0)
+                    self.robot_base.move(RobotBaseDirection.FORWARD)
                 elif task_info['operation'] == 'move_backward':
                     print('in robot movement handler move backward')
-                    self.robot_base.move(1)
+                    self.robot_base.move(RobotBaseDirection.BACKWARD)
                 elif task_info['operation'] == 'turn_left':
                     print('in robot movement handler turn left')
-                    self.robot_base.rotate(0)
+                    self.robot_base.rotate(RobotBaseRotation.LEFT)
                 elif task_info['operation'] == 'turn_right':
                     print('in robot movement handler turn right')
-                    self.robot_base.rotate(1)
+                    self.robot_base.rotate(RobotBaseRotation.RIGHT)
                 elif task_info['operation'] == 'stop_movement':
                     print('in robot movement handler stop movement')
                     self.robot_base.stop()
-
-                elif task_info['task'] == 'SCARED':
-                    self.robot_base.back_move(1)
-                    time.sleep(5)
+            if task_info['handler_name'] == 'robot_movement' and task_info['requester_name'] == 'emotion':
+                if task_info['task'] == 'SHOW_SCARED':
+                    print('in robot movement show scared')
+                    self.robot_base.move(RobotBaseDirection.BACKWARD)
+                    time.sleep(2)
                     self.robot_base.stop()
-                elif task_info['task'] == 'CURIOUS':
+                elif task_info['task'] == 'SHOW_CURIOUS':
+                    print('in robot movement show curious')
                     self.robot_base.random_walk()
-                    time.sleep(5)
+                    time.sleep(2)
                     self.robot_base.stop()
-
             self.robot_movement_busy.overwrite(False)

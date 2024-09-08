@@ -7,6 +7,14 @@ class Rotation(Enum):
     CLOCKWISE = 0
     COUNTER_CLOCKWISE = 1
 
+class RobotBaseDirection(Enum):
+    FORWARD = 0
+    BACKWARD = 1
+
+class RobotBaseRotation(Enum):
+    LEFT = 0
+    RIGHT = 1
+
 class SingleChannelMotor:
     def __init__(self, pin_pwm, pin_in1, pin_in2, pin_enc1=None, pin_enc2=None):
         self._pin_pwm  = pin_pwm
@@ -97,19 +105,19 @@ class DualChannelMotor:
         self.left_motor.set_duty(duty)
         self.right_motor.set_duty(duty)
 
-    def move(self, direction):
-        if direction == 0:
-            self.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-            self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
-        elif direction == 1:
+    def move(self, direction: RobotBaseDirection):
+        if direction == RobotBaseDirection.FORWARD: 
             self.left_motor.set_rotation(Rotation.CLOCKWISE)
             self.right_motor.set_rotation(Rotation.CLOCKWISE)
+        elif direction == RobotBaseDirection.BACKWARD:
+            self.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
+            self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
         
-    def rotate(self, rotation):
-        if rotation == 0:
+    def rotate(self, rotation: RobotBaseRotation):
+        if rotation == RobotBaseRotation.LEFT:
             self.left_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
             self.right_motor.set_rotation(Rotation.CLOCKWISE)
-        elif rotation == 1:
+        elif rotation == RobotBaseRotation.RIGHT:
             self.left_motor.set_rotation(Rotation.CLOCKWISE)
             self.right_motor.set_rotation(Rotation.COUNTER_CLOCKWISE)
         
@@ -120,23 +128,22 @@ class DualChannelMotor:
     def random_walk(self):
         selection = random.randint(1, 5)
         if selection == 1:
-            self.move(0)
+            self.move(RobotBaseDirection.FORWARD)
         elif selection == 2:
-            self.move(1)
+            self.move(RobotBaseDirection.BACKWARD)
         elif selection == 3:
-            self.rotate(0)
+            self.rotate(RobotBaseRotation.LEFT)
         elif selection == 4:
-            self.rotate(1)
+            self.rotate(RobotBaseRotation.RIGHT)
         elif selection == 5: # do nothing
             self.stop()
-        time.sleep(3)
 
 if __name__ == '__main__':
     GPIO.setmode(GPIO.BCM)
     robot_base = DualChannelMotor(23, 24, 25, 1, 12, 16, pin_standby=None)
     robot_base.left_motor.set_rotation(Rotation.CLOCKWISE)
     robot_base.right_motor.set_rotation(Rotation.CLOCKWISE)
-    duty = 90 
+    duty = 40 
     robot_base.left_motor.set_duty(duty)
     robot_base.right_motor.set_duty(duty)
     test_start_time = time.time()
