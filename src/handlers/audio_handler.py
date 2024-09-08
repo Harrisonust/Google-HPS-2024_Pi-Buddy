@@ -44,7 +44,7 @@ class AudioHandler(Handler):
                     print("Listening audio")
                     audio = self.r.listen(source, phrase_time_limit=5)
                     text = self.r.recognize_google(audio)
-                    print(text)
+                    print(f"You said: {text}")
                     if "hey" in text.lower():
                         print("Wake word detected.")
                         response_text = np.random.choice(self.greetings)

@@ -15,6 +15,7 @@ ENV/
 src/images/
 src/videos/
 src/database/database.db
+src/audio
             
 # Distribution / packaging
 build/
