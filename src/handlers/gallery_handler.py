@@ -2,12 +2,13 @@ import http.server
 import socketserver
 import threading
 import os
+import requests
 
 from handlers.handler import Handler
 from value_manager import ValueManager
 
 PORT = 8000  # Port number for the HTTP server
-WEB_FOLDER = '../gallery/'  # Directory containing the static files
+WEB_FOLDER = 'src/gallery/'  # Directory containing the static files
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def translate_path(self, path):
@@ -24,6 +25,15 @@ class GalleryHandler(Handler):
         self.httpd = None
         self.run_server = False
         self.start_server()
+
+    def get_public_ip(self):
+        try:
+            response = requests.get('https://api.ipify.org')
+            response.raise_for_status()  # Check if the request was successful
+            print("Public IP address:", response.text)
+        except requests.RequestException as e:
+            print("Error retrieving public IP address:", e)
+
         
     def start_server(self):
         if self.run_server:
@@ -40,7 +50,8 @@ class GalleryHandler(Handler):
         # Start the server in a new thread
         self.server_thread = threading.Thread(target=self.httpd.serve_forever)
         self.server_thread.start()
-        print(f"Serving at port {PORT}")
+        IP = self.get_public_ip()
+        print(f"Serving at port{IP}:{PORT}")
     
     def stop_server(self):
         if self.run_server:
