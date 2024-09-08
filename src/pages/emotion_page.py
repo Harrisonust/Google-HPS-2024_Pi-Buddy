@@ -105,7 +105,7 @@ class EmotionPage(Page):
         
         self.busy = ValueManager(int(False))
         self.end_display = ValueManager(int(False))
-        self.displaying_emotion_id = ValueManager(6)   # Shows 'joyful' as default
+        self.displaying_emotion_id = ValueManager(1)   # Shows 'joyful' as default
         self.display_completed = ValueManager(int(False))
 
 
