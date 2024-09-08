@@ -47,6 +47,8 @@ class Control:
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),
             'audio': AudioHandler(self.task_queue),
+            'robot_movement': RobotMovementHandler(self.task_queue),
+            'teleop': TeleopHandler(self.task_queue),
         }
         
         if reset_database:
@@ -60,7 +62,10 @@ class Control:
         process = threading.Thread(target=self._execute_tasks)
         process.name = 'main execute task'
         process.start()
-        
+       
+        for thread in threading.enumerate():
+            print(thread.name)
+
 
     def _start_listening(self):
         # Start listening processes for input handlers

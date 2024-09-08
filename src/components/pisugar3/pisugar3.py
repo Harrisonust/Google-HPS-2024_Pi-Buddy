@@ -1,12 +1,12 @@
 import time
 from datetime import datetime
 import RPi.GPIO as GPIO
-import smbus2
+from smbus2 import SMBus
 from .pisugar3_reg import *
 
 class BatteryManager: 
 	def __init__(self):
-		self._i2c = smbus2.SMBus(1) # /dev/i2c-1
+		self._i2c = SMBus(1) # /dev/i2c-1
 		self._address = PISUGAR3_ADDR
 		self.set_rtc()
 
