@@ -1,6 +1,6 @@
 import time
 import multiprocessing
-
+import os
 
 from pages.pages_utils import theme_colors, PageConfig, Text, IconPaths
 from pages.page import Page
@@ -80,7 +80,10 @@ class TimerRing():
             self.screen.draw_circle(self.x, self.y, self.outer_radius - 1, self.background_color)
             self.screen.draw_circle(self.x, self.y, self.inner_radius + 1, self.color)
             self.screen.draw_circle(self.x, self.y, self.inner_radius, self.background_color)
-        
+            for _ in range(3):
+                os.system("aplay audio/beep.wav")
+                time.sleep(0.2)
+
         # COUNTING/PAUSED
         else:
             end_angle = int(ticks_left / self.total_ticks * 360)
