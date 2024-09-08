@@ -160,11 +160,17 @@ class EmotionHandler(Handler):
             else:
                 self.sleepy.overwrite(int(False))
             
+            # 'hungry' is updated True when it's 12.-13. or 18.-19.
+            if hour == 12 or hour == 18:
+                self.hungry.overwrite(int(True))
+            else:
+                self.hungry.overwrite(int(False))
+            
             # 'energetic' is updated True at Saturdays and Sundays
             if day == 'Saturday' or day == 'Sunday':
                 self.energetic.overwrite(int(True))
             else:
-                self.energetic.overwrite(int(False))
+                self.energetic.overwrite(int(False))            
             
             # Updates every minutes
             time.sleep(60)
