@@ -29,9 +29,11 @@ class AudioHandler(Handler):
             "Hello there",
             "Hi, how can I assist you?"
         ]
+        self.audio_gain = 1500
 
         task = threading.Thread(target=self.listen_for_wake_word)
         task.start()
+
 
     # Listen for the wake word "hey"
     def listen_for_wake_word(self):
@@ -52,7 +54,7 @@ class AudioHandler(Handler):
                         #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
                         tts = gTTS(text=response_text, lang='en', slow = False)
                         tts.save("audio/output.wav")
-                        os.system("mpg321 audio/output.wav")
+                        os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                         self.listen_and_respond(source)
                 except sr.UnknownValueError:
                     print('input not recognized')
@@ -77,7 +79,7 @@ class AudioHandler(Handler):
                 elif "bye" in text.lower():
                     tts = gTTS(text='Goodbye', lang='en', slow = False)
                     tts.save("audio/output.wav")
-                    os.system("mpg321 audio/output.wav")
+                    os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                     break
                 else:
                     self.page_switching('QA',args={'who':'user','what':text})
@@ -142,7 +144,7 @@ class AudioHandler(Handler):
                 #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
                 # tts = gTTS(text=response_text, lang='en', slow = False)
                 # tts.save("audio/output.wav")
-                # os.system("mpg321 audio/output.wav")
+                # os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                 time.sleep(0.5)
 
                 if not audio:
@@ -293,7 +295,7 @@ class AudioHandler(Handler):
         self.page_switching('QA', args={'who':'robot','what':response_text})
         tts = gTTS(text=response_text, lang='en', slow = False)
         tts.save("audio/output.wav")
-        os.system("mpg321 audio/output.wav")
+        os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                 
 
         if command_match:
