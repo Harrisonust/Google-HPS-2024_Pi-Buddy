@@ -9,6 +9,12 @@ from value_manager import ValueManager
 PORT = 8000  # Port number for the HTTP server
 WEB_FOLDER = '../gallery/'  # Directory containing the static files
 
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def translate_path(self, path):
+        # Modify the path to point to the WEB_FOLDER
+        path = super().translate_path(path)
+        return os.path.join(WEB_FOLDER, os.path.basename(path))
+    
 class GalleryHandler(Handler):
     
     def __init__(self, task_queue):
@@ -25,8 +31,7 @@ class GalleryHandler(Handler):
             return
 
         # Define the handler to serve files from the WEB_FOLDER
-        Handler = http.server.SimpleHTTPRequestHandler
-        Handler.directory = WEB_FOLDER
+        Handler = CustomHTTPRequestHandler
 
         # Create a new server instance
         self.httpd = socketserver.TCPServer(("", PORT), Handler)
