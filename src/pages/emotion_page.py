@@ -119,8 +119,8 @@ class EmotionPage(Page):
             text=None,
             text_size=10,
             color=EmotionPageConfig.TIME_BATTERY_INFO_COLOR,
-            x_marking=8,
-            y_marking=5,
+            x_marking=4,
+            y_marking=2,
         )
         
         # Battery component
@@ -131,8 +131,8 @@ class EmotionPage(Page):
             text=None,
             text_size=10,
             color=EmotionPageConfig.TIME_BATTERY_INFO_COLOR,
-            x_marking=60,
-            y_marking=5
+            x_marking=125,
+            y_marking=2
         )
 
 
@@ -265,8 +265,8 @@ class EmotionPage(Page):
             battery_charging = self.battery_charging.reveal()
             if battery_level != -1:
                 self.screen.draw_image(
-                    x=80,
-                    y=5,
+                    x=145,
+                    y=2,
                     width=13,
                     height=13,
                     path=IconPaths.Lightning if battery_charging else IconPaths.Unplugged,
