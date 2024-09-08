@@ -123,7 +123,7 @@ class EmotionHandler(Handler):
             
             # Get time
             current_datetime = datetime.now()
-            day = current_datetime.strftime("A")
+            day = current_datetime.strftime("%A")
             hour = int(current_datetime.strftime("%H"))
             
             # Get weather
