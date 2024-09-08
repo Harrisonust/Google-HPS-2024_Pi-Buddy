@@ -63,9 +63,9 @@ class EncodersHandler(Handler):
             # Get cur_pos values
             glide_encoder_cur_pos = self.glide_encoder.get_position()
             select_encoder_cur_pos = self.select_encoder.get_position()
-            print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
 
             if select_encoder_cur_pos - self.select_encoder_prev_pos >= EncoderConfig.VALID_DISPLACEMENT:
+                print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
                 # ENTER_SELECT
                 self.task_updated.overwrite(int(True))
                 self.task_queue.append({
@@ -76,6 +76,7 @@ class EncodersHandler(Handler):
                 })
             
             elif self.select_encoder_prev_pos - select_encoder_cur_pos >= EncoderConfig.VALID_DISPLACEMENT:
+                print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
                 # OUT_RESUME
                 self.task_updated.overwrite(int(True))
                 self.task_queue.append({
@@ -86,6 +87,7 @@ class EncodersHandler(Handler):
                 })
             
             elif glide_encoder_cur_pos - self.glide_encoder_prev_pos >= EncoderConfig.VALID_DISPLACEMENT:
+                print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
                 # MOVE_CURSOR_RIGHT_UP
                 self.task_updated.overwrite(int(True))
                 self.task_queue.append({
@@ -95,7 +97,9 @@ class EncodersHandler(Handler):
                     'task_priority': 1
                 })
             
+                print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
             elif self.glide_encoder_prev_pos - glide_encoder_cur_pos >= EncoderConfig.VALID_DISPLACEMENT:
+                print(f"Glide: {glide_encoder_cur_pos}, Select: {select_encoder_cur_pos}")
                 self.task_updated.overwrite(int(True))
                 self.task_queue.append({
                     'requester_name': 'encoders',
