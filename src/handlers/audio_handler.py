@@ -11,9 +11,6 @@ import re
 # from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
 from value_manager import ValueManager
-from handlers.handler import Handler
-from value_manager import ValueManager
-
 
 class AudioHandler(Handler):
 
@@ -50,8 +47,8 @@ class AudioHandler(Handler):
                         print(response_text)
                         #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the greeting
                         tts = gTTS(text=response_text, lang='en', slow = False)
-                        tts.save("output.wav")
-                        os.system("mpg321 output.wav")
+                        tts.save("audio/output.wav")
+                        os.system("mpg321 audio/output.wav")
                         self.listen_and_respond(source)
                 except sr.UnknownValueError:
                     print('input not recognized')
@@ -62,12 +59,12 @@ class AudioHandler(Handler):
     def listen_and_respond(self, source):
         while True:
             print("Listening...")
-            os.system("aplay beep.wav")
+            os.system("aplay audio/beep.wav")
             try:
                 audio = self.r.listen(source, timeout=35, phrase_time_limit=15)
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
-                os.system("aplay boop.wav")
+                os.system("aplay audio/boop.wav")
                 if not text:
                     print("No speech detected, returning to wake word listening.")
                     #continue
@@ -75,8 +72,8 @@ class AudioHandler(Handler):
                     #return
                 elif "bye" in text.lower():
                     tts = gTTS(text='Goodbye', lang='en', slow = False)
-                    tts.save("output.wav")
-                    os.system("mpg321 output.wav")
+                    tts.save("audio/output.wav")
+                    os.system("mpg321 audio/output.wav")
                     break
                 else:
                     self.page_switching('QA',args={'who':'user','what':text})

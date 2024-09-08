@@ -5,6 +5,7 @@ from .menu_screen_handler import MenuScreenHandler
 from .emotion_handler import EmotionHandler
 from .test_audio_handler import TestAudioHandler
 from .audio_handler import AudioHandler
+from.gallery_handler import GalleryHandler
 
 __all__ = [
     'EmotionHandler',
@@ -13,5 +14,6 @@ __all__ = [
     'BatteryHandler',
     'TestEncodersHandler',
     'EncodersHandler',
-    'MenuScreenHandler'
+    'MenuScreenHandler',
+    'GalleryHandler'
 ]

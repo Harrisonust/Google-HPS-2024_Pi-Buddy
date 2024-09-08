@@ -47,6 +47,7 @@ class Control:
             'menu_screen': MenuScreenHandler(self.task_queue),
             'emotion': EmotionHandler(self.task_queue),
             'audio': AudioHandler(self.task_queue),
+            'gallery': GalleryHandler(self.task_queue),
         }
         
         if reset_database:
