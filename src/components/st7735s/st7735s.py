@@ -332,8 +332,8 @@ class Screen:
         g = data[:, :, 1].astype(np.uint16)
         b = data[:, :, 0].astype(np.uint16)
         color_map = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-        self._buf[max(0,y):min(self._col_dim, y+height), max(0,x):min(self._row_dim, x+width), 0] = (color_map >> 8)
-        self._buf[max(0,y):min(self._col_dim, y+height), max(0,x):min(self._row_dim, x+width), 1] = (color_map & 0xFF)
+        self._buf[y:y+height, x:x+width, 0] = (color_map >> 8)
+        self._buf[y:y+height, x:x+width, 1] = (color_map & 0xFF)
 
     def fill_screen(self, color) -> None:
         if color is None:
