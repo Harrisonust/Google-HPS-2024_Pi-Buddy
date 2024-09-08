@@ -3,14 +3,19 @@ import time
 import random
 import math
 import os
+from datetime import datetime
 
 
 from value_manager import ValueManager
-from pages.pages_utils import theme_colors
+from pages.pages_utils import theme_colors, Text, IconPaths, PageConfig
 from pages.page import Page
 
-# MUST MATCH EmotionHandlerConfig AT EMOTION_HANDLER.PY
+
+
 class EmotionPageConfig:
+    TIME_BATTERY_INFO_COLOR = theme_colors.Teritary
+    
+    # MUST MATCH EmotionHandlerConfig AT EMOTION_HANDLER.PY
     task_2_id = {
         'SHOW_JOYFUL': 1,
         'SHOW_DEPRESSED' : 2,
@@ -105,8 +110,30 @@ class EmotionPage(Page):
         
         self.busy = ValueManager(int(False))
         self.end_display = ValueManager(int(False))
-        self.displaying_emotion_id = ValueManager(6)   # Shows 'joyful' as default
+        self.displaying_emotion_id = ValueManager(1)   # Shows 'joyful' as default
         self.display_completed = ValueManager(int(False))
+        
+        # Time component
+        self.time_component = Text(
+            screen=self.screen,
+            text=None,
+            text_size=10,
+            color=EmotionPageConfig.TIME_BATTERY_INFO_COLOR,
+            x_marking=8,
+            y_marking=5,
+        )
+        
+        # Battery component
+        self.battery_level = ValueManager(15)
+        self.battery_charging = ValueManager(int(False))
+        self.battery_component = Text(
+            screen=self.screen,
+            text=None,
+            text_size=10,
+            color=EmotionPageConfig.TIME_BATTERY_INFO_COLOR,
+            x_marking=60,
+            y_marking=5
+        )
 
 
     def reset_states(self, args):
@@ -162,6 +189,13 @@ class EmotionPage(Page):
                                 'recieved': task_info['task']
                             }
                 }
+            
+            # Update battery information
+            elif task_info['task'] == 'UPDATE_BATTERY_STATE':
+                self.battery_level.overwrite(task_info['battery_level'])
+                self.battery_charging.overwrite(task_info['battery_charging'])
+                self.busy.overwrite(int(False))
+            
             else:
                 self.busy.overwrite(int(False))
 
@@ -221,6 +255,28 @@ class EmotionPage(Page):
                 y_angle += EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_angle_displacement']
                 
                 
+            # Draw time
+            current_datetime = datetime.now()
+            self.time_component.text = current_datetime.strftime("%H: %M: %S")
+            self.time_component.draw()
+            
+            # Draw battery information
+            battery_level = self.battery_level.reveal()
+            battery_charging = self.battery_charging.reveal()
+            if battery_level != -1:
+                self.screen.draw_image(
+                    x=80,
+                    y=5,
+                    width=13,
+                    height=13,
+                    path=IconPaths.Lightning if battery_charging else IconPaths.Unplugged,
+                    replace_with={
+                        PageConfig.ICON_TRUE_COLOR: EmotionPageConfig.TIME_BATTERY_INFO_COLOR
+                    }
+                )
+                self.battery_component.text = str(battery_level) + '%'
+                self.battery_component.draw()
+            
             self.screen.update()
             self.screen.clear()
         
