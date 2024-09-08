@@ -50,6 +50,7 @@ class Control:
             'robot_movement': RobotMovementHandler(self.task_queue),
             #'teleop': TeleopHandler(self.task_queue),
         }
+
         
         if reset_database:
             reset_db(reset_todo=False, reset_images=True, reset_videos=True)
