@@ -7,13 +7,13 @@ import google.generativeai as genai
 import threading
 from gtts import gTTS
 import re
+import sqlite3
 
 # from handlers.audio_control_handler import process_response
 from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
 from value_manager import ValueManager
-
 
 class AudioHandler(Handler):
 
@@ -89,7 +89,7 @@ class AudioHandler(Handler):
                 prompt = text
                 system_instructions = 'You are Pi-buddy, a friendly AI desktop pet. ' + \
                                       'You are mostly optimistic, but also easily moody. ' + \
-                                      'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #curious, #scared) ' + \
+                                      'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
                                       'Please don\'t include emojis' + \
                                       'Please consider the dictionary below' + \
@@ -113,7 +113,6 @@ class AudioHandler(Handler):
                                       '  "set emotion to hungry": "!Command3 &hungry"'+ \
                                       '  "set emotion to energetic": "!Command3 &energetic"'+ \
                                       '  "set emotion to sleepy": "!Command3 &sleepy"'+ \
-                                      '  "set emotion to curious": "!Command3 &curious"'+ \
                                       '  "set emotion to scared": "!Command3 &scared"'+ \
                                       '  "set a timer for x seconds": "!Command4 &(x)&0&0"'+ \
                                       '  "set a timer for x minutes": "!Command4 &0&(x)&0"'+ \
