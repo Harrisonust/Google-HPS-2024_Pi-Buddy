@@ -95,7 +95,7 @@ class AudioHandler(Handler):
                 prompt = text
                 system_instructions = 'You are Pi-buddy, a friendly AI desktop pet. ' + \
                                       'You are mostly optimistic, but also easily moody. ' + \
-                                      'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
+                                      'Please always return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
                                       'Please don\'t include emojis' + \
                                       'Please consider the dictionary below' + \
@@ -159,18 +159,16 @@ class AudioHandler(Handler):
                     self.listen_for_wake_word()
 
             except sr.UnknownValueError:
+                print("unknown value error, keep listening...")
                 time.sleep(2)
-                print("Silence found, shutting up, listening...")
-                #self.listen_for_wake_word()
-                #break
-                #return
+                continue
+            except sr.WaitTimeoutError:
+                print("wait timeout error, keep listening...")
+                time.sleep(2)
                 continue
             except sr.RequestError as e:
-                print(f"Could not request results; {e}")
-                os.system(f"espeak 'Could not request results; {e}'")  # Use espeak to say the error
-                #self.listen_for_wake_word()
-                #break
-                #return
+                print(f"Could not request results; {e}, keep listening")
+                time.sleep(2)
                 continue
 
     def page_switching(self, page, args=None):
@@ -318,8 +316,9 @@ class AudioHandler(Handler):
                 self.call_and_come()
                 print('Call and come executed successfully')
             elif command_number == 3:
-                emotion = emotions[0]
+                emotion = args[0]
                 self.set_emotion(emotion)
+                self.page_switching('Emotion')
                 print('Emotion set to ' + str(emotion))
             elif command_number == 4:
                 seconds = int(args[0]) if len(args) > 0 else None
