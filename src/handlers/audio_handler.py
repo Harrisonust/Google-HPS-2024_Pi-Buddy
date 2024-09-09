@@ -14,6 +14,7 @@ from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
 from value_manager import ValueManager
+from pages.pages_utils import PageConfig
 
 class AudioHandler(Handler):
 
@@ -23,6 +24,8 @@ class AudioHandler(Handler):
         self.task_queue = task_queue
 
         self.r = sr.Recognizer()  # Set up the speech recognition engine
+        self.r.pause_threshold = 0.5
+        self.r.energy_threshold = 300
         self.greetings = [
             "Hello! What can I do for you today?",
             "yeah?",
@@ -45,6 +48,7 @@ class AudioHandler(Handler):
                 try:
                     print("Listening audio")
                     audio = self.r.listen(source, phrase_time_limit=5)
+                    print("Recognizing audio")
                     text = self.r.recognize_google(audio)
                     print(f"You said: {text}")
                     if "hey" in text.lower():
@@ -67,7 +71,9 @@ class AudioHandler(Handler):
             print("Listening...")
             os.system("aplay audio/beep.wav")
             try:
-                audio = self.r.listen(source, timeout=5, phrase_time_limit=10)
+                print("Listening audio")
+                audio = self.r.listen(source, timeout=5, phrase_time_limit=8)
+                print("Recognizing audio")
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
                 os.system("aplay audio/boop.wav")
@@ -96,9 +102,12 @@ class AudioHandler(Handler):
                                       'if any !command is called, then there is no need to set #emotion' + \
                                       'If you catch any of the commands in the dictionary or anything insinuating these commands, ' + \
                                       'please include the corresponding text in the dictionary below at the start of your response. ' + \
+                                      'For example, if I ask you how is the weather today, you should consider switch to the weather page;' + \
+                                      'If I ask you what time is it now, you should switch to time page;' + \
+                                      'If I ask you to remind me to do something, you should trigger the "add task to todo" command' + \
                                       'It should look like !command(number) as well as any arguments that are stated for that command number with &(arg_variable)' +\
                                       'Please note that you are capable of all these commands and ' + \
-                                      'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming"' + \
+                                      'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming", or "ok I will take a photo for you"' + \
                                       'Dictionary:'+ \
                                       '  "switch to weather page": "!Command1 &Weather"'+ \
                                       '  "switch to time page": "!Command1 &Time"'+ \
@@ -120,7 +129,7 @@ class AudioHandler(Handler):
                                       '  "set a timer for x minutes and y seconds": "!Command4 &(y)&(x)&0"'+ \
                                       '  "set a timer for x hours and y minutes": "!Command4 &0&(y)&(x)"'+ \
                                       '  "set a timer for x hours, y minutes, and z seconds": "!Command4 &(z)&(y)&(x)"'+ \
-                                      '  "add task to todo": "!Command5 &(task)"'+ \
+                                      '  "add task to todo": "!Command5 &(task_to_be_done)"(please connect each word in the todo phrase with "_" )'+ \
                                       '  "take a photo": "!Command6"'+ \
                                       '  "start recording video": "!Command7"'+ \
                                       '  "start recording video for x seconds": "!Command7 &(x)"'+ \
@@ -321,13 +330,13 @@ class AudioHandler(Handler):
             elif command_number == 5:
                 task_name = args[0] if args else None
                 self.add_todo(task_name)
-                print('Task added: ' + task_name)
+                print('Task added: ' + str(task_name))
             elif command_number == 6:
                 self.take_a_photo()
                 print('Photo taken successfully')
             elif command_number == 7:
                 seconds_of_video = int(args[0]) if args else None
-                self.start_recording(seconds_of_video)
+                self.start_recording()
                 print(f'Started recording for {seconds_of_video} seconds')
             elif command_number == 8:
                 self.end_recording()
@@ -335,6 +344,7 @@ class AudioHandler(Handler):
 
         elif emotions:
             self.set_emotion(emotions[0])
+            self.page_switching('Emotion')
             print('I am ' + str(emotions[0]))
 
         return leftover_text

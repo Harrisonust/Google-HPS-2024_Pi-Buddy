@@ -10,7 +10,7 @@ from pin_defines import *
 class EncoderConfig:
     READ_PERIOD = 0.1       # Define the period to read left and right encoder positions
     VALID_DISPLACEMENT = 1  # Define the threshold for valid displacement
-    EXPIRATION_TIME = 20    # Time capacity before expiration signal is sent
+    EXPIRATION_TIME = 60    # Time capacity before expiration signal is sent
     
 
 class EncodersHandler(Handler):
