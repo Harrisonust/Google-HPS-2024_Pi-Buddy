@@ -14,6 +14,7 @@ from handlers.handler import Handler
 from value_manager import ValueManager
 from handlers.handler import Handler
 from value_manager import ValueManager
+from pages.pages_utils import PageConfig
 
 class AudioHandler(Handler):
 
@@ -23,6 +24,8 @@ class AudioHandler(Handler):
         self.task_queue = task_queue
 
         self.r = sr.Recognizer()  # Set up the speech recognition engine
+        self.r.pause_threshold = 0.5
+        self.r.energy_threshold = 300
         self.greetings = [
             "Hello! What can I do for you today?",
             "yeah?",
@@ -45,6 +48,7 @@ class AudioHandler(Handler):
                 try:
                     print("Listening audio")
                     audio = self.r.listen(source, phrase_time_limit=5)
+                    print("Recognizing audio")
                     text = self.r.recognize_google(audio)
                     print(f"You said: {text}")
                     if "hey" in text.lower():
@@ -67,7 +71,9 @@ class AudioHandler(Handler):
             print("Listening...")
             os.system("aplay audio/beep.wav")
             try:
-                audio = self.r.listen(source, timeout=5, phrase_time_limit=10)
+                print("Listening audio")
+                audio = self.r.listen(source, timeout=5, phrase_time_limit=8)
+                print("Recognizing audio")
                 text = self.r.recognize_google(audio)
                 print(f"You said: {text}")
                 os.system("aplay audio/boop.wav")
@@ -89,24 +95,27 @@ class AudioHandler(Handler):
                 prompt = text
                 system_instructions = 'You are Pi-buddy, a friendly AI desktop pet. ' + \
                                       'You are mostly optimistic, but also easily moody. ' + \
-                                      'Please return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
+                                      'Please always return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
                                       'based on user prompt and your own response. ' + \
                                       'Please don\'t include emojis' + \
                                       'Please consider the dictionary below' + \
                                       'if any !command is called, then there is no need to set #emotion' + \
                                       'If you catch any of the commands in the dictionary or anything insinuating these commands, ' + \
                                       'please include the corresponding text in the dictionary below at the start of your response. ' + \
+                                      'For example, if I ask you how is the weather today, you should consider switch to the weather page;' + \
+                                      'If I ask you what time is it now, you should switch to time page;' + \
+                                      'If I ask you to remind me to do something, you should trigger the "add task to todo" command' + \
                                       'It should look like !command(number) as well as any arguments that are stated for that command number with &(arg_variable)' +\
                                       'Please note that you are capable of all these commands and ' + \
-                                      'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming"' + \
+                                      'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming", or "ok I will take a photo for you"' + \
                                       'Dictionary:'+ \
-                                      '  "switch to weather page": "!Command1 &Weather"'+ \
-                                      '  "switch to time page": "!Command1 &Time"'+ \
+                                      '  "If I ask question related to weather, switch to weather page": "!Command1 &Weather"'+ \
+                                      '  "If I ask about the time, switch to time page": "!Command1 &Time"'+ \
                                       '  "switch to timer page": "!Command1 &Timer"'+ \
                                       '  "switch to photograph page": "!Command1 &Photograph"'+ \
                                       '  "switch to film page": "!Command1 &Film"'+ \
-                                      '  "switch to battery page": "!Command1 &Battery"'+ \
-                                      '  "switch to todo page": "!Command1 &Todo"'+ \
+                                      '  "If I ask how much battery do you have, switch to battery page": "!Command1 &Battery"'+ \
+                                      '  "If I ask you questions like what do I need to do, switch to todo page": "!Command1 &Todo"'+ \
                                       '  "come to me": "!Command2"'+ \
                                       '  "set emotion to depressed": "!Command3 &depressed"'+ \
                                       '  "set emotion to joyful": "!Command3 &joyful"'+ \
@@ -120,7 +129,7 @@ class AudioHandler(Handler):
                                       '  "set a timer for x minutes and y seconds": "!Command4 &(y)&(x)&0"'+ \
                                       '  "set a timer for x hours and y minutes": "!Command4 &0&(y)&(x)"'+ \
                                       '  "set a timer for x hours, y minutes, and z seconds": "!Command4 &(z)&(y)&(x)"'+ \
-                                      '  "add task to todo": "!Command5 &(task)"'+ \
+                                      '  "add task to todo": "!Command5 &(task_to_be_done)"(please connect each word in the todo phrase with "_" )'+ \
                                       '  "take a photo": "!Command6"'+ \
                                       '  "start recording video": "!Command7"'+ \
                                       '  "start recording video for x seconds": "!Command7 &(x)"'+ \
@@ -150,18 +159,16 @@ class AudioHandler(Handler):
                     self.listen_for_wake_word()
 
             except sr.UnknownValueError:
+                print("unknown value error, keep listening...")
                 time.sleep(2)
-                print("Silence found, shutting up, listening...")
-                #self.listen_for_wake_word()
-                #break
-                #return
+                continue
+            except sr.WaitTimeoutError:
+                print("wait timeout error, keep listening...")
+                time.sleep(2)
                 continue
             except sr.RequestError as e:
-                print(f"Could not request results; {e}")
-                os.system(f"espeak 'Could not request results; {e}'")  # Use espeak to say the error
-                #self.listen_for_wake_word()
-                #break
-                #return
+                print(f"Could not request results; {e}, keep listening")
+                time.sleep(2)
                 continue
 
     def page_switching(self, page, args=None):
@@ -292,9 +299,10 @@ class AudioHandler(Handler):
         # Clean up the remaining text
         leftover_text = response_text.strip()
         self.page_switching('QA', args={'who':'robot','what':response_text})
-        tts = gTTS(text=response_text, lang='en', slow = False)
-        tts.save("audio/output.wav")
-        os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
+        if response_text != "":
+            tts = gTTS(text=response_text, lang='en', slow = False)
+            tts.save("audio/output.wav")
+            os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                 
 
         if command_match:
@@ -309,8 +317,9 @@ class AudioHandler(Handler):
                 self.call_and_come()
                 print('Call and come executed successfully')
             elif command_number == 3:
-                emotion = emotions[0]
+                emotion = args[0]
                 self.set_emotion(emotion)
+                self.page_switching('Emotion')
                 print('Emotion set to ' + str(emotion))
             elif command_number == 4:
                 seconds = int(args[0]) if len(args) > 0 else None
@@ -321,13 +330,13 @@ class AudioHandler(Handler):
             elif command_number == 5:
                 task_name = args[0] if args else None
                 self.add_todo(task_name)
-                print('Task added: ' + task_name)
+                print('Task added: ' + str(task_name))
             elif command_number == 6:
                 self.take_a_photo()
                 print('Photo taken successfully')
             elif command_number == 7:
                 seconds_of_video = int(args[0]) if args else None
-                self.start_recording(seconds_of_video)
+                self.start_recording()
                 print(f'Started recording for {seconds_of_video} seconds')
             elif command_number == 8:
                 self.end_recording()
@@ -335,6 +344,7 @@ class AudioHandler(Handler):
 
         elif emotions:
             self.set_emotion(emotions[0])
+            self.page_switching('Emotion')
             print('I am ' + str(emotions[0]))
 
         return leftover_text
