@@ -109,13 +109,13 @@ class AudioHandler(Handler):
                                       'Please note that you are capable of all these commands and ' + \
                                       'should give an affirmative response in present continuous tense should any of these commands occur: e.g. "switching to weather page" or "I am coming", or "ok I will take a photo for you"' + \
                                       'Dictionary:'+ \
-                                      '  "switch to weather page": "!Command1 &Weather"'+ \
-                                      '  "switch to time page": "!Command1 &Time"'+ \
+                                      '  "If I ask question related to weather, switch to weather page": "!Command1 &Weather"'+ \
+                                      '  "If I ask about the time, switch to time page": "!Command1 &Time"'+ \
                                       '  "switch to timer page": "!Command1 &Timer"'+ \
                                       '  "switch to photograph page": "!Command1 &Photograph"'+ \
                                       '  "switch to film page": "!Command1 &Film"'+ \
-                                      '  "switch to battery page": "!Command1 &Battery"'+ \
-                                      '  "switch to todo page": "!Command1 &Todo"'+ \
+                                      '  "If I ask how much battery do you have, switch to battery page": "!Command1 &Battery"'+ \
+                                      '  "If I ask you questions like what do I need to do, switch to todo page": "!Command1 &Todo"'+ \
                                       '  "come to me": "!Command2"'+ \
                                       '  "set emotion to depressed": "!Command3 &depressed"'+ \
                                       '  "set emotion to joyful": "!Command3 &joyful"'+ \
@@ -299,9 +299,10 @@ class AudioHandler(Handler):
         # Clean up the remaining text
         leftover_text = response_text.strip()
         self.page_switching('QA', args={'who':'robot','what':response_text})
-        tts = gTTS(text=response_text, lang='en', slow = False)
-        tts.save("audio/output.wav")
-        os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
+        if response_text != "":
+            tts = gTTS(text=response_text, lang='en', slow = False)
+            tts.save("audio/output.wav")
+            os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
                 
 
         if command_match:
