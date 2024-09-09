@@ -219,6 +219,7 @@ class AudioHandler(Handler):
     def take_a_photo(self):
         # 4
         self.page_switching('Photograph', 'take_photo')
+        
 
 
     def start_recording(self):

@@ -1,9 +1,10 @@
 import os
+from handlers.battery_handler import BatteryHandler
 
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
 VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg']
 
-GALLERY_FOLDER = 'gallery'  # '/home/pi/image_gallery'
+GALLERY_FOLDER = 'src/gallery'  # Path to your gallery folder
 HTML_FILE = os.path.join(GALLERY_FOLDER, 'index.html')
 
 def create_gallery_html():
@@ -15,10 +16,6 @@ def create_gallery_html():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Media Gallery</title>
         <style>
-            html, body {
-                height: 100%;
-                margin: 0;
-            }
             body {
                 display: grid;
                 grid-template-rows: 1fr auto;
@@ -31,10 +28,36 @@ def create_gallery_html():
             header {
                 background-color: #9209ed;
                 color: white;
-                padding: 15px 20px;
+                padding:15px;
                 text-align: center;
                 font-size: 24px;
                 font-weight: bold;
+            }
+            .greeting-row {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                padding: 20px;
+                background-color: #fff;
+            }
+            .greeting-left {
+                display: flex;
+                flex-direction: column;  /* Stacks the greeting texts vertically */
+                align-items: flex-start;
+            }
+            .greeting-text {
+                font-size: 42px;
+                color: #333;
+                font-weight: bold;
+                margin-bottom: 5px;  /* Adds space between the texts */
+            }
+            .greeting-images img {
+                height: 100px;
+                align-items: left;
+            }
+            .greeting-battery img {
+                height: 100px;
+                object-fit: contain;
             }
             .container {
                 display: flex;
@@ -83,13 +106,17 @@ def create_gallery_html():
                 background-color: #f9f9f9;
             }
             footer {
-                text-align: center;
-                padding: 10px 20px;
                 background-color: #333;
                 color: white;
-                margin-top: 30px;
-                font-size: 14px;
+                text-align: center;
+                padding: 10px 0;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 25px; /* Footer height */
             }
+
             footer a {
                 color: #3b303d;
                 text-decoration: none;
@@ -104,18 +131,55 @@ def create_gallery_html():
             My Media Gallery
         </header>
         
+        <!-- Greeting Row with Text and Images -->
+        <div class="greeting-row">     
+            <div class="greeting-left">
+                <div class="greeting-text">Good Morning!</div>
+                <div class="greeting-text">I am Pibuddy~</div>
+            </div>
+            <div class="greeting-images">  
+                <img src="icons/pibuddy.png" alt="Pibuddy">   
+                <img src="icons/battery1.png" alt="Battery">  
+            </div>  
+        </div>
+
         <div class="container">
             <div class="gallery-section">
                 <div class="section-title">Images</div>
                 <div class="gallery" id="images-gallery">
     '''
-
+    
+    if BatteryHandler.battery_charging.reveal():
+        if BatteryHandler.battery_level.reveal()>80:
+            html_content += '<img src="icons/battery1.png" alt="Battery5c">\n'
+        elif BatteryHandler.battery_level.reveal()>60:
+            html_content += '<img src="icons/battery1.png" alt="Battery4c">\n'
+        elif BatteryHandler.battery_level.reveal()>40:
+            html_content += '<img src="icons/battery1.png" alt="Battery3c">\n'
+        elif BatteryHandler.battery_level.reveal()>20:
+            html_content += '<img src="icons/battery1.png" alt="Battery2c">\n'
+        elif BatteryHandler.battery_level.reveal()>0:
+            html_content += '<img src="icons/battery1.png" alt="Battery1c">\n'
+    
+    else:
+        if BatteryHandler.battery_level.reveal()>80:
+            html_content += '<img src="icons/battery1.png" alt="Battery5">\n'
+        elif BatteryHandler.battery_level.reveal()>60:
+            html_content += '<img src="icons/battery1.png" alt="Battery4">\n'
+        elif BatteryHandler.battery_level.reveal()>40:
+            html_content += '<img src="icons/battery1.png" alt="Battery3">\n'
+        elif BatteryHandler.battery_level.reveal()>20:
+            html_content += '<img src="icons/battery1.png" alt="Battery2">\n'
+        elif BatteryHandler.battery_level.reveal()>0:
+            html_content += '<img src="icons/battery1.png" alt="Battery1">\n'
+        
+    
     image_count = 0
     video_count = 0
 
     # Loop through files in the directory and add images
-    for file_name in os.listdir(GALLERY_FOLDER):
-        file_path = os.path.join(GALLERY_FOLDER, file_name)
+    for file_name in os.listdir('src/images'):
+        file_path = os.path.join('src/images', file_name)
         if os.path.isfile(file_path):
             ext = os.path.splitext(file_name)[1].lower()
             if ext in IMAGE_EXTENSIONS:
@@ -136,8 +200,8 @@ def create_gallery_html():
     '''
 
     # Loop through files in the directory and add videos
-    for file_name in os.listdir(GALLERY_FOLDER):
-        file_path = os.path.join(GALLERY_FOLDER, file_name)
+    for file_name in os.listdir('src/videos'):
+        file_path = os.path.join('src/videos', file_name)
         if os.path.isfile(file_path):
             ext = os.path.splitext(file_name)[1].lower()
             if ext in VIDEO_EXTENSIONS:

@@ -32,7 +32,8 @@ class BatteryHandler(Handler):
         # Set as class variables because they may be of use in the future (?) 
         self.battery_level = ValueManager(0)
         self.battery_charging = ValueManager(int(False))
-        
+        BatteryHandler.battery_level
+        BatteryHandler.battery_charging
     
     def listen(self):
         # Continuously listen to battery power level

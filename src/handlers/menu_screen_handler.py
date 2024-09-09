@@ -11,7 +11,7 @@ from pin_defines import *
 
 # PageId indexes
 class PageId:
-    EmotionPage =       0
+     Page =       0
     MenuPage =          1
     SetTimerPage =      2 
     TimerPage =         3
