@@ -8,7 +8,7 @@ from handlers.handler import Handler
 from value_manager import ValueManager
 
 PORT = 8000  # Port number for the HTTP server
-WEB_FOLDER = 'src/gallery/'  # Directory containing the static files
+WEB_FOLDER = '/home/pi/google_hps_dap_controller/src/gallery/'  # Directory containing the static files
 
 class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def translate_path(self, path):
