@@ -49,6 +49,7 @@ class Control:
             'audio': AudioHandler(self.task_queue),
             'robot_movement': RobotMovementHandler(self.task_queue),
             #'teleop': TeleopHandler(self.task_queue),
+            'gallery': GalleryHandler(self.task_queue),
         }
 
         

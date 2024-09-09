@@ -6,6 +6,7 @@ from .emotion_handler import EmotionHandler
 from .audio_handler import AudioHandler
 from .robot_movement_handler import RobotMovementHandler
 from .teleop import TeleopHandler
+from .gallery_handler import GalleryHandler
 
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     'MenuScreenHandler',
     'RobotMovementHandler',
     'TeleopHandler',
+    'GalleryHandler',
 ]
