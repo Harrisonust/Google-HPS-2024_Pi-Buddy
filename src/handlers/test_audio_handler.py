@@ -15,7 +15,7 @@ class TestAudioHandler(Handler):
         
         ### FOR DEBUGGING & TESTING ###
         self.function_in_test = self.page_switching
-        self.args_to_function_in_test = ('QA', {'who':'user', 'what':'Thats when ssh comes in handy. Use an ssh client program on another computer connected to the same network. Start an Xterm console window and use the above commands'})
+        self.args_to_function_in_test = ('QA', {'who':'robot', 'what':'hello world'})
         
         self.task_handler_busy = ValueManager(int(False))
 

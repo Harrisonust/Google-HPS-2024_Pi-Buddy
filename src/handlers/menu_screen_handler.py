@@ -70,8 +70,8 @@ class MenuScreenHandler(Handler):
             'WeatherPage':          WeatherPage(self.screen),
             'TodoPage':             TodoPage(self.screen),
             'BatteryPage':          BatteryPage(self.screen),
-            'PhotographPage':       PhotographPage(self.screen),
-            'FilmPage':             FilmPage(self.screen),
+            # 'PhotographPage':       PhotographPage(self.screen),
+            # 'FilmPage':             FilmPage(self.screen),
             'QAPage':               QAPage(self.screen),
         }
         
