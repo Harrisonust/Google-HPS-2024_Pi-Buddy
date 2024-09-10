@@ -72,8 +72,7 @@ def _reset_images(conn, cursor):
             print(f"Directory '{video_path}' created.")
         else:
             print(f"Directory '{video_path}' already exists.")
-            image_files = [os.path.relpath(os.path.join(video_path, f), start=video_path) 
-                    for f in os.listdir(video_path) if os.path.isfile(os.path.join(video_path, f))]
+            image_files = [video_path + f for f in os.listdir(video_path) if os.path.isfile(video_path +f)]
             
             # Write existing files into SQL table
             for image_file in image_files:
@@ -119,8 +118,7 @@ def _reset_videos(conn, cursor):
             print(f"Directory '{video_path}' created.")
         else:
             print(f"Directory '{video_path}' already exists.")
-            video_files = [os.path.relpath(os.path.join(video_path, f), start=video_path) 
-                    for f in os.listdir(video_path) if os.path.isfile(os.path.join(video_path, f))]
+            video_files = [video_path + f for f in os.listdir(video_path) if os.path.isfile(video_path + f)]
             
             # Write existing files into SQL table
             for video_file in video_files:
