@@ -99,6 +99,8 @@ class AudioHandler(Handler):
                       'You are mostly optimistic, but also easily moody. ' + \
                       'Please always return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
                       'based on user prompt and your own response. ' + \
+                      'If the new user prompt or your response does not show a new emotion, please maintain the previous emotion.' + \
+                      'You have the ability to empathize, e.g. if user is having a bad mood, then you should either be depressed as well, or you can also choose to cheer him up.' +\
                       'Please don\'t include any kind of emojis. ' + \
                       'Please consider the dictionary below. ' + \
                       'If any !command is called, then there is no need to set #emotion. ' + \
@@ -356,8 +358,8 @@ class AudioHandler(Handler):
                 print('Recording ended successfully')
 
         elif emotions:
+            print('Setting emotion to ' + str(emotions[0]))
             self.set_emotion(emotions[0])
             self.page_switching('Emotion')
-            print('I am ' + str(emotions[0]))
 
         return leftover_text

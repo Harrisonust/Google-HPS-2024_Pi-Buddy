@@ -14,7 +14,8 @@ from value_manager import ValueManager
 
 class EmotionHandlerConfig:
     URL = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001'
-    STATION_ID = 'C0D680'
+    # STATION_ID = 'C0D680' # Hsinchu
+    STATION_ID = 'C0AJ80'  # Banqiao
     AUTHORIZATION = 'CWA-223E922B-B77E-4E5D-BFF2-9DE9D5BB7A57'
 
     # MUST MATCH EmotionPageConfig AT EMOTION_PAGE.PY
@@ -81,6 +82,7 @@ class EmotionHandler(Handler):
         observe_time_weather_process = multiprocessing.Process(target=self._observe_time_weather)
         observe_time_weather_process.start()
         
+        self.prioritized_emotion_repeat = 15
         # Updates frequently
         # observe_noise_process = multiprocessing.Process(target=self._observe_noise)
         # observe_noise_process.start()
@@ -201,29 +203,29 @@ class EmotionHandler(Handler):
         # 'prioritized_emotion'
         elif self.prioritized_emotion.reveal() != -1:
             new_emotion = EmotionHandlerConfig.key_2_emotion[self.prioritized_emotion.reveal()]
-            self.prioritized_emotion.overwrite(-1)
+            print('emotion repeat', self.prioritized_emotion_repeat)
+            if self.prioritized_emotion_repeat > 0:
+                self.prioritized_emotion_repeat -= 1
+            else:
+                self.prioritized_emotion.overwrite(-1)
             
         # 'scared'
         # elif self.scared.reveal():
         #     new_emotion = 'scared'
         #     self.scared.overwrite(int(False))
-        
-        else:
-            lottery_box = []
-            if self.depressed.reveal():
-                lottery_box.append('depressed')
-            if self.joyful.reveal():
-                lottery_box.append('joyful')
-            if self.energetic.reveal():
-                lottery_box.append('energetic')
-            if self.sleepy.reveal():
-                lottery_box.append('sleepy')
-            
-            if lottery_box:
-                random.shuffle(lottery_box)
-                new_emotion = lottery_box[0]
-            # 'depressed', 'joyful', 'energetic', 'sleepy' are updated in observe_time_weather
-            # therefore, no overwrite-s here
+         
+        elif self.sleepy.reveal():
+            new_emotion = 'sleepy'
+            self.sleepy.overwrite(int(False))
+        elif self.depressed.reveal():
+            new_emotion = 'depressed'
+            self.depressed.overwrite(int(False))
+        elif self.energetic.reveal():
+            new_emotion = 'energetic'
+            self.energetic.overwrite(int(False))
+        elif self.joyful.reveal():
+            new_emotion = 'joyful'
+            self.joyful.overwrite(int(False))
 
         return EmotionHandlerConfig.emotion_2_key[new_emotion]
     

@@ -60,7 +60,7 @@ class BatteryHandler(Handler):
             })
             
             # Wait for a defined period before checking again
-            time.sleep(60)
+            time.sleep(3)
     
     
     def handle_task(self, task_info):

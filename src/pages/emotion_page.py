@@ -237,7 +237,7 @@ class EmotionPage(Page):
                     y_angle = EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_angle_start']
                 
                 # All frames iterated, reset and change state
-                elif frame_count == 30:
+                elif frame_count == 10:
                 # elif frame_count == len(frame_paths):
                     frame_paths, frame_count = None, None
                     self.displaying_emotion_id.overwrite(0)
