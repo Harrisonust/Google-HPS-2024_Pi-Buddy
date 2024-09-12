@@ -84,7 +84,7 @@ def create_gallery_html():
             font-size: 22px;
             text-align: center;
             margin-bottom: 15px;
-            color: #333;
+            color: #ffffff;
         }
         .gallery {
             display: grid;
@@ -136,7 +136,8 @@ def create_gallery_html():
             <div class="greeting-text">Good Morning! I am Pibuddy~</div>
         </div>
         <div class="greeting-images">
-            <img class="battery" src="icons/battery1.png" alt="Battery" />
+            <a href="raspberrypi.local:8421">
+                <img class="battery" src="icons/battery1.png" alt="Battery" />
     '''
     
     if BatteryHandler.battery_charging.reveal():
@@ -164,6 +165,7 @@ def create_gallery_html():
             html_content += '<img class="battery" src="icons/battery1.png" alt="Battery">\n'
         
     html_content += '''
+            </a>
         </div>
         </div>
 
