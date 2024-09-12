@@ -63,7 +63,7 @@ class AudioHandler(Handler):
                         self.listen_and_respond(source)
                 except sr.UnknownValueError:
                     print('input not recognized')
-                time.sleep(0.5)
+                time.sleep(0.05)
 
 
     # Listen for input and respond with OpenAI API
@@ -154,22 +154,20 @@ class AudioHandler(Handler):
                 self.chat_history.append(f"User: {text}")
                 self.chat_history.append(f"Pi-buddy: {response_text}")
                 
-                time.sleep(0.5)
-
                 if not audio:
                     self.listen_for_wake_word()
 
             except sr.UnknownValueError:
                 print("unknown value error, keep listening...")
-                time.sleep(2)
+                time.sleep(1)
                 continue
             except sr.WaitTimeoutError:
                 print("wait timeout error, keep listening...")
-                time.sleep(2)
+                time.sleep(1)
                 continue
             except sr.RequestError as e:
                 print(f"Could not request results; {e}, keep listening")
-                time.sleep(2)
+                time.sleep(1)
                 continue
 
     def page_switching(self, page, args=None):

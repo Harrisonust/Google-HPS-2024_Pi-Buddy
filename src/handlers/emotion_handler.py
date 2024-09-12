@@ -82,7 +82,7 @@ class EmotionHandler(Handler):
         observe_time_weather_process = multiprocessing.Process(target=self._observe_time_weather)
         observe_time_weather_process.start()
         
-        self.prioritized_emotion_repeat = 15
+        self.prioritized_emotion_repeat = 10
         # Updates frequently
         # observe_noise_process = multiprocessing.Process(target=self._observe_noise)
         # observe_noise_process.start()
