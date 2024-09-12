@@ -223,7 +223,7 @@ class PhotographPage(Page):
 
                 # Show the last-captured picture
                 self.screen.draw_image(0, 0, 160, 128, self.saved_images[saved_display_id][1])
-                    
+                self.screen.draw_text(2, 2, str(saved_display_id), 10, theme_colors.Font)    
                 
             elif state == PhotographPageStates.SHOW_CURRENT:
                 if prev_state == PhotographPageStates.SHOW_SAVED:

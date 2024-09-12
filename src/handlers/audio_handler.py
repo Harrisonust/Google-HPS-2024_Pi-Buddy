@@ -25,7 +25,7 @@ class AudioHandler(Handler):
 
         self.r = sr.Recognizer()  # Set up the speech recognition engine
         self.r.pause_threshold = 0.5
-        self.r.energy_threshold = 300
+        self.r.energy_threshold = 400
         self.greetings = [
             "Hello! What can I do for you today?",
             "yeah?",
@@ -41,7 +41,7 @@ class AudioHandler(Handler):
 
     # Listen for the wake word "hey"
     def listen_for_wake_word(self):
-        with sr.Microphone() as source:
+        with sr.Microphone(sample_rate=44100) as source:
             print("Adjusting for ambient noise, please wait...")
             self.r.adjust_for_ambient_noise(source)  # Adjust for ambient noise
 
@@ -133,13 +133,9 @@ class AudioHandler(Handler):
                       '"Set a timer for x seconds": "!Command4 &(x)&0&0", ' + \
                       '"Set a timer for x minutes": "!Command4 &0&(x)&0", ' + \
                       '"Set a timer for x hours": "!Command4 &0&0&(x)", ' + \
-                      '"Set a timer for x minutes and y seconds": "!Command4 &(y)&(x)&0", ' + \
-                      '"Set a timer for x hours and y minutes": "!Command4 &0&(y)&(x)", ' + \
-                      '"Set a timer for x hours, y minutes, and z seconds": "!Command4 &(z)&(y)&(x)", ' + \
                       '"Add task to todo": "!Command5 &(task_to_be_done)" (please connect each word in the todo phrase with "_"), ' + \
                       '"Take a photo": "!Command6", ' + \
                       '"Start recording video": "!Command7", ' + \
-                      '"Start recording video for x seconds": "!Command7 &(x)", ' + \
                       '"End recording": "!Command8"'
 
                 model = 'gemini-1.5-flash'
