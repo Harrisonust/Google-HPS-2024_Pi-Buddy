@@ -23,8 +23,31 @@ class GalleryHandler(Handler):
         self.task_queue = task_queue
         self.server_thread = None
         self.httpd = None
+        # Define the CRON job details
+        # cron_job = "*/5 * * * * .venv/bin/python3 D:/GitHub/google_hps_dap_controller/src/gallery/cron.py"
+        # cron_file = "/tmp/mycron"
+        # setup_cron_job()
+        # print("CRON job has been set up.")
+
         self.run_server = False
         self.start_server()
+
+
+    # def setup_cron_job(self):
+    #     # Create a backup of the current crontab
+    #     os.system('crontab -l > {}'.format(self.cron_file))
+
+    #     # Add the new cron job
+    #     with open(self.cron_file, 'a') as f:
+    #         f.write(f"\n{self.cron_job}\n")
+
+    #     # Install the new cron job
+    #     os.system('crontab {}'.format(self.cron_file))
+
+    #     # Remove the temporary cron file
+    #     os.system('rm {}'.format(self.cron_file))
+
+
 
     def get_public_ip(self):
         try:

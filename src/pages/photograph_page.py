@@ -214,7 +214,7 @@ class PhotographPage(Page):
                     # Update parametres
                     self.saved_images.append((img_name, PhotographPageConfig.SAVE_PATH + img_name))
                     self.max_id.overwrite(max_id + 1)
-
+                    os.system('python3 /home/pi/google_hps_dap_controller/src/gallery/gallery.py') 
                 # Show the last-captured picture
                 self.screen.draw_image(0, 0, 160, 128, self.saved_images[saved_display_id][1])
                     

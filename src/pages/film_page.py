@@ -2,6 +2,7 @@ import multiprocessing
 import threading
 import time
 import sqlite3
+import os
 
 from picamera2 import Picamera2, Preview
 from picamera2.encoders import H264Encoder
@@ -177,6 +178,7 @@ class FilmPage(Page):
                 # End recording video
                 self.prev_state.overwrite(state)
                 self.state.overwrite(FilmPageStates.END_RECORD)
+                os.system('python3 /home/pi/google_hps_dap_controller/src/gallery/gallery.py') 
             
             elif task_info['task'] == 'SWITCH_PAGE' and (state == FilmPageStates.SHOW_CURRENT or state == FilmPageStates.SHOW_SAVED):
                 self.state.overwrite(FilmPageStates.LEAVE)
