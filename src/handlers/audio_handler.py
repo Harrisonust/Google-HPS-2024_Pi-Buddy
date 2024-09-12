@@ -32,6 +32,7 @@ class AudioHandler(Handler):
             "Hello there",
             "Hi, how can I assist you?"
         ]
+        self.chat_history = []  # Initialize chat history
         self.audio_gain = 1500
 
         task = threading.Thread(target=self.listen_for_wake_word)
@@ -90,20 +91,19 @@ class AudioHandler(Handler):
                 else:
                     self.page_switching('QA',args={'who':'user','what':text})
 
+
                 # Send input to Gemini API
                 api_key = "AIzaSyC5olADq7MxujG6hbSBGBIDQXVKwWge97I"
-                prompt = text
+                prompt = "\n".join(self.chat_history) + f"\nUser: {text}\nPi-buddy:"
                 system_instructions = 'You are Pi-buddy, a friendly AI desktop pet. ' + \
                       'You are mostly optimistic, but also easily moody. ' + \
                       'Please always return your mood at the start of your response (#depressed, #joyful, #hungry, #energetic, #sleepy, #scared) ' + \
                       'based on user prompt and your own response. ' + \
-                      'Please don\'t include emojis. ' + \
+                      'Please don\'t include any kind of emojis. ' + \
                       'Please consider the dictionary below. ' + \
                       'If any !command is called, then there is no need to set #emotion. ' + \
                       'Always try to match the user\'s input to the closest command in the dictionary, ' + \
                       'even if the phrasing doesn\'t match exactly. ' + \
-                      'but if there is no such a command in the dictionary, you must not create one yourself' + \
-                      'e.g. If I ask you if you can call my friend, please do not switch to phone page' + \
                       'If you catch any of the commands in the dictionary or anything insinuating these commands, ' + \
                       'please include the corresponding text in the dictionary below at the start of your response. ' + \
                       'For example, if I ask "how is the weather today," you should switch to the weather page. ' + \
@@ -148,16 +148,14 @@ class AudioHandler(Handler):
                 model = genai.GenerativeModel(model, system_instruction=system_instructions)
                 config = genai.GenerationConfig(temperature=temperature, stop_sequences=[stop_sequence])
                 response = model.generate_content(contents=[prompt], generation_config=config)
+                print("prompt", prompt)
                 print("response.text", response.text)
                 response_text = self.process_response(response.text)
-                
-                print("Speaking...")
-                print(response_text)
 
-                #os.system(f"espeak -v en+f3 '{response_text}'")  # Use espeak to say the response
-                # tts = gTTS(text=response_text, lang='en', slow = False)
-                # tts.save("audio/output.wav")
-                # os.system(f"mpg321 -g {self.audio_gain} audio/output.wav")
+                # Append the user input and AI response to chat history
+                self.chat_history.append(f"User: {text}")
+                self.chat_history.append(f"Pi-buddy: {response_text}")
+                
                 time.sleep(0.5)
 
                 if not audio:
