@@ -2,6 +2,7 @@
 import threading, queue
 import RPi.GPIO as GPIO
 import time
+import os
 
 from handlers import *
 from database.reset_database import reset_db
@@ -85,6 +86,7 @@ class Control:
             if self.task_queue.get_len() != 0:
                 # Pop task from task_queue
                 task_info = self.task_queue.pop()
+                print(task_info)
                 # Start a new process to handle the output for the task
                 process = threading.Thread(target=self.handlers[task_info['handler_name']].handle_task, args=(task_info,))
                 process.name = f'{task_info["handler_name"]} execute'
@@ -96,4 +98,5 @@ class Control:
 if __name__ == '__main__':
     
     GPIO.setmode(GPIO.BCM)
+    os.environ['GRPC_ENABLE_FORK_SUPPORT'] = '0'
     Control(reset_database=True)

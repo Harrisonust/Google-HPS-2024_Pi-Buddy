@@ -115,15 +115,21 @@ class PhotographPage(Page):
             saved_len = self.saved_len.reveal()
             
             if task_info['task'] == 'MOVE_CURSOR_LEFT_DOWN':
-                if state == PhotographPageStates.SHOW_SAVED:
+                if state == PhotographPageStates.SHOW_SAVED or state == PhotographPageStates.SHOW_CURRENT:
                     # Go to next image
+                    self.state.overwrite(PhotographPageStates.SHOW_SAVED)
+                    self.saved_display_id.overwrite(saved_len)
+
                     saved_display_id += 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)
             
             elif task_info['task'] == 'MOVE_CURSOR_RIGHT_UP':
-                if state == PhotographPageStates.SHOW_SAVED:
+                if state == PhotographPageStates.SHOW_SAVED or state == PhotographPageStates.SHOW_CURRENT:
                     # Go to previous image
+                    self.state.overwrite(PhotographPageStates.SHOW_SAVED)
+                    self.saved_display_id.overwrite(saved_len)
+
                     saved_display_id -= 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)
@@ -217,7 +223,7 @@ class PhotographPage(Page):
 
                 # Show the last-captured picture
                 self.screen.draw_image(0, 0, 160, 128, self.saved_images[saved_display_id][1])
-                    
+                self.screen.draw_text(2, 2, str(saved_display_id), 10, theme_colors.Font)    
                 
             elif state == PhotographPageStates.SHOW_CURRENT:
                 if prev_state == PhotographPageStates.SHOW_SAVED:
