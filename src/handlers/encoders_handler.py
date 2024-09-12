@@ -25,6 +25,9 @@ class EncodersHandler(Handler):
         self.glide_encoder_prev_pos = self.glide_encoder.get_position()
         self.select_encoder_prev_pos = self.select_encoder.get_position()
         
+        # RESET_TIMER task handling
+        self.busy = ValueManager(int(False))
+        
         # Timer initialization
         self.task_updated = ValueManager(int(False))
         
@@ -118,6 +121,11 @@ class EncodersHandler(Handler):
             
             time.sleep(EncoderConfig.READ_PERIOD)        
     
-    def handle_task(self):
-        # handle_task should not be called on for EncodersHandler
-        raise TypeError(f'Invalid call to EncodersHandler "handle_task" function')
+    def handle_task(self, task_info):
+        if self.busy.reveal():
+            pass
+        else:
+            self.busy.overwrite(int(True))
+            if task_info['task'] == 'SWITCH_PAGE':
+                self.task_updated.overwrite(int(True))
+            self.busy.overwrite(int(False))

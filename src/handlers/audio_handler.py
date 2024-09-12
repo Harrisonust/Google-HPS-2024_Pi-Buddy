@@ -193,6 +193,12 @@ class AudioHandler(Handler):
             'page_key': page + 'Page',
             'args': args
         })
+        
+        self.task_queue.append({
+            'requester_name': 'audio_control',
+            'handler_name': 'encoders',
+            'task': 'RESET_TIMER'
+        })
 
 
     def call_and_come(self):
