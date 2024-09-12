@@ -98,6 +98,7 @@ class QAPage(Page):
     def handle_task(self, task_info):
         if not self.busy.reveal():
             self.busy.overwrite(int(True))
+            print(task_info)
             '''
             if task_info['task'] == 'PAGE_EXPIRED':
                 self.leave.overwrite(int(True))
@@ -111,6 +112,7 @@ class QAPage(Page):
             '''
             if task_info['task'] == 'SWITCH_PAGE':
                 self.leave.overwrite(int(True))
+                print("helloworld")
                 while True:
                     if self.display_completed.reveal():
                         return {

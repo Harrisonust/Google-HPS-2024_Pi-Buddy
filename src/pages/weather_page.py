@@ -14,8 +14,7 @@ from pages.page import Page
 
 class WeatherPageConfig:
     URL = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001'
-    # STATION_ID = 'C0D680' # Hsinchu
-    STATION_ID = 'C0AJ80'  # Banqiao
+    STATION_ID = 'C0D680'
     AUTHORIZATION = 'CWA-223E922B-B77E-4E5D-BFF2-9DE9D5BB7A57'
     
     TEXT_X = 10

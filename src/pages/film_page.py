@@ -125,19 +125,13 @@ class FilmPage(Page):
             
             # Write states by current states
             if task_info['task'] == 'MOVE_CURSOR_LEFT_DOWN':
-                if state == FilmPageStates.SHOW_SAVED or state == FilmPageStates.SHOW_CURRENT:
-                    self.prev_state.overwrite(state)
-                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
-
+                if state == FilmPageStates.SHOW_SAVED:
                     saved_display_id += 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)
             
             elif task_info['task'] == 'MOVE_CURSOR_RIGHT_UP':
-                if state == FilmPageStates.SHOW_SAVED or state == FilmPageStates.SHOW_CURRENT:
-                    self.prev_state.overwrite(state)
-                    self.state.overwrite(FilmPageStates.SHOW_SAVED)
-
+                if state == FilmPageStates.SHOW_SAVED:
                     saved_display_id -= 1
                     saved_display_id %= saved_len
                     self.saved_display_id.overwrite(saved_display_id)

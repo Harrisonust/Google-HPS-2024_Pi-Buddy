@@ -44,7 +44,7 @@ class EmotionPageConfig:
             'y_angle_displacement': math.radians(5),
             'x_radius': 12,
             'y_radius': 3,
-            'img1_freq': 0.1
+            'img1_freq': 0.02
             },
         
         # depressed
@@ -55,7 +55,7 @@ class EmotionPageConfig:
             'y_angle_displacement': math.radians(5),
             'x_radius': 12,
             'y_radius': 1.5,
-            'img1_freq': 0.1
+            'img1_freq': 0.02
             },
         
         # hungry
@@ -110,8 +110,7 @@ class EmotionPage(Page):
         
         self.busy = ValueManager(int(False))
         self.end_display = ValueManager(int(False))
-        self.initial_emotion_id = 1
-        self.displaying_emotion_id = ValueManager(self.initial_emotion_id)   # Shows 'joyful' as default
+        self.displaying_emotion_id = ValueManager(1)   # Shows 'joyful' as default
         self.display_completed = ValueManager(int(False))
         
         # Time component
@@ -132,10 +131,10 @@ class EmotionPage(Page):
             text=None,
             text_size=10,
             color=EmotionPageConfig.TIME_BATTERY_INFO_COLOR,
-            x_marking=120,
+            x_marking=125,
             y_marking=2
         )
-    
+
 
     def reset_states(self, args):
         self.busy.overwrite(int(False))
@@ -238,7 +237,7 @@ class EmotionPage(Page):
                     y_angle = EmotionPageConfig.id_2_motion[displaying_emotion_id]['y_angle_start']
                 
                 # All frames iterated, reset and change state
-                elif frame_count == 10:
+                elif frame_count == 30:
                 # elif frame_count == len(frame_paths):
                     frame_paths, frame_count = None, None
                     self.displaying_emotion_id.overwrite(0)
