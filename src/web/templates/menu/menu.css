@@ -1,0 +1,131 @@
+.group-28,
+.group-28 * {
+  box-sizing: border-box;
+}
+.group-28 {
+  height: 928px;
+  position: relative;
+}
+.menu {
+  background: #2b2b2b;
+  border-radius: 80px;
+  width: 1282px;
+  height: 928px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  overflow: hidden;
+}
+.group-27 {
+  position: absolute;
+  inset: 0;
+}
+.x-circle {
+  width: 6.24%;
+  height: 8.62%;
+  position: absolute;
+  right: 3.04%;
+  left: 90.72%;
+  bottom: 86.1%;
+  top: 5.28%;
+  overflow: visible;
+}
+.menu2 {
+  color: var(--white, #ffffff);
+  text-align: left;
+  font-family: var(--h3-work-sans-font-family, "WorkSans-SemiBold", sans-serif);
+  font-size: var(--h3-work-sans-font-size, 38px);
+  line-height: var(--h3-work-sans-line-height, 120%);
+  font-weight: var(--h3-work-sans-font-weight, 600);
+  position: absolute;
+  left: 111px;
+  top: 83px;
+  width: 1050px;
+  height: 46px;
+}
+.image-9 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 85px;
+  top: 186px;
+  object-fit: cover;
+}
+.image-10 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 371px;
+  top: 186px;
+  object-fit: cover;
+}
+.image-11 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 668px;
+  top: 186px;
+  object-fit: cover;
+}
+.image-12 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 965px;
+  top: 186px;
+  object-fit: cover;
+}
+.image-13 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 85px;
+  top: 559px;
+  object-fit: cover;
+}
+.image-14 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 371px;
+  top: 559px;
+  object-fit: cover;
+}
+.image-15 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 657px;
+  top: 559px;
+  object-fit: cover;
+}
+.image-16 {
+  width: 240px;
+  height: 318px;
+  position: absolute;
+  left: 965px;
+  top: 559px;
+  object-fit: cover;
+}
+.image-button {
+  border: none; /* Remove default border */
+  padding: 0; /* Remove default padding */
+  background: none; /* Remove default background */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.image-button img {
+  display: block; /* Remove extra space below the image */
+  width: auto; /* Adjust as needed */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.image-button:hover img {
+  transform: scale(1.05); /* Slightly enlarge image on hover */
+  transition: transform 0.3s; /* Smooth transition */
+}
+
+.image-button:focus {
+  outline: none; /* Remove default focus outline */
+}
+

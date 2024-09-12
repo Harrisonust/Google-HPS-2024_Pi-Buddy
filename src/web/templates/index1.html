@@ -1,0 +1,97 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/vars.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+        <style>
+        a,
+        button,
+        input,
+        select,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: none;
+            text-decoration: none;
+            background: none;
+
+            -webkit-font-smoothing: antialiased;
+        }
+
+        menu,
+        ol,
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        </style>
+        <script>
+            function toggleOverlay() {
+                const overlay = document.getElementById('overlay');
+                overlay.classList.toggle('show');
+            }
+        </script>
+    </head>
+    <body>
+        <div class="home">
+        <img class="aura" src="aura.png" />
+        <div class="welcome-i-am-pibuddy">
+            Welcome
+            <br />
+            I am Pi-Buddy~
+        </div>
+        <img class="pibuddy" src="pibuddy.png" />
+        <a href="raspberrypi.local:8421">
+            <img class="battery" src="battery-5-10.png" alt="Battery Button" />
+        </a>
+        <div class="group-2">
+            <div class="rectangle-2"></div>
+            <div class="gallery">Gallery</div>
+            <div class="gallery-container">
+            <div class="gallery-section images">
+                <h2>Images</h2>
+    <img src="{{ url_for('static', filename='aura.png')}}" alt="aura.png">
+<img src="{{ url_for('static', filename='battery-5-10.png')}}" alt="battery-5-10.png">
+<img src="{{ url_for('static', filename='pibuddy.png')}}" alt="pibuddy.png">
+
+            </div>
+            <div class="gallery-section videos">
+                <h2>Videos</h2>
+    <video controls><source src="test_vid.mp4" type="video/mp4">Your browser does not support the video tag.</video>
+
+    </div>
+            </div>
+        </div>
+        <div class="line-1"></div>
+        <div class="line-2"></div>
+
+        <button class="remote-button" onclick="openOverlay()">
+            <div class="rectangle-4">
+            <div class="menu">Menu</div>
+            </div>
+        </button>
+
+        <button class="remote-button" onclick="openOverlay()">
+            <div class="rectangle-42">
+            <div class="remote-control">
+                Remote
+                <br />
+                Control
+            </div>
+            </div>
+        </button>
+        <footer class="footer">� Your Pibuddy gallery. @ Google HPS team4.</footer>
+    </body>
+    </html>
+    

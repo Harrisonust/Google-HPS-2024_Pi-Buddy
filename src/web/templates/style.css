@@ -1,0 +1,405 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent scrolling on body */
+}
+
+body {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #b9b5ba;
+  color: #333;
+}
+
+/* .home {
+  background: #4a464d;
+  height: 1024px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  padding: 20px;
+  max-width: 1500px;
+} */
+.home {
+  background: url('aura.png') no-repeat center center fixed;
+  background-size: cover; /* Cover the whole background */
+  height: 100vh; /* Full viewport height */
+  overflow: auto; /* Allow scrolling */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 20px;
+  max-width: 100%;
+}
+/* .aura {
+  width: 1440px;
+  height: 1024px;
+  position: absolute;
+  left: calc(50% - 720px);
+  top: 0px;
+  object-fit: cover;
+} */
+.aura {
+  display: none; /* Hide the aura image as it's used as a background */
+}
+.welcome-i-am-pibuddy {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-ExtraLightItalic", sans-serif;
+  font-size: 80px;
+  font-weight: 200;
+  font-style: italic;
+  position: absolute;
+  left: 601px;
+  top: 141px;
+  width: 728px;
+  height: 52px;
+}
+.pibuddy {
+  width: 714px;
+  height: 653px;
+  position: absolute;
+  left: 635px;
+  top: 36px;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(-1, 1);
+  object-fit: cover;
+}
+.battery {
+  width: 193px;
+  height: 96px;
+  position: absolute;
+  left: 1131px;
+  top: 93px;
+  object-fit: cover;
+}
+.battery:hover, .battery:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.group-3 {
+  position: absolute;
+  inset: 0;
+}
+.group-2 {
+  width: 951px;
+  height: 459px;
+  position: static;
+}
+.rectangle-2 {
+  display: inline-block; /* Allows the div to resize according to its content */
+  background: #0a0224;
+  border-radius: 60px;
+  width: auto; /* Let width auto-adjust based on content */
+  height: auto; /* Let height auto-adjust based on content */
+  /* width: 951px;
+  height: 459px; */
+  position: absolute;
+  left: 244px;
+  top: 565px;
+  opacity: 1; 
+  padding: 20px; 
+  box-sizing: border-box
+
+  /* width: 100%;
+  position: relative;  */
+}
+.gallery {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  position: absolute;
+  left: 635px;
+  top: 574.97px;
+  width: 170px;
+  height: 22.73px;
+}
+.images {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  position: absolute;
+  left: 419px;
+  top: 627.28px;
+  width: 189px;
+  height: 22.73px;
+    opacity: 1; 
+}
+.videos {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  position: absolute;
+  left: 828px;
+  top: 627.28px;
+  width: 192px;
+  height: 22.73px;
+}
+.line-1 {
+  margin-top: -3px;
+  border-style: solid;
+  border-color: #ffffff;
+  border-width: 3px 0 0 0;
+  width: 820px;
+  height: 0px;
+  position: absolute;
+  left: 311px;
+  top: 627.28px;
+  transform-origin: 0 0;
+  transform: rotate(-0.035deg) scale(1, 1);
+}
+.line-2 {
+  margin-top: -1px;
+  border-style: solid;
+  border-color: #ffffff;
+  border-width: 1px 0 0 0;
+  width: 166.3px;
+  height: 0px;
+  position: absolute;
+  left: 720px;
+  top: 626.88px;
+  transform-origin: 0 0;
+  transform: rotate(89.655deg) scale(1, 1);
+}
+.group-1 {
+  position: absolute;
+  inset: 0;
+}
+.rectangle-1 {
+  background: rgba(60, 50, 66, 0.7);
+  width: 1440px;
+  height: 75px;
+  position: absolute;
+  left: calc(50% - 720px);
+  bottom: 0px;
+}
+.your-pibuddy-interface-google-hps-team-4 {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  position: absolute;
+  left: calc(50% - 301px);
+  bottom: 13px;
+  width: 601px;
+  height: 38px;
+}
+.group-5 {
+  position: absolute;
+  inset: 0;
+}
+.remote-button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+.remote-button :hover, remote-button :hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.remote-button .rectangle-4 {
+  background: #570a91;
+  border-radius: 43px;
+  width: 310px;
+  height: 157px;
+  position: absolute;
+  left: 672px;
+  top: 372px;
+  display: flex;
+  justify-content: center;
+  align-items:  center; /* Horizontal centering */
+  
+  /* align-items: center;
+  /* Flexbox properties for centering content */
+  /* display: flex;
+  justify-content: center; /* Horizontal centering */
+  /* align-items: center; Vertical centering */
+}
+.menu {
+  color: #ffffff;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 35px;
+  font-weight: 400;
+  /* No need for absolute positioning */
+  /* color: #ffffff;
+  text-align: center;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 35px;
+  font-weight: 400;
+  position: absolute;
+  left: calc(50% - -5px);
+  top: 434px;
+  width: 151px;
+  height: 34px; */
+}
+.group-6 {
+  position: absolute;
+  inset: 0;
+}
+.remote-button .rectangle-42 {
+  background: #730606;
+  border-radius: 43px;
+  width: 310px;
+  height: 159px;
+  position: absolute;
+  left: 1015px;
+  top: 372px;
+  display: flex;
+  justify-content: center;
+  align-items:  center; /* Horizontal centering */
+}
+.remote-control {
+  color: #ffffff;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 35px;
+  font-weight: 400;
+
+  /* color: #ffffff;
+  text-align: center;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 35px;
+  font-weight: 400;
+  position: absolute;
+  left: calc(50% - -373.78px);
+  top: 406.33px;
+  width: 150.56px;
+  height: 90.34px; */
+}
+/* Style for the overlay */
+.overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: none; /* Hidden by default */
+}
+.show {
+  display: block;
+}
+
+/* Close button (X) */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 30px;
+    color: black;
+    cursor: pointer;
+}
+/* .container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.gallery-section {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+.section-title {
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-gap: 15px;
+  padding: 0;
+}
+.gallery img, .gallery video {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+} */
+.gallery-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.gallery-container1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+  height: 100%;
+  padding: 20px; /* Adjust padding as needed */
+  border-radius: 10px; /* Matches the border radius you may use */
+  background-color: #f9f9f9; /* Background color to match */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border: 2px solid #ccc; /* Border to match the design */
+  overflow: auto;
+}
+
+.gallery-section {
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping of images/videos */
+  justify-content: center; /* Center items horizontally */
+}
+
+.images img,
+.videos video {
+  width: 200px;
+  height: auto;
+  margin: 10px;
+}
+
+.gallery h2 {
+  margin-bottom: 10px;
+}
+.images img:hover, .videos video:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.placeholder {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  width: 100%
+}
+.footer {
+  background-color: rgba(128, 128, 128, 0.8); /* Grey with slight transparency */
+  color: white; /* White text */
+  text-align: center; /* Center the text */
+  padding: 10px; /* Add some padding */
+  position: fixed; /* Stick the footer at the bottom */
+  bottom: 0;
+  width: 100%; /* Make the footer take the full width */
+  font-family: Arial, sans-serif; /* Optional: set a font family */
+  font-size: 14px; /* Optional: set font size */
+}

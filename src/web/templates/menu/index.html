@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='menu/vars.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='menu/style.css') }}"
+    />
+    <style>
+      a,
+      button,
+      input,
+      select,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: none;
+        text-decoration: none;
+        background: none;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      menu,
+      ol,
+      ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="group-28">
+      <div class="menu">
+        <div class="menu-container">
+          <div class="menu2">Menu</div>
+          <button class="image-button">
+            <img
+              class="x-circle"
+              src="{{ url_for('static', filename='menu/x-circle0.svg') }}"
+              onclick="hideOverlay()"
+            />
+          </button>
+        </div>
+        <div class="image-grid">
+          <button class="image-button">
+            <img
+              class="emotion"
+              src="{{ url_for('static', filename='menu/image-90.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="timer"
+              src="{{ url_for('static', filename='menu/image-100.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="clock"
+              src="{{ url_for('static', filename='menu/image-110.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="weather"
+              src="{{ url_for('static', filename='menu/image-120.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="todo"
+              src="{{ url_for('static', filename='menu/image-130.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="battery1"
+              src="{{ url_for('static', filename='menu/image-140.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="photograph"
+              src="{{ url_for('static', filename='menu/image-150.png') }}"
+            />
+          </button>
+          <button class="image-button">
+            <img
+              class="film"
+              src="{{ url_for('static', filename='menu/image-160.png') }}"
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+.group-28,
+.group-28 * {
+  box-sizing: border-box;
+}
+
+.group-28 {
+  /* height: 80vh;  */
+  height: 614px;
+  width: 1000px;
+  position: relative;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.menu {
+  background: #2b2b2b;
+  border-radius: 80px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  padding: 20px;
+}
+
+.menu2 {
+  color: #ffffff;
+  text-align: left;
+  font-family: "WorkSans-SemiBold", sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  margin-left: 50px;
+}
+
+.x-circle {
+  width: 4px; /* Set fixed size for the buttons */
+  height: 4px;
+  overflow: visible;
+}
+.menu-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px;
+  background: #2b2b2b;
+  border-radius: 8px;
+  height:10;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 3 columns */
+  grid-gap: 20px; /* Space between items */
+  justify-items: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  padding: 20px;
+}
+
+.image-button {
+  width: auto; /* Set fixed size for the buttons */
+  height: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.image-button img {
+  display: block;
+  width: 80%; /* Set fixed size for the buttons */
+  height: auto;
+  object-fit: cover; /* Ensure images are fully contained within their containers */
+  border-radius: 10px;
+}
+
+.image-button:hover img {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+}
+
+.image-button:focus {
+  outline: none;
+}
