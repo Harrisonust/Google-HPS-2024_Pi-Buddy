@@ -6,7 +6,7 @@ VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg']
 
 GALLERY_FOLDER = 'src/gallery'  # Path to your gallery folder
 HTML_FILE = os.path.join(GALLERY_FOLDER, 'index.html')
-
+battery_handler = BatteryHandler()
 def create_gallery_html():
     html_content = '''
     <!DOCTYPE html>
@@ -140,28 +140,28 @@ def create_gallery_html():
                 <img class="battery" src="icons/battery1.png" alt="Battery" />
     '''
     
-    if BatteryHandler.battery_charging.reveal():
-        if BatteryHandler.battery_level.reveal()>80:
+    if battery_handler.battery_charging.reveal():
+        if battery_handler.battery_level.reveal()>80:
             html_content += '<img class="battery" src="icons/battery5c.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>60:
+        elif battery_handler.battery_level.reveal()>60:
             html_content += '<img class="battery" src="icons/battery4c.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>40:
+        elif battery_handler.battery_level.reveal()>40:
             html_content += '<img class="battery" src="icons/battery3c.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>20:
+        elif battery_handler.battery_level.reveal()>20:
             html_content += '<img class="battery" src="icons/battery2c.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>0:
+        elif battery_handler.battery_level.reveal()>0:
             html_content += '<img class="battery" src="icons/battery1c.png" alt="Battery">\n'
     
     else:
-        if BatteryHandler.battery_level.reveal()>80:
+        if battery_handler.battery_level.reveal()>80:
             html_content += '<img class="battery" src="icons/battery5.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>60:
+        elif battery_handler.battery_level.reveal()>60:
             html_content += '<img class="battery" src="icons/battery4.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>40:
+        elif battery_handler.battery_level.reveal()>40:
             html_content += '<img class="battery" src="icons/battery3.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>20:
+        elif battery_handler.battery_level.reveal()>20:
             html_content += '<img class="battery" src="icons/battery2.png" alt="Battery">\n'
-        elif BatteryHandler.battery_level.reveal()>0:
+        elif battery_handler.battery_level.reveal()>0:
             html_content += '<img class="battery" src="icons/battery1.png" alt="Battery">\n'
         
     html_content += '''
