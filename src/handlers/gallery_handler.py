@@ -20,7 +20,7 @@ class GalleryHandler(Handler):
         self.server_thread.start()
 
     def start_server(self):
-        os.system("python app.py")
+        os.system("python web/app.py")
         # Start the server in a new thread
         self.server_thread = threading.Thread()
         self.server_thread.start()
