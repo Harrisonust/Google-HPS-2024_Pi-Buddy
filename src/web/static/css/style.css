@@ -40,16 +40,15 @@ body {
   max-width: 100%;
 }
 .aura {
-  width: 1440px;
-  height: 1024px;
-  position: absolute;
-  left: calc(50% - 720px);
+  width: 100%;
+  height: 100%;
+  position: fixed;
   top: 0px;
   object-fit: cover;
 }
-.aura {
-  display: none; /* Hide the aura image as it's used as a background */
-}
+/* .aura {
+  display: none; 
+} */
 .welcome-i-am-pibuddy {
   color: #ffffff;
   text-align: left;
@@ -346,19 +345,23 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  background: #0a0224;
+  opacity: 1;
+  top
 }
-.gallery-container1 {
+.container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100px;
-  height: 100%;
-  padding: 20px; /* Adjust padding as needed */
-  border-radius: 10px; /* Matches the border radius you may use */
-  background-color: #f9f9f9; /* Background color to match */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  border: 2px solid #ccc; /* Border to match the design */
+  justify-content: space-around;
+  flex-wrap: wrap;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 10px;
+  background-color: #020533;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #ccc;
   overflow: auto;
+  flex-grow: 1;
 }
 
 .gallery-section {
@@ -392,6 +395,47 @@ body {
   background-color: #f9f9f9;
   width: 100%
 }
+        .media-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .media-container img,
+        .media-container video {
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .media-container img.expanded,
+        .media-container video.expanded {
+            width: 80%;
+            height: auto;
+            z-index: 10;
+            position: relative;
+            transform: scale(1.5);
+        }
+
+        .pop {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+      }
+
+      .pop img,
+      .pop video {
+          max-width: 90%;
+          max-height: 90%;
+      }
 .footer {
   background-color: rgba(128, 128, 128, 0.8); /* Grey with slight transparency */
   color: white; /* White text */

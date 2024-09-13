@@ -4,7 +4,7 @@ IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
 VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg']
 
 GALLERY_FOLDER = 'd:/HPS/web/web/templates/'  # '/home/pi/image_gallery'
-HTML_FILE = os.path.join(GALLERY_FOLDER, 'index.html')
+HTML_FILE = os.path.join(GALLERY_FOLDER, 'index2.html')
 
 def create_gallery_html():
     html_content = '''

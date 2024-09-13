@@ -40,6 +40,111 @@
         padding: 0;
       }
     </style>
+    <script>
+      // Example: Call page_switching
+      function switchPage(page, args = null) {
+        fetch("/page_switching", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ page: page, args: args }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message); // Handle the response
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: Set Emotion
+      function setEmotion(emotion) {
+        fetch("/set_emotion", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ emotion: emotion }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message); // Handle the response
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: Take a Photo
+      function takePhoto() {
+        fetch("/take_a_photo", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: Start Recording
+      function startRecording() {
+        fetch("/start_recording", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: End Recording
+      function endRecording() {
+        fetch("/end_recording", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: Set Timer
+      function setCountDownTimer(hours, minutes, seconds) {
+        fetch("/set_count_down_timer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            hours: hours,
+            minutes: minutes,
+            seconds: seconds,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message); // Handle the response
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Example: Add Todo Task
+      function addTodoTask(task_name) {
+        fetch("/add_todo", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ task_name: task_name }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data.message);
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
     <title>Document</title>
   </head>
   <body>
@@ -60,48 +165,56 @@
             <img
               class="emotion"
               src="{{ url_for('static', filename='menu/image-90.png') }}"
+              onclick="setEmotion('Happy')"
             />
           </button>
           <button class="image-button">
             <img
               class="timer"
               src="{{ url_for('static', filename='menu/image-100.png') }}"
+              onclick="switchPage('Timer')"
             />
           </button>
           <button class="image-button">
             <img
               class="clock"
               src="{{ url_for('static', filename='menu/image-110.png') }}"
+              onclick="switchPage('Time')
             />
           </button>
           <button class="image-button">
             <img
               class="weather"
               src="{{ url_for('static', filename='menu/image-120.png') }}"
+              onclick="switchPage('Weather')
             />
           </button>
           <button class="image-button">
             <img
               class="todo"
               src="{{ url_for('static', filename='menu/image-130.png') }}"
+              onclick="switchPage('Todo')
             />
           </button>
           <button class="image-button">
             <img
               class="battery1"
               src="{{ url_for('static', filename='menu/image-140.png') }}"
+              onclick="switchPage('Battery')
             />
           </button>
           <button class="image-button">
             <img
               class="photograph"
               src="{{ url_for('static', filename='menu/image-150.png') }}"
+              onclick="switchPage('photograph')
             />
           </button>
           <button class="image-button">
             <img
               class="film"
               src="{{ url_for('static', filename='menu/image-160.png') }}"
+              onclick="switchPage('Film',args=None)
             />
           </button>
         </div>

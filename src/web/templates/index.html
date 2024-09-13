@@ -37,6 +37,27 @@
     }
     </style>
     <script>
+        function expandMedia(mediaElement) {
+            const pop = document.getElementById('pop');
+            const popImage = document.getElementById('pop-media');
+            const popVideo = document.getElementById('pop-video');
+
+            if (mediaElement.tagName === 'IMG') {
+                popImage.src = mediaElement.src;
+                popImage.style.display = 'block';
+                popVideo.style.display = 'none';
+            } else if (mediaElement.tagName === 'VIDEO') {
+                popVideo.src = mediaElement.src;
+                popVideo.style.display = 'block';
+                popImage.style.display = 'none';
+            }
+
+            pop.style.display = 'flex';
+        }
+        function closeOverlay() {
+            const pop = document.getElementById('pop');
+            pop.style.display = 'none';
+        }
       function showMenu() {
           const overlay = document.getElementById('overlay');
           const xhr = new XMLHttpRequest();
@@ -95,21 +116,26 @@
         <img class="battery" src="{{ url_for('static', filename='icons/battery-5-10.png') }}" alt="Battery Button" />
     </a>
     <div class="group-2">
-        <div class="rectangle-2"></div>
         <div class="gallery">Gallery</div>
         <div class="gallery-container">
         <div class="gallery-section images">
             <h2>Images</h2>
-<img src="{{ url_for('static', filename='gallery/aura.png')}}" alt="aura.png">
-<img src="{{ url_for('static', filename='gallery/battery-5-10.png')}}" alt="battery-5-10.png">
-<img src="{{ url_for('static', filename='gallery/pibuddy.png')}}" alt="pibuddy.png">
-
+            <div class="media-container">
+<img src="{{ url_for('static', filename='gallery/aura.png')}}" alt="aura.png" onclick="expandMedia(this)">
+<img src="{{ url_for('static', filename='gallery/battery-5-10.png')}}" alt="battery-5-10.png" onclick="expandMedia(this)">
+<img src="{{ url_for('static', filename='gallery/pibuddy.png')}}" alt="pibuddy.png" onclick="expandMedia(this)">
+            </div>
         </div>
         <div class="gallery-section videos">
             <h2>Videos</h2>
-<video controls><source src="{{ url_for('static', filename='gallery/test_vid.mp4')}}" type="video/mp4">Your browser does not support the video tag.</video>
-
+            <div class="media-container">
+<video src="{{ url_for('static', filename='gallery/test_vid.mp4')}}" onclick="expandMedia(this)" type="video/mp4" controls></video>
 </div>
+</div>
+    <div class="pop" id="pop" onclick="closeOverlay()">
+        <img id="pop-media" src="" style="display: none;">
+        <video id="pop-video" src="" style="display: none;" controls></video>
+    </div>
         </div>
     </div>
     <div class="line-1"></div>
