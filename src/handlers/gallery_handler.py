@@ -26,7 +26,7 @@ class GalleryHandler(Handler):
         # Define the CRON job details
         cron_job = "*/5 * * * * /home/pi/google_hps_dap_controller/src/.venv/bin/python D:/GitHub/google_hps_dap_controller/src/gallery/cron.py"
         cron_file = "/tmp/mycron"
-        setup_cron_job()
+        self.setup_cron_job()
         print("CRON job has been set up.")
 
         self.run_server = False

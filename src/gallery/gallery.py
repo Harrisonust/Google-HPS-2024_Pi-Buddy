@@ -142,27 +142,27 @@ def create_gallery_html():
     
     if battery_handler.battery_charging.reveal():
         if battery_handler.battery_level.reveal()>80:
-            html_content += '<img class="battery" src="icons/battery5c.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery5c.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>60:
-            html_content += '<img class="battery" src="icons/battery4c.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery4c.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>40:
-            html_content += '<img class="battery" src="icons/battery3c.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery3c.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>20:
-            html_content += '<img class="battery" src="icons/battery2c.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery2c.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>0:
-            html_content += '<img class="battery" src="icons/battery1c.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery1c.png" alt="Battery">\n'
     
     else:
         if battery_handler.battery_level.reveal()>80:
-            html_content += '<img class="battery" src="icons/battery5.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery5.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>60:
-            html_content += '<img class="battery" src="icons/battery4.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery4.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>40:
-            html_content += '<img class="battery" src="icons/battery3.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery3.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>20:
-            html_content += '<img class="battery" src="icons/battery2.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery2.png" alt="Battery">\n'
         elif battery_handler.battery_level.reveal()>0:
-            html_content += '<img class="battery" src="icons/battery1.png" alt="Battery">\n'
+            html_content += '<img class="battery" src="/home/pi/google_hps_dap_controller/src/gallery/icons/battery1.png" alt="Battery">\n'
         
     html_content += '''
             </a>
@@ -170,7 +170,7 @@ def create_gallery_html():
         </div>
 
         <div class="pibuddy-container">
-        <img class="pibuddy" src="icons/pibuddy-left.png" alt="Pibuddy" />
+        <img class="pibuddy" src="/home/pi/google_hps_dap_controller/src/gallery/icons/pibuddy-left.png" alt="Pibuddy" />
         <div class="container">
             <div class="gallery-section">
             <div class="section-title">Images</div>
@@ -181,8 +181,8 @@ def create_gallery_html():
     video_count = 0
 
     # Loop through files in the directory and add images
-    for file_name in os.listdir('src/images'):
-        file_path = os.path.join('../images', file_name)
+    for file_name in os.listdir('/home/pi/google_hps_dap_controller/src/images'):
+        file_path = os.path.join('/home/pi/google_hps_dap_controller/src/images', file_name)
         if os.path.isfile(file_path):
             ext = os.path.splitext(file_name)[1].lower()
             if ext in IMAGE_EXTENSIONS:
@@ -203,8 +203,8 @@ def create_gallery_html():
     '''
 
     # Loop through files in the directory and add videos
-    for file_name in os.listdir('src/videos'):
-        file_path = os.path.join('../videos', file_name)
+    for file_name in os.listdir('/home/pi/google_hps_dap_controller/src/videos'):
+        file_path = os.path.join('/home/pi/google_hps_dap_controller/src/gallery/videos', file_name)
         if os.path.isfile(file_path):
             ext = os.path.splitext(file_name)[1].lower()
             if ext in VIDEO_EXTENSIONS:
