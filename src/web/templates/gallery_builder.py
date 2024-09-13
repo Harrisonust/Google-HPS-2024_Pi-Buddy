@@ -1,10 +1,13 @@
 import os
+import shutil
 
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
 VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg']
 
-GALLERY_FOLDER = 'd:/HPS/web/web/templates/'  # '/home/pi/image_gallery'
-HTML_FILE = os.path.join(GALLERY_FOLDER, 'index2.html')
+GALLERY_FOLDER = '/home/pi/google_hps_dap_controller/src/web/static/gallery/'  # '/home/pi/image_gallery'
+VIDEO_FOLDER = '/home/pi/google_hps_dap_controller/src/images'
+IMAGE_FOLDER = '/home/pi/google_hps_dap_controller/src/images'
+HTML_FILE = '/home/pi/google_hps_dap_controller/src/web/templates/index.html'
 
 def create_gallery_html():
     html_content = '''
@@ -46,6 +49,27 @@ def create_gallery_html():
         }
         </style>
         <script>
+        function expandMedia(mediaElement) {
+            const pop = document.getElementById('pop');
+            const popImage = document.getElementById('pop-media');
+            const popVideo = document.getElementById('pop-video');
+
+            if (mediaElement.tagName === 'IMG') {
+                popImage.src = mediaElement.src;
+                popImage.style.display = 'block';
+                popVideo.style.display = 'none';
+            } else if (mediaElement.tagName === 'VIDEO') {
+                popVideo.src = mediaElement.src;
+                popVideo.style.display = 'block';
+                popImage.style.display = 'none';
+            }
+
+            pop.style.display = 'flex';
+        }
+        function closeOverlay() {
+            const pop = document.getElementById('pop');
+            pop.style.display = 'none';
+        }
         function showMenu() {
             const overlay = document.getElementById('overlay');
             const xhr = new XMLHttpRequest();
@@ -105,22 +129,23 @@ def create_gallery_html():
             <img class="battery" src="{{ url_for('static', filename='icons/battery-5-10.png') }}" alt="Battery Button" />
         </a>
         <div class="group-2">
-            <div class="rectangle-2"></div>
             <div class="gallery">Gallery</div>
             <div class="gallery-container">
             <div class="gallery-section images">
                 <h2>Images</h2>
+                <div class="media-container">
     '''
 
     image_count = 0
     video_count = 0
 
     # Loop through files in the directory and add images
-    for file_name in os.listdir(GALLERY_FOLDER):
-        file_path = os.path.join(GALLERY_FOLDER, file_name)
+    for file_name in os.listdir(IMAGE_FOLDER):
+        file_path = os.path.join(IMAGE_FOLDER, file_name)
         if os.path.isfile(file_path):
             ext = os.path.splitext(file_name)[1].lower()
             if ext in IMAGE_EXTENSIONS:
+                shutil.copy(file_path, GALLERY_FOLDER)
                 html_content += '<img src="{{ url_for(\'static\', filename=\'gallery/'
                 html_content += f'{file_name}\')' 
                 html_content += '}}'
@@ -134,14 +159,17 @@ def create_gallery_html():
     # Add the video section
     html_content += '''
             </div>
-            <div class="gallery-section videos">
-                <h2>Videos</h2>
+        </div>
+        <div class="gallery-section videos">
+            <h2>Videos</h2>
+            <div class="media-container">
     '''
 
     # Loop through files in the directory and add videos
-    for file_name in os.listdir(GALLERY_FOLDER):
-        file_path = os.path.join(GALLERY_FOLDER, file_name)
+    for file_name in os.listdir(VIDEO_FOLDER):
+        file_path = os.path.join(VIDEO_FOLDER, file_name)
         if os.path.isfile(file_path):
+            shutil.copy(file_path, GALLERY_FOLDER)
             ext = os.path.splitext(file_name)[1].lower()
             if ext in VIDEO_EXTENSIONS:
                 html_content += '<video controls><source src="{{ url_for(\'static\', filename=\'gallery/'
@@ -159,18 +187,23 @@ def create_gallery_html():
     # Close the gallery divs and add the footer
     html_content += '''
     </div>
+    </div>
+        <div class="pop" id="pop" onclick="closeOverlay()">
+            <img id="pop-media" src="" style="display: none;">
+            <video id="pop-video" src="" style="display: none;" controls></video>
+        </div>
             </div>
         </div>
         <div class="line-1"></div>
         <div class="line-2"></div>
 
-        <button class="remote-button" onclick="openOverlay()">
+        <button class="remote-button" onclick="showMenu()">
             <div class="rectangle-4">
             <div class="menu">Menu</div>
             </div>
         </button>
 
-        <button class="remote-button" onclick="openOverlay()">
+        <button class="remote-button" onclick="showJoystick()">
             <div class="rectangle-42">
             <div class="remote-control">
                 Remote
@@ -179,6 +212,7 @@ def create_gallery_html():
             </div>
             </div>
         </button>
+        <div id="overlay" class="overlay"> </div>
         <footer class="footer">� Your Pibuddy gallery. @ Google HPS team4.</footer>
     </body>
     </html>
