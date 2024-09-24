@@ -33,8 +33,9 @@ Once a widget is selected:
 
 3. Flexible Navigation
 Whether using voice commands or the rotary encoder, Pi-Buddy provides an intuitive and smooth experience, switching seamlessly between widgets while always returning to its default emotional display.
-![Audio Handler](resources/WidgetsHandler.jpg)
-
+<div align="center">
+<img src="resources/WidgetsHandler.jpg" width="75%" />
+</div>
 
 ### AudioHandler: How Pi-Buddy Listens and Responds
 Pi-Buddy is equipped with an advanced audio handler, enabling it to both respond to commands and engage in conversation. Whether you're giving it a task or simply chatting, Pi-Buddy's audio system ensures smooth, natural communication.
@@ -51,7 +52,9 @@ Pi-Buddy determines if you're giving a command (like setting a timer or asking f
 4. Continuous Listening
 Once Pi-Buddy completes its task or response, it goes back to listening mode, ready for the next interaction.
 
-![Audio Handler](resources/AudioHandler.jpg)
+<div align="center">
+<img src="resources/AudioHandler.jpg" width="75%" />
+</div>
 
 ### EmotionHandler: How Pi-Buddy Reacts to Its Environment
 Pi-Buddy doesn’t just follow commands—it feels! The Emotion Engine allows Pi-Buddy to sense its environment and adapt its mood, giving it a personality that changes with the time of day, weather, or even sudden loud noises.
@@ -73,19 +76,25 @@ Pi-Buddy’s emotion engine processes inputs from:
     * LLM QA to interact and respond emotionally during conversations.
 
 By continuously sensing its surroundings and adjusting its mood, Pi-Buddy becomes more than just a robot—it becomes a responsive companion with a range of emotions.
-![Audio Handler](resources/EmotionEngine.jpg)
+
+<div align="center">
+<img src="resources/EmotionEngine.jpg" width="65%" />
+</div>
 
 ## Hardware
-![Hardware Architecture](resources/DesktopAssistantPetHardwareBlocks.jpg)
+<div align="center">
+<img src="resources/DesktopAssistantPetHardwareBlocks.jpg" width="85%" />
+</div>
+
 ### Components Used
-• Display: Waveshare ST7735S 1.8 inches LCD Display (SPI)
-• Camera: Raspberry Pi Camera OV5647 (MIPI-CSI2)
-• Speaker & Microphone: Seeed Studio ReSpeaker 2-Mic Hat (I2S + I2C)
-• Battery & PMIC: PiSugar3 (I2C)
-• Motor Driver: TB6612FNG (GPIO + PWM)
-• Motors: DFRobot Metal DC Geared Motor w/Encoder - 6V 210RPM 10Kg\.cm
-• Encoders(GPIO)
-• Distance Sensors: ToF (I2C) for obstacle avoidance and IR (GPIO) for fall prevention
+* Display: Waveshare ST7735S 1.8 inches LCD Display (SPI)
+* Camera: Raspberry Pi Camera OV5647 (MIPI-CSI2)
+* Speaker & Microphone: Seeed Studio ReSpeaker 2-Mic Hat (I2S + I2C)
+* Battery & PMIC: PiSugar3 (I2C)
+* Motor Driver: TB6612FNG (GPIO + PWM)
+* Motors: DFRobot Metal DC Geared Motor w/Encoder - 6V 210RPM 10Kg\.cm
+* Encoders(GPIO)
+* Distance Sensors: ToF (I2C) for obstacle avoidance and IR (GPIO) for fall prevention
 
 Most of the components use custom drivers written with RPi.GPIO, spidev, and smbus2 libraries for interfacing.
 
