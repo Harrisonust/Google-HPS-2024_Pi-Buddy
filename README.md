@@ -2,6 +2,9 @@
 
 ## Briefing
 Pi-Buddy is an advanced robot powered by Raspberry Pi Zero 2W and equipped with multiple sensors. It offers features such as note-taking, photo capture, meeting recording, to-do management, weather updates, and voice interaction. It also responds emotionally, adjusting its mood based on user interactions and environments.
+<div align="center">
+<img src="resources/PiBuddy.jpeg" width="75%" />
+</div>
 
 ## Software
 ## System Overview
