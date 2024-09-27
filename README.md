@@ -7,7 +7,7 @@ Pi-Buddy is an advanced robot powered by Raspberry Pi Zero 2W and equipped with 
 </div>
 
 ## Software
-## System Overview
+### System Overview
 The system operates with three main threads that manage user interactions: 
 * AudioHandler
 * MenuScreenHandler (WidgetHandler)
@@ -101,7 +101,7 @@ By continuously sensing its surroundings and adjusting its mood, Pi-Buddy become
 
 Most of the components use custom drivers written with RPi.GPIO, spidev, and smbus2 libraries for interfacing.
 
-### Pin definitions
+### Pin Definitions
 |Connection|BCM|Physical|Physical|BCM|Connection|
 |---|---|---|---|---|---|
 |X|3.3V|1|2|5V|X|
